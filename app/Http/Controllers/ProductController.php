@@ -140,64 +140,70 @@ class ProductController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
-    {
-        try {
-            $validated = $request->validate([
-                'category_id' => 'sometimes|exists:categories,id',
-                'supplier_id' => 'sometimes|exists:suppliers,id',
-                'name' => 'sometimes|string',
-                'sku' => 'required|string|max:100|unique:products,sku,' . $product->id,
-                'description' => 'nullable|string',
-                'purchase_price' => 'sometimes|numeric',
-                'selling_price' => 'sometimes|numeric',
-                'image' => 'nullable|string',
-                'min_stock' => 'sometimes|integer'
-            ]);
+   public function update(Request $request, $id)
+{
+    try {
+        // Cari produk dulu
+        $product = $this->productService->findById($id);
 
-            $product = $this->productService->update($id, $validated);
-
-           if (!$product) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Produk tidak ditemukan',
-                    'error' => "Produk dengan ID {$id} tidak ada dalam database",
-                    'code' => 'PRODUCT_NOT_FOUND'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Produk berhasil diperbarui!',
-                'data' => [
-                    'product' => $product,
-                    'updated_at' => now()->format('Y-m-d H:i:s'),
-                    'updated_fields' => array_keys($validated),
-                    'total_updated_fields' => count($validated)
-                ],
-                'meta' => [
-                    'endpoint' => "/api/products/{$id}",
-                    'method' => 'PUT/PATCH',
-                    'description' => 'Memperbarui data produk berdasarkan ID'
-                ]
-            ], 200);
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        if (!$product) {
             return response()->json([
                 'success' => false,
-                'message' => 'Data yang dikirim tidak valid',
-                'errors' => $e->errors(),
-                'code' => 'VALIDATION_ERROR'
-            ], 422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal memperbarui produk',
-                'error' => 'Terjadi kesalahan pada server saat mengupdate data',
-                'code' => 'UPDATE_PRODUCT_ERROR'
-            ], 500);
+                'message' => 'Produk tidak ditemukan',
+                'error' => "Produk dengan ID {$id} tidak ada dalam database",
+                'code' => 'PRODUCT_NOT_FOUND'
+            ], 404);
         }
+
+        // Validasi
+        $validated = $request->validate([
+            'category_id'   => 'sometimes|exists:categories,id',
+            'supplier_id'   => 'sometimes|exists:suppliers,id',
+            'name'          => 'sometimes|string',
+            'sku'           => 'required|string|max:100|unique:products,sku,' . $product->id,
+            'description'   => 'nullable|string',
+            'purchase_price'=> 'sometimes|numeric',
+            'selling_price' => 'sometimes|numeric',
+            'image'         => 'nullable|string',
+            'min_stock'     => 'sometimes|integer'
+        ]);
+
+        // Update data
+        $updatedProduct = $this->productService->update($id, $validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Produk berhasil diperbarui!',
+            'data' => [
+                'product' => $updatedProduct,
+                'updated_at' => now()->format('Y-m-d H:i:s'),
+                'updated_fields' => array_keys($validated),
+                'total_updated_fields' => count($validated)
+            ],
+            'meta' => [
+                'endpoint' => "/api/products/{$id}",
+                'method' => 'PUT/PATCH',
+                'description' => 'Memperbarui data produk berdasarkan ID'
+            ]
+        ], 200);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Data yang dikirim tidak valid',
+            'errors' => $e->errors(),
+            'code' => 'VALIDATION_ERROR'
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal memperbarui produk',
+            'error' => 'Terjadi kesalahan pada server saat mengupdate data',
+            'code' => 'UPDATE_PRODUCT_ERROR'
+        ], 500);
     }
+}
+
 
     public function destroy($id)
     {

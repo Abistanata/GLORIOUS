@@ -5,7 +5,12 @@
 @section('page-description', 'Silakan masuk dengan kredensial Anda untuk mengakses dashboard')
 
 @section('content')
-<form id="loginForm" class="space-y-6">
+<form 
+    id="loginForm" 
+    method="POST" 
+    action="{{ route('login.process') }}" 
+    class="space-y-6"
+>
     @csrf
 
     <div id="alertContainer" class="hidden"></div>

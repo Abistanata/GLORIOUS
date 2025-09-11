@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Services\CategoryService;
 use Illuminate\Http\Request;
+use App\Models\Category;
+
+
 
 class CategoryController extends Controller
 {
@@ -17,6 +20,9 @@ class CategoryController extends Controller
     public function index()
     {
         return response()->json($this->service->getAll());
+        
+        $categories = Category::all(['id', 'name']);
+    return view('main.dashboard', compact('categories'));
     }
 
     public function store(Request $request)
@@ -30,6 +36,8 @@ class CategoryController extends Controller
         return response()->json($category, 201);
     }
 
+  
+    
     public function show($id)
     {
         return response()->json($this->service->findById($id));

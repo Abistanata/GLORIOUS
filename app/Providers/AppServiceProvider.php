@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Repositories\SupplierRepository;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View; // ✅ ini penting
+use App\Models\Category; // ✅ tambahin titik koma
 
 // Repositories & Interfaces
 use App\Repositories\UserRepository;
@@ -28,11 +30,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->bind(SupplierRepositoryInterface::class, SupplierRepository::class);
         $this->app->bind(ProductAttributeRepositoryInterface::class, ProductAttributeRepository::class);
-        $this->app->bind(StockTransactionRepositoryInterface::class,  StockTransactionRepository::class);
+        $this->app->bind(StockTransactionRepositoryInterface::class, StockTransactionRepository::class);
     }
 
     public function boot(): void
     {
-        //
+        // Supaya $categories tersedia di semua view
+        View::composer('*', function ($view) {
+            $view->with('categories', Category::all());
+        });
     }
 }

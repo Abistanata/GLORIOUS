@@ -13,6 +13,8 @@ use App\Http\Controllers\StaffReportController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\StaffDashboardController;
 use App\Http\Controllers\ManagerDashboardController;
+use App\Http\Controllers\ServiceController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -25,34 +27,54 @@ use App\Http\Controllers\ManagerDashboardController;
 // ===================================
 
 Route::get('/', function () {
-    if (auth()->check()) {
-        $user = auth()->user();
-        return redirect(match ($user->role) {
-            'Admin'          => route('admin.dashboard'),
-            'Manajer Gudang' => route('manajergudang.dashboard'),
-            'Staff Gudang'   => route('staff.dashboard'),
-            default          => '/login',
-        });
-    }
-    return view('layouts.welcome');
-})->name('welcome');
+    return view('main.dashboard.index');
+})->name('main.dashboard');
 
-// GUEST ROUTES
-Route::middleware('guest')->group(function () {
-    Route::get('/login', fn() => view('auth.login'))->name('login');
-    Route::get('/register', fn() => view('auth.register'))->name('register');
+Route::view('/about', 'about')->name('about');
+Route::get('/services', [ServiceController::class, 'index'])->name('main.services.index');
+
+// Items (kategori dinamis dari database)
+Route::prefix('items')->name('items.')->group(function () {
+    // Produk berdasarkan kategori
+    Route::get('/category/{id}', [ProductController::class, 'byCategory'])->name('category');
+
+    // Produk lainnya (yang tidak masuk kategori utama)
+    Route::get('/lainnya', [ProductController::class, 'lainnya'])->name('lainnya');
 });
 
-// Auth actions (available for all)
-Route::post('/login', [AuthController::class, 'login'])->name('login.process');
-Route::post('/login/simple', [AuthController::class, 'simpleLogin'])->name('login.simple'); // Fallback
-Route::post('/register', [AuthController::class, 'register'])->name('register.process');
 
-// Auth actions (require authentication)
-Route::middleware('auth')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/me', [AuthController::class, 'me'])->name('auth.me');
-});
+Route::prefix('stockify')->group(function () {
+    Route::get('/', function () {
+        if (auth()->check()) {
+            $user = auth()->user();
+            return redirect(match ($user->role) {
+                'Admin'          => route('admin.dashboard'),
+                'Manajer Gudang' => route('manajergudang.dashboard'),
+                'Staff Gudang'   => route('staff.dashboard'),
+                default          => route('login'),
+            });
+        }
+
+        return view('layouts.welcome');
+    })->name('welcome');
+
+    });
+    // GUEST ROUTES
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', fn() => view('auth.login'))->name('login');
+        Route::get('/register', fn() => view('auth.register'))->name('register');
+    });
+
+    // Auth actions (available for all)
+    Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+    Route::post('/login/simple', [AuthController::class, 'simpleLogin'])->name('login.simple');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.process');
+
+    // Auth actions (require authentication)
+    Route::middleware('auth')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+        Route::get('/me', [AuthController::class, 'me'])->name('auth.me');
+    });
 
 // ===================================
 // ADMIN ROUTES
