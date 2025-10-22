@@ -40,7 +40,7 @@
                 <a href="{{ route('main.dashboard') }}" class="hover:underline">Home</a>
             </li>
             <li>
-                <a href="{{ route('about') }}" class="hover:underline">About Us</a>
+                <a href="{{ route('main.about.index') }}" class="hover:underline">About Us</a>
             </li>
             <li class="relative group cursor-pointer">
                 <span class="flex items-center gap-1">
@@ -89,7 +89,7 @@
 {{-- 📱 Mobile Menu --}}
 <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 shadow-md">
     <a href="{{ route('main.dashboard') }}" class="block px-4 py-2 hover:bg-orange-100 dark:hover:bg-gray-700">Home</a>
-    <a href="{{ route('about') }}" class="block px-4 py-2 hover:bg-orange-100 dark:hover:bg-gray-700">About Us</a>
+    <a href="{{ route('main.about.index') }}" class="block px-4 py-2 hover:bg-orange-100 dark:hover:bg-gray-700">About Us</a>
     <a href="{{ route('main.services.index') }}" class="block px-4 py-2 hover:bg-orange-100 dark:hover:bg-gray-700">Services</a>
 
     <div class="border-t my-2 border-gray-300 dark:border-gray-700"></div>
@@ -119,78 +119,76 @@
 
 
 {{-- ⚡ Footer --}}
-<footer class="bg-[#1a1a1a] py-12 mt-0">
-   <div class="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-xs text-gray-400">
-        {{-- Company Info --}}
-        <div class="space-y-4">
-            <div class="flex items-center space-x-2">
-                <img src="images/logo.png" 
-                     alt="Glorious Computer Logo" 
-                     class="w-10 h-10 object-contain">
-                <span class="text-xs font-semibold tracking-widest leading-tight text-white">
-                    GLORIOUS <br> COMPUTER
-                </span>
-            </div>
-            <p class="leading-relaxed">
-                Solusi perangkat komputer, printer, dan aksesoris terbaik dengan harga terjangkau.
-            </p>
-            <div class="flex space-x-4 text-white">
-                <a href="#" aria-label="Facebook" class="hover:text-gray-300">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" aria-label="Instagram" class="hover:text-gray-300">
-                    <i class="fab fa-instagram"></i>
-                </a>
-                <a href="#" aria-label="WhatsApp" class="hover:text-gray-300">
-                    <i class="fab fa-whatsapp"></i>
-                </a>
-            </div>
-        </div>
-
-        {{-- Navigation --}}
-        <div>
-            <h3 class="font-semibold mb-4 text-white">Navigasi</h3>
-            <ul class="space-y-2">
-                {{-- 🔽 Loop kategori dari database --}}
-               
-                    @foreach($categories as $category)
-                        <li>
-                            <a href="{{ route('items.category', $category->id) }}" class="hover:text-white">
-                                {{ $category->name }}
-                            </a>
+<!-- Footer -->
+    <footer class="bg-darker py-12 border-t border-gray-700">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Glorious Computer</h3>
+                    <p class="text-gray-400 mb-4">
+                        Solusi teknologi dan service terpercaya untuk komputer, laptop, dan perangkat elektronik.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors text-xl">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors text-xl">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors text-xl">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors text-xl">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Layanan</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">Service Hardware</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">Software & Installasi</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">Konsultasi IT</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">Perawatan Berkala</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Tautan Cepat</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#about" class="text-gray-400 hover:text-primary transition-colors">Tentang Kami</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Layanan</a></li>
+                        <li><a href="#produk" class="text-gray-400 hover:text-primary transition-colors">Produk</a></li>
+                        <li><a href="#testimoni" class="text-gray-400 hover:text-primary transition-colors">Testimoni</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-primary transition-colors">Kontak</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Kontak</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-primary"></i>
+                            <span>Jl. Argandaru No.4, Bukateja, Purbalingga</span>
                         </li>
-                    @endforeach
-                    
-
-                <li><a href="{{ route('main.services.index') }}" class="hover:text-white">Layanan</a></li>
-                <li><a href="{{ route('about') }}" class="hover:text-white">Kontak</a></li>
-            </ul>
+                        <li class="flex items-start">
+                            <i class="fas fa-phone-alt mt-1 mr-3 text-primary"></i>
+                            <span>0821-3380-3940</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope mt-1 mr-3 text-primary"></i>
+                            <span>gloriouscomputer@email.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-500">
+                <p>&copy; 2023 Glorious Computer. All rights reserved.</p>
+            </div>
         </div>
-
-        {{-- Contact --}}
-        <div>
-            <h3 class="font-semibold mb-4 text-white">Hubungi Kami</h3>
-            <ul class="space-y-3">
-                <li class="flex items-center space-x-3">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Jl. Argandaru No.4, Bukateja, Purbalingga</span>
-                </li>
-                <li class="flex items-center space-x-3">
-                    <i class="fab fa-whatsapp"></i>
-                    <span>+62 821-3380-3940</span>
-                </li>
-                <li class="flex items-center space-x-3">
-                    <i class="fas fa-envelope"></i>
-                    <span>support@gloriouscomputer.com</span>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <p class="text-center text-gray-500 text-[10px] mt-12 select-none">
-        © {{ date('Y') }} Glorious Computer | All Rights Reserved
-    </p>
-</footer>
+    </footer>
 
     {{-- 🔧 JS --}}
     <script>

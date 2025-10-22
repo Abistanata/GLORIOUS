@@ -14,6 +14,9 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\StaffDashboardController;
 use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\Main\AboutController;
+
+
 
 
 /*
@@ -30,7 +33,8 @@ Route::get('/', function () {
     return view('main.dashboard.index');
 })->name('main.dashboard');
 
-Route::view('/about', 'about')->name('about');
+Route::get('/about', [AboutController::class, 'index'])->name('main.about.index');
+
 Route::get('/services', [ServiceController::class, 'index'])->name('main.services.index');
 
 // Items (kategori dinamis dari database)
