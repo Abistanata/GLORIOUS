@@ -15,6 +15,8 @@ use App\Http\Controllers\StaffDashboardController;
 use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\Main\AboutController;
+use App\Http\Controllers\Main\ProductsController;
+use App\Http\Controllers\Main\DashboardsController;
 
 
 
@@ -29,22 +31,16 @@ use App\Http\Controllers\Main\AboutController;
 // HALAMAN UTAMA & AUTENTIKASI
 // ===================================
 
-Route::get('/', function () {
-    return view('main.dashboard.index');
-})->name('main.dashboard');
+Route::get('/', [DashboardsController::class, 'index'])->name('main.dashboard.index');
 
 Route::get('/about', [AboutController::class, 'index'])->name('main.about.index');
 
 Route::get('/services', [ServiceController::class, 'index'])->name('main.services.index');
 
-// Items (kategori dinamis dari database)
-Route::prefix('items')->name('items.')->group(function () {
-    // Produk berdasarkan kategori
-    Route::get('/category/{id}', [ProductController::class, 'byCategory'])->name('category');
-
-    // Produk lainnya (yang tidak masuk kategori utama)
-    Route::get('/lainnya', [ProductController::class, 'lainnya'])->name('lainnya');
-});
+// Atau lebih sederhana:
+Route::get('/products', [App\Http\Controllers\Main\ProductsController::class, 'index'])->name('main.products.index');
+Route::get('/products/category/{category_id}', [App\Http\Controllers\Main\ProductsController::class, 'index'])->name('main.products.category');
+Route::get('/products/{id}', [App\Http\Controllers\Main\ProductsController::class, 'show'])->name('main.products.show');
 
 
 Route::prefix('stockify')->group(function () {

@@ -1036,7 +1036,7 @@ footer::before {
         <div class="container">
             <div class="hero-content-about animate">
                 <h1>Tentang <span>Glorious Computer</span></h1>
-                <p>Lebih dari 10 tahun menjadi partner terpercaya dalam solusi teknologi dan service komputer di Purbalingga dan sekitarnya.</p>
+                <p>Lebih dari 20 tahun menjadi partner terpercaya dalam solusi teknologi dan service komputer di Purbalingga dan sekitarnya.</p>
                 <a href="#story" class="cta-button-about">Jelajahi Cerita Kami</a>
                 
                 <div class="hero-stats">
@@ -1071,7 +1071,7 @@ footer::before {
             <div class="about-content">
                 <div class="about-text animate">
                     <h2>Visi & Misi Perusahaan</h2>
-                    <p>Glorious Computer didirikan pada tahun 2013 dengan visi untuk menjadi penyedia solusi teknologi terdepan di Purbalingga. Berawal dari sebuah bengkel kecil di Jl. Argandaru, kami telah berkembang menjadi perusahaan yang melayani ratusan klien dari berbagai sektor.</p>
+                    <p>Glorious Computer didirikan pada tahun 2005 dengan visi untuk menjadi penyedia solusi teknologi terdepan di Purbalingga. Berawal dari sebuah bengkel kecil di Jl. Argandaru, kami telah berkembang menjadi perusahaan yang melayani ratusan klien dari berbagai sektor.</p>
                     <p>Dengan komitmen pada kualitas dan kepuasan pelanggan, kami terus berinovasi dalam memberikan layanan terbaik untuk komputer, laptop, dan printer. Setiap teknisi kami memiliki sertifikasi dan pengalaman yang memadai untuk menangani berbagai masalah teknologi.</p>
                     <div class="stats">
                         <div class="stat-item">
@@ -1226,7 +1226,7 @@ footer::before {
     <section class="cta-section">
         <div class="container">
             <h2 class="animate">Percayakan Teknologi Anda Pada Kami</h2>
-            <p class="animate">Dengan pengalaman lebih dari 10 tahun, kami siap memberikan solusi terbaik untuk semua kebutuhan teknologi Anda.</p>
+            <p class="animate">Dengan pengalaman lebih dari 20 tahun, kami siap memberikan solusi terbaik untuk semua kebutuhan teknologi Anda.</p>
             <div class="cta-buttons">
                 <a href="{{ route('main.services.index') }}" class="btn btn-primary animate">Lihat Layanan</a>
                 <a href="#kontak" class="btn btn-secondary animate">Hubungi Kami</a>

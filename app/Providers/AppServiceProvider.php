@@ -35,8 +35,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Supaya $categories tersedia di semua view
+         // Share categories to all views
         View::composer('*', function ($view) {
+            $view->with('categories', Category::all());
+        });
+
+        // Or only to specific views (more efficient)
+        View::composer(['layouts.theme', 'components.navbar'], function ($view) {
             $view->with('categories', Category::all());
         });
     }

@@ -716,7 +716,7 @@
                 </h2>
                 
                 <p class="hero-tagline-modern">
-                    Partner terpercaya untuk kebutuhan komputer, laptop, dan service elektronik. 
+                    Partner terpercaya untuk kebutuhan komputer, laptop, printer dan servis. 
                     Kami hadir untuk mendukung bisnis & personal Anda dengan layanan profesional 
                     dan solusi teknologi terdepan.
                 </p>
@@ -791,7 +791,7 @@
                 </div>
                 <div class="relative">
                     <div class="bg-gray-light rounded-2xl p-8 card-hover border border-gray-700">
-                        <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Workshop Kami" class="rounded-xl shadow-lg w-full">
+                        <img src="images/background.jpg" alt="Workshop Kami" class="rounded-xl shadow-lg w-full">
                     </div>
                 </div>
             </div>
@@ -846,7 +846,7 @@
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3 text-sm"></i>
-                        <span>Penggantian komponen asli</span>
+                        <span>Penggantian Sparepart </span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3 text-sm"></i>
@@ -854,7 +854,19 @@
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3 text-sm"></i>
+                        <span>Perbaikan engsel & speaker laptop</span>
+                    </li>
+                    {{-- <li class="flex items-center">
+                        <i class="fas fa-check text-primary mr-3 text-sm"></i>
                         <span>Cleaning dan perawatan rutin</span>
+                    </li> --}}
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-primary mr-3 text-sm"></i>
+                        <span>Perbaikan Laptop mati & Motherboard</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-primary mr-3 text-sm"></i>
+                        <span>Upgrade Agar performa laptop makin ngebut, NO LEMOT!</span>
                     </li>
                 </ul>
                 <div class="mt-6 text-center">
@@ -872,7 +884,7 @@
                 </div>
                 <h3 class="text-xl font-bold mb-4 text-center group-hover:text-primary transition-colors duration-300">Install Software</h3>
                 <p class="text-gray-400 mb-6 text-center">
-                    Instalasi software original, update sistem operasi, dan konfigurasi perangkat lunak sesuai kebutuhan Anda. Kami pastikan software berjalan lancar dan aman.
+                    Instalasi software, update sistem operasi, dan konfigurasi perangkat lunak sesuai kebutuhan Anda. Kami pastikan software berjalan lancar dan aman.
                 </p>
                 <ul class="space-y-2 text-gray-300">
                     <li class="flex items-center">
@@ -907,24 +919,24 @@
                 </div>
                 <h3 class="text-xl font-bold mb-4 text-center group-hover:text-primary transition-colors duration-300">Perbaikan Printer</h3>
                 <p class="text-gray-400 mb-6 text-center">
-                    Servis lengkap printer inkjet dan laserjet, termasuk penggantian sparepart, cleaning head, dan kalibrasi agar hasil cetak selalu optimal.
+                    Servis lengkap printer inkjet, laserjet, dotmatrik. Mengkondisikan printer selalu siap digunakan dengan hasil yang optimal.
                 </p>
                 <ul class="space-y-2 text-gray-300">
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3 text-sm"></i>
-                        <span>Perbaikan hardware printer</span>
+                        <span>Perbaikan hasil cetak</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3 text-sm"></i>
-                        <span>Penggantian sparepart asli</span>
+                        <span>Reset Counter </span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3 text-sm"></i>
-                        <span>Cleaning dan kalibrasi head</span>
+                        <span>Paper jam & kertas tidak lancar</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3 text-sm"></i>
-                        <span>Optimasi hasil cetak</span>
+                        <span>Normalisasi kinerja printer</span>
                     </li>
                 </ul>
                 <div class="mt-6 text-center">
@@ -947,7 +959,11 @@
                 <ul class="space-y-2 text-gray-300">
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3 text-sm"></i>
-                        <span>Upgrade RAM & Storage</span>
+                        <span>Upgrade SSD</span>
+                    </li>
+                    <li class="flex items-center">
+                        <i class="fas fa-check text-primary mr-3 text-sm"></i>
+                        <span>Upgrade RAM</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-check text-primary mr-3 text-sm"></i>
@@ -1036,49 +1052,136 @@
     </div>
 </section>
 
-    <!-- Products Section -->
-    <section id="produk" class="py-20 bg-darker">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold mb-6 section-title">
-                    Produk Unggulan
-                </h2>
-                <p class="text-gray-400 max-w-2xl mx-auto text-lg">
-                    Temukan produk teknologi terbaik dengan kualitas terjamin dan harga kompetitif untuk kebutuhan Anda.
-                </p>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach (range(1,6) as $i)
-                <div class="bg-dark rounded-2xl overflow-hidden card-hover border border-gray-700">
-                    <div class="h-48 overflow-hidden">
-                        <img src="{{ asset('images/produk'.$i.'.jpg') }}" alt="Produk {{ $i }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2">Produk {{ $i }}</h3>
-                        <p class="text-gray-400 mb-4 text-sm">
-                            Deskripsi singkat produk {{ $i }} dengan spesifikasi dan keunggulan yang ditawarkan.
-                        </p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-primary font-bold text-lg">Rp{{ number_format(100000 * $i,0,',','.') }}</span>
-                            <button class="bg-primary hover:bg-primary-dark text-white font-semibold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105">
-                                Beli Sekarang
-                            </button>
+   <!-- Products Section -->
+<section id="produk" class="py-20 bg-darker">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6 section-title">
+                Produk Unggulan
+            </h2>
+            <p class="text-gray-400 max-w-2xl mx-auto text-lg">
+                Tersedia Unit Second Laptop, PC, dan Printer.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            @if(isset($products) && $products->count() > 0)
+                @foreach($products as $product)
+                    @php
+                        $currentStock = $product->current_stock;
+                    @endphp
+                    <div class="bg-dark rounded-2xl overflow-hidden card-hover border border-gray-700 transition-all duration-300 hover:border-primary">
+                        <!-- Product Image -->
+                        <div class="h-48 overflow-hidden bg-gray-700 relative">
+                            @if($product->image && Storage::exists($product->image))
+                                <img src="{{ asset('storage/' . $product->image) }}" 
+                                     alt="{{ $product->name }}"
+                                     class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <i class="fas fa-laptop text-5xl text-gray-500"></i>
+                                </div>
+                            @endif
+                            
+                            <!-- Stock Badge -->
+                            <div class="absolute top-4 right-4">
+                                @if($currentStock > 10)
+                                    <span class="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                                        <i class="fas fa-check mr-1"></i>Tersedia
+                                    </span>
+                                @elseif($currentStock > 0)
+                                    <span class="bg-yellow-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                                        <i class="fas fa-exclamation mr-1"></i>Menipis
+                                    </span>
+                                @else
+                                    <span class="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                                        <i class="fas fa-times mr-1"></i>Habis
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <!-- Category -->
+                            <div class="mb-2">
+                                <span class="text-primary text-sm font-medium">
+                                    {{ $product->category->name ?? 'Uncategorized' }}
+                                </span>
+                            </div>
+                            
+                            <!-- Product Name -->
+                            <h3 class="text-xl font-bold text-white mb-2">{{ $product->name }}</h3>
+                            
+                            <!-- Description -->
+                            <p class="text-gray-400 mb-4 text-sm line-clamp-2">
+                                {{ $product->description ?: 'Produk berkualitas dari Glorious Computer.' }}
+                            </p>
+                            
+                            <!-- Specifications -->
+                            <div class="space-y-1 mb-4 text-xs text-gray-400">
+                                <div class="flex justify-between">
+                                    <span>SKU:</span>
+                                    <span class="text-white">{{ $product->sku ?? 'N/A' }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Stok:</span>
+                                    <span class="text-white">{{ $currentStock }} {{ $product->unit ?? 'pcs' }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Price and Action -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-primary font-bold text-lg">
+                                    Rp {{ number_format($product->selling_price, 0, ',', '.') }}
+                                </span>
+                                <div class="flex gap-2">
+                                    <a href="{{ route('main.products.show', $product->id) }}" 
+                                       class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-full transition-all duration-300">
+                                        Detail
+                                    </a>
+                                    <a href="https://wa.me/6282133803940?text=Halo,%20saya%20tertarik%20dengan%20produk%20{{ urlencode($product->name) }}%20(SKU:%20{{ $product->sku }})%20dengan%20harga%20Rp%20{{ number_format($product->selling_price, 0, ',', '.') }}" 
+                                       target="_blank"
+                                       class="bg-primary hover:bg-primary-dark text-white font-semibold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105 {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                       @if($currentStock == 0) onclick="return false;" @endif>
+                                        {{ $currentStock == 0 ? 'Habis' : 'Beli' }}
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
                 @endforeach
-            </div>
-            
+            @else
+                <!-- Empty State -->
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-box-open text-5xl text-primary mb-4"></i>
+                    <h3 class="text-2xl font-bold text-white mb-2">Tidak Ada Produk</h3>
+                    <p class="text-gray-400 mb-6">
+                        Belum ada produk yang tersedia.
+                    </p>
+                </div>
+            @endif
+        </div>
+
+        @if(isset($products) && $products->count() > 0)
             <div class="text-center mt-12">
-                <a href="#" class="inline-flex items-center text-primary hover:text-primary-light font-semibold text-lg">
+                <a href="{{ route('main.products.index') }}" 
+                   class="inline-flex items-center text-primary hover:text-primary-light font-semibold text-lg">
                     Lihat Semua Produk
                     <i class="fas fa-arrow-right ml-2"></i>
                 </a>
             </div>
-        </div>
-    </section>
+        @endif
+    </div>
+</section>
 
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
     <!-- Testimonials Section -->
     <section id="testimoni" class="py-20 bg-dark">
         <div class="container mx-auto px-4">

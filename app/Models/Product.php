@@ -58,27 +58,70 @@ class Product extends Model
     protected function stockStatus(): Attribute
     {
         return Attribute::make(
-            get: fn () => match (true) {
-                $this->current_stock <= 0 => 'out_of_stock',
-                $this->current_stock <= $this->min_stock => 'low_stock', // Pastikan ini 'min_stock'
-                default => 'in_stock',
+            get: function () {
+                $currentStock = $this->current_stock;
+                
+                if ($currentStock <= 0) {
+                    return 'out_of_stock';
+                } elseif ($currentStock <= $this->min_stock) {
+                    return 'low_stock';
+                } else {
+                    return 'in_stock';
+                }
             }
         );
     }
 
-    // Helper method for calculating available stock
+    // Helper method for calculating available stock - SESUAIKAN DENGAN STRUCTURE ANDA
     public function availableStock()
     {
-        if (isset($this->attributes['stock_in_sum'])) {
-            return ($this->attributes['stock_in_sum'] ?? 0) - ($this->attributes['stock_out_sum'] ?? 0);
-        }
+        // Jika menggunakan current_stock langsung dari database
+        return $this->current_stock;
+        
+        // OPSI 2: Jika menggunakan perhitungan dari stockTransactions
+        // if ($this->relationLoaded('stockTransactions')) {
+        //     $stockIn = $this->stockTransactions->where('type', 'Masuk')->sum('quantity');
+        //     $stockOut = $this->stockTransactions->where('type', 'Keluar')->sum('quantity');
+        //     return $stockIn - $stockOut;
+        // }
+        
+        // OPSI 3: Query langsung ke database
+        // $stockIn = $this->stockTransactions()->where('type', 'Masuk')->sum('quantity');
+        // $stockOut = $this->stockTransactions()->where('type', 'Keluar')->sum('quantity');
+        // return $stockIn - $stockOut;
+    }
 
-        if ($this->relationLoaded('stockTransactions')) {
-            return $this->stockTransactions->where('type', 'Masuk')->sum('quantity') -
-                   $this->stockTransactions->where('type', 'Keluar')->sum('quantity');
-        }
+    // Scope untuk filtering
+    public function scopeInStock($query)
+    {
+        return $query->where('current_stock', '>', 0);
+    }
 
-        return $this->stockTransactions()->where('type', 'Masuk')->sum('quantity') -
-               $this->stockTransactions()->where('type', 'Keluar')->sum('quantity');
+    public function scopeLowStock($query)
+    {
+        return $query->whereRaw('current_stock <= min_stock')
+                    ->where('current_stock', '>', 0);
+    }
+
+    public function scopeOutOfStock($query)
+    {
+        return $query->where('current_stock', '<=', 0);
+    }
+
+    public function scopeByCategory($query, $categoryId)
+    {
+        return $query->where('category_id', $categoryId);
+    }
+
+    // Method untuk update stock
+    public function updateStock($quantity, $type = 'in')
+    {
+        if ($type === 'in') {
+            $this->current_stock += $quantity;
+        } else {
+            $this->current_stock -= $quantity;
+        }
+        
+        $this->save();
     }
 }

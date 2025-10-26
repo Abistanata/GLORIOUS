@@ -32,7 +32,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Kategori</p>
-                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $categories->total() }}</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $totalCategories }}</p>
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Produk</p>
-                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $categories->sum('products_count') }}</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $totalProducts }}</p>
                 </div>
             </div>
         </div>
@@ -60,9 +60,7 @@
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Rata-rata Produk</p>
-                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">
-                        {{ $categories->count() > 0 ? round($categories->sum('products_count') / $categories->count(), 1) : 0 }}
-                    </p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $averageProducts }}</p>
                 </div>
             </div>
         </div>
@@ -168,9 +166,11 @@
                 </div>
 
                 {{-- Pagination --}}
-                <div class="mt-6">
-                    {{ $categories->appends(request()->query())->links() }}
-                </div>
+@if(method_exists($categories, 'links'))
+<div class="mt-6">
+    {{ $categories->appends(request()->query())->links() }}
+</div>
+@endif
             @else
                 <div class="text-center py-12">
                     <div class="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
