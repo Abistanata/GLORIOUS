@@ -36,6 +36,8 @@
                         <p class="text-gray-500 text-sm mt-1">Nama kategori harus unik dan belum pernah digunakan</p>
                     </div>
 
+                    
+
                     {{-- Deskripsi --}}
                     <div>
                         <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

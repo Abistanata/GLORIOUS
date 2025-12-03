@@ -9,7 +9,7 @@
         <nav class="flex mb-4" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
                 <li class="inline-flex items-center">
-                    <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white transition-colors">
+                    <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center text-sm font-medium text-gray-700 transition-colors hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
                         <svg class="w-3 h-3 mr-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                             <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
                         </svg>
@@ -21,7 +21,7 @@
                         <svg class="w-3 h-3 mx-1 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                         </svg>
-                        <a href="{{ route('admin.products.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-white transition-colors">Produk</a>
+                        <a href="{{ route('admin.products.index') }}" class="ml-1 text-sm font-medium text-gray-700 transition-colors hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-white">Produk</a>
                     </div>
                 </li>
                 <li aria-current="page">
@@ -44,7 +44,7 @@
             <div class="flex items-center space-x-3">
                 <!-- Quick Actions -->
                 <button type="button" class="inline-flex items-center px-3 py-2 text-xs font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700" onclick="window.print()">
-                    <i class="fas fa-print mr-1"></i>
+                    <i class="mr-1 fas fa-print"></i>
                     Print
                 </button>
             </div>
@@ -53,12 +53,12 @@
 
     <!-- Alert Messages -->
     @if ($errors->any())
-        <div class="mb-6 p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
+        <div class="p-4 mb-6 text-sm text-red-800 border border-red-200 rounded-lg bg-red-50 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">
             <div class="flex items-center mb-2">
-                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <i class="mr-2 fas fa-exclamation-triangle"></i>
                 <span class="font-medium">Terdapat kesalahan dalam form:</span>
             </div>
-            <ul class="list-disc list-inside space-y-1">
+            <ul class="space-y-1 list-disc list-inside">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -67,20 +67,20 @@
     @endif
 
     <!-- Main Form Card -->
-    <div class="overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
+    <div class="overflow-hidden bg-white border border-gray-200 shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700">
         <!-- Form Header -->
         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-                        <i class="fas fa-plus-circle mr-2 text-blue-600 dark:text-blue-400"></i>
+                    <h2 class="flex items-center text-lg font-semibold text-gray-900 dark:text-white">
+                        <i class="mr-2 text-blue-600 fas fa-plus-circle dark:text-blue-400"></i>
                         Form Data Produk
                     </h2>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Lengkapi semua field yang bertanda (*) wajib diisi</p>
                 </div>
                 <div class="flex items-center space-x-2">
                     <div class="flex items-center px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full dark:bg-blue-900/20 dark:text-blue-400">
-                        <i class="fas fa-info-circle mr-1"></i>
+                        <i class="mr-1 fas fa-info-circle"></i>
                         Form Baru
                     </div>
                 </div>
@@ -93,11 +93,11 @@
 
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
                 <!-- Left Column - Basic Information -->
-                <div class="lg:col-span-8 space-y-6">
+                <div class="space-y-6 lg:col-span-8">
                     <!-- Section: Product Information -->
                     <div class="p-6 border border-gray-200 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
-                            <i class="fas fa-box mr-2 text-blue-600 dark:text-blue-400"></i>
+                        <h3 class="flex items-center mb-4 text-lg font-medium text-gray-900 dark:text-white">
+                            <i class="mr-2 text-blue-600 fas fa-box dark:text-blue-400"></i>
                             Informasi Produk
                         </h3>
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -120,8 +120,8 @@
                                     <label for="sku" class="block text-sm font-medium text-gray-900 dark:text-white">
                                         Kode SKU <span class="text-red-500">*</span>
                                     </label>
-                                    <button type="button" id="generateSkuBtn" class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 transition-colors">
-                                        <i class="fas fa-magic mr-1"></i>
+                                    <button type="button" id="generateSkuBtn" class="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-600 transition-colors rounded-md bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/20 dark:hover:bg-blue-900/30">
+                                        <i class="mr-1 fas fa-magic"></i>
                                         Generate
                                     </button>
                                 </div>
@@ -196,11 +196,11 @@
 
                     <!-- Section: Price & Stock -->
                     <div class="p-6 border border-gray-200 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
-                            <i class="fas fa-dollar-sign mr-2 text-green-600 dark:text-green-400"></i>
+                        <h3 class="flex items-center mb-4 text-lg font-medium text-gray-900 dark:text-white">
+                            <i class="mr-2 text-green-600 fas fa-dollar-sign dark:text-green-400"></i>
                             Harga & Stok
                         </h3>
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-4">
                             <!-- Purchase Price -->
                             <div>
                                 <label for="purchase_price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -208,7 +208,7 @@
                                 </label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <span class="text-gray-500 dark:text-gray-400 font-medium">Rp</span>
+                                        <span class="font-medium text-gray-500 dark:text-gray-400">Rp</span>
                                     </div>
                                     <input type="hidden" id="purchase_price_raw" name="purchase_price" value="{{ old('purchase_price', '0') }}">
                                     <input type="text" id="purchase_price_display" value="{{ old('purchase_price', '0') }}" required
@@ -227,70 +227,212 @@
                                 </label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <span class="text-gray-500 dark:text-gray-400 font-medium">Rp</span>
+                                        <span class="font-medium text-gray-500 dark:text-gray-400">Rp</span>
                                     </div>
                                     <input type="hidden" id="selling_price_raw" name="selling_price" value="{{ old('selling_price', '0') }}">
                                     <input type="text" id="selling_price_display" value="{{ old('selling_price', '0') }}" required
                                            class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('selling_price') border-red-500 dark:border-red-500 @enderror"
                                            placeholder="0">
                                 </div>
-                                @error('selling_price')
-                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                                @enderror
                                 <!-- Profit Margin Display -->
-                                <div id="profitMargin" class="mt-2 text-sm text-gray-600 dark:text-gray-400 hidden">
+                                <div id="profitMargin" class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                                     <span class="font-medium">Margin: </span>
                                     <span id="marginAmount" class="text-green-600 dark:text-green-400"></span>
                                     <span class="text-gray-500">(<span id="marginPercent"></span>%)</span>
                                 </div>
+                                @error('selling_price')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Discount Price -->
+                            <div>
+                                <label for="discount_price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                    Harga Diskon
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <span class="font-medium text-gray-500 dark:text-gray-400">Rp</span>
+                                    </div>
+                                    <input type="hidden" id="discount_price_raw" name="discount_price" value="{{ old('discount_price', '0') }}">
+                                    <input type="text" id="discount_price_display" value="{{ old('discount_price', '0') }}"
+                                           class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('discount_price') border-red-500 dark:border-red-500 @enderror"
+                                           placeholder="0">
+                                </div>
+                                <!-- Discount Info Display -->
+                                <div id="discountInfo" class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                    <span class="font-medium">Diskon: </span>
+                                    <span id="discountAmount" class="text-red-600 dark:text-red-400"></span>
+                                    <span class="text-gray-500">(<span id="discountPercent"></span>%)</span>
+                                </div>
+                                @error('discount_price')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Current Stock -->
                             <div>
                                 <label for="current_stock" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                    Stok Awal <span class="text-red-500">*</span>
+                                    Stok Terkini <span class="text-red-500">*</span>
                                 </label>
-                                <input type="number" id="current_stock" name="current_stock" value="{{ old('current_stock', '0') }}" min="0" required
-                                       class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('current_stock') border-red-500 dark:border-red-500 @enderror"
-                                       placeholder="0">
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <i class="text-gray-500 fas fa-box dark:text-gray-400"></i>
+                                    </div>
+                                    <input type="number" id="current_stock" name="current_stock" value="{{ old('current_stock', '0') }}" min="0" required
+                                           class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('current_stock') border-red-500 dark:border-red-500 @enderror"
+                                           placeholder="0">
+                                </div>
+                                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    <span>Stok awal produk</span>
+                                </div>
                                 @error('current_stock')
                                     <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
 
                             <!-- Minimum Stock -->
-                            <div>
-                                <label for="min_stock" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                    Stok Minimum <span class="text-red-500">*</span>
-                                </label>
-                                <input type="number" id="min_stock" name="min_stock" value="{{ old('min_stock', '0') }}" min="0" required
-                                       class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('min_stock') border-red-500 dark:border-red-500 @enderror"
-                                       placeholder="0">
-                                @error('min_stock')
-                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                                @enderror
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Sistem akan memberikan peringatan jika stok mencapai batas ini</p>
+                            <div class="md:col-span-4">
+                                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                    <div>
+                                        <label for="min_stock" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                            Stok Minimum <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                <i class="text-yellow-500 fas fa-exclamation-triangle dark:text-yellow-400"></i>
+                                            </div>
+                                            <input type="number" id="min_stock" name="min_stock" value="{{ old('min_stock', '0') }}" min="0" required
+                                                   class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('min_stock') border-red-500 dark:border-red-500 @enderror"
+                                                   placeholder="0">
+                                        </div>
+                                        <div id="stockWarning" class="hidden mt-2 text-sm text-yellow-600 dark:text-yellow-400">
+                                            <i class="mr-1 fas fa-exclamation-circle"></i>
+                                            <span>Stok terkini di bawah stok minimum!</span>
+                                        </div>
+                                        @error('min_stock')
+                                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="max_stock" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                            Stok Maksimum (Opsional)
+                                        </label>
+                                        <div class="relative">
+                                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                                <i class="text-blue-500 fas fa-chart-bar dark:text-blue-400"></i>
+                                            </div>
+                                            <input type="number" id="max_stock" name="max_stock" value="{{ old('max_stock', '') }}" min="0"
+                                                   class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('max_stock') border-red-500 dark:border-red-500 @enderror"
+                                                   placeholder="Tidak terbatas">
+                                        </div>
+                                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                            <span>Batasan stok maksimal</span>
+                                        </div>
+                                        @error('max_stock')
+                                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="flex items-center justify-between p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
+                                        <div class="flex items-center">
+                                            <i class="mr-2 text-blue-500 fas fa-chart-pie"></i>
+                                            <span class="text-sm font-medium text-gray-900 dark:text-white">Status Stok:</span>
+                                        </div>
+                                        <div id="stockStatus" class="flex items-center">
+                                            <span id="stockStatusText" class="text-sm font-medium">Belum dihitung</span>
+                                            <div id="stockStatusBadge" class="ml-2 hidden px-2 py-1 text-xs font-medium rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Description -->
+                    <!-- Spesifikasi Produk -->
                     <div class="p-6 border border-gray-200 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
-                            <i class="fas fa-align-left mr-2 text-purple-600 dark:text-purple-400"></i>
-                            Deskripsi Produk
+                        <h3 class="flex items-center mb-4 text-lg font-medium text-gray-900 dark:text-white">
+                            <i class="mr-2 text-purple-600 fas fa-list-alt dark:text-purple-400"></i>
+                            Spesifikasi Produk
                         </h3>
                         <div>
                             <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                Deskripsi Detail
+                                Detail Spesifikasi
                             </label>
                             <textarea id="description" name="description" rows="5"
                                       class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('description') border-red-500 dark:border-red-500 @enderror"
-                                      placeholder="Tuliskan deskripsi lengkap tentang produk ini, termasuk spesifikasi, fitur, dan informasi penting lainnya...">{{ old('description') }}</textarea>
+                                      placeholder="Tuliskan spesifikasi lengkap produk, seperti bahan, ukuran, warna, kapasitas, atau spesifikasi teknis lainnya...">{{ old('description') }}</textarea>
                             @error('description')
                                 <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
-                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Deskripsi yang detail akan membantu dalam identifikasi dan pencarian produk</p>
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Gunakan format bullet atau poin-poin penting untuk memudahkan pembacaan</p>
+                        </div>
+                    </div>
+
+                    <!-- Additional Information -->
+                    <div class="p-6 border border-gray-200 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700">
+                        <h3 class="flex items-center mb-4 text-lg font-medium text-gray-900 dark:text-white">
+                            <i class="mr-2 text-orange-600 fas fa-info-circle dark:text-orange-400"></i>
+                            Informasi Tambahan
+                        </h3>
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                            <!-- Pengiriman -->
+                            <div>
+                                <label for="shipping_info" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                    Pengiriman
+                                </label>
+                                <select id="shipping_info" name="shipping_info"
+                                        class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('shipping_info') border-red-500 dark:border-red-500 @enderror">
+                                    <option value="">Pilih Metode Pengiriman</option>
+                                    <option value="free" {{ old('shipping_info') == 'free' ? 'selected' : '' }}>Gratis Ongkir</option>
+                                    <option value="calculated" {{ old('shipping_info') == 'calculated' ? 'selected' : '' }}>Dihitung Otomatis</option>
+                                    <option value="flat_rate" {{ old('shipping_info') == 'flat_rate' ? 'selected' : '' }}>Tarif Flat</option>
+                                    <option value="pickup" {{ old('shipping_info') == 'pickup' ? 'selected' : '' }}>Ambil di Tempat</option>
+                                </select>
+                                @error('shipping_info')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Kondisi -->
+                            <div>
+                                <label for="condition" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                    Kondisi <span class="text-red-500">*</span>
+                                </label>
+                                <select id="condition" name="condition" required
+                                        class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('condition') border-red-500 dark:border-red-500 @enderror">
+                                    <option value="">Pilih Kondisi</option>
+                                    <option value="new" {{ old('condition') == 'new' ? 'selected' : '' }}>Baru</option>
+                                    <option value="used" {{ old('condition') == 'used' ? 'selected' : '' }}>Bekas</option>
+                                    <option value="refurbished" {{ old('condition') == 'refurbished' ? 'selected' : '' }}>Rekondisi</option>
+                                </select>
+                                @error('condition')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Garansi -->
+                            <div>
+                                <label for="warranty" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                    Garansi
+                                </label>
+                                <select id="warranty" name="warranty"
+                                        class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all @error('warranty') border-red-500 dark:border-red-500 @enderror">
+                                    <option value="">Pilih Masa Garansi</option>
+                                    <option value="no_warranty" {{ old('warranty') == 'no_warranty' ? 'selected' : '' }}>Tidak Ada Garansi</option>
+                                    <option value="1_month" {{ old('warranty') == '1_month' ? 'selected' : '' }}>1 Bulan</option>
+                                    <option value="3_months" {{ old('warranty') == '3_months' ? 'selected' : '' }}>3 Bulan</option>
+                                    <option value="6_months" {{ old('warranty') == '6_months' ? 'selected' : '' }}>6 Bulan</option>
+                                    <option value="1_year" {{ old('warranty') == '1_year' ? 'selected' : '' }}>1 Tahun</option>
+                                    <option value="2_years" {{ old('warranty') == '2_years' ? 'selected' : '' }}>2 Tahun</option>
+                                    <option value="lifetime" {{ old('warranty') == 'lifetime' ? 'selected' : '' }}>Seumur Hidup</option>
+                                </select>
+                                @error('warranty')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -299,16 +441,16 @@
                 <div class="lg:col-span-4">
                     <div class="sticky top-6">
                         <div class="p-6 border border-gray-200 rounded-lg bg-gray-50/50 dark:bg-gray-800/50 dark:border-gray-700">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
-                                <i class="fas fa-image mr-2 text-indigo-600 dark:text-indigo-400"></i>
+                            <h3 class="flex items-center mb-4 text-lg font-medium text-gray-900 dark:text-white">
+                                <i class="mr-2 text-indigo-600 fas fa-image dark:text-indigo-400"></i>
                                 Gambar Produk
                             </h3>
 
                             <!-- Image Preview -->
                             <div class="mb-4">
                                 <div class="relative group">
-                                    <img id="imagePreview" class="object-cover w-full h-48 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 transition-all group-hover:border-blue-400" src="https://via.placeholder.com/300x200?text=No+Image" alt="Preview gambar">
-                                    <button type="button" id="removeImageBtn" class="absolute p-2 text-white bg-red-500 rounded-full -top-2 -right-2 hover:bg-red-600 transition-colors shadow-lg" style="display: none;">
+                                    <img id="imagePreview" class="object-cover w-full h-48 transition-all border-2 border-gray-300 border-dashed rounded-lg dark:border-gray-600 group-hover:border-blue-400" src="https://via.placeholder.com/300x200?text=No+Image" alt="Preview gambar">
+                                    <button type="button" id="removeImageBtn" class="absolute p-2 text-white transition-colors bg-red-500 rounded-full shadow-lg -top-2 -right-2 hover:bg-red-600" style="display: none;">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
@@ -320,23 +462,23 @@
                             <div>
                                 <input type="file" id="image" name="image" accept="image/*" class="hidden">
                                 <label for="image" class="cursor-pointer">
-                                    <div class="flex flex-col items-center justify-center w-full px-4 py-6 text-sm font-medium text-gray-700 bg-white border-2 border-gray-300 border-dashed rounded-lg hover:bg-gray-50 hover:border-blue-400 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-blue-500 transition-all">
-                                        <i class="fas fa-cloud-upload-alt text-2xl mb-2 text-blue-500"></i>
+                                    <div class="flex flex-col items-center justify-center w-full px-4 py-6 text-sm font-medium text-gray-700 transition-all bg-white border-2 border-gray-300 border-dashed rounded-lg hover:bg-gray-50 hover:border-blue-400 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-blue-500">
+                                        <i class="mb-2 text-2xl text-blue-500 fas fa-cloud-upload-alt"></i>
                                         <span class="font-medium">Klik untuk pilih gambar</span>
-                                        <span class="text-xs text-gray-500 dark:text-gray-400 mt-1">atau drag & drop file di sini</span>
+                                        <span class="mt-1 text-xs text-gray-500 dark:text-gray-400">atau drag & drop file di sini</span>
                                     </div>
                                 </label>
-                                <div class="mt-3 text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                                <div class="mt-3 space-y-1 text-xs text-gray-500 dark:text-gray-400">
                                     <div class="flex items-center">
-                                        <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                                        <i class="mr-1 text-green-500 fas fa-check-circle"></i>
                                         Format: JPG, PNG, GIF
                                     </div>
                                     <div class="flex items-center">
-                                        <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                                        <i class="mr-1 text-green-500 fas fa-check-circle"></i>
                                         Maksimal: 2MB
                                     </div>
                                     <div class="flex items-center">
-                                        <i class="fas fa-info-circle text-blue-500 mr-1"></i>
+                                        <i class="mr-1 text-blue-500 fas fa-info-circle"></i>
                                         Rekomendasi: 800x600px
                                     </div>
                                 </div>
@@ -346,13 +488,69 @@
                             </div>
                         </div>
 
+                        <!-- Stock Summary -->
+                        <div class="p-4 mt-6 border border-blue-200 rounded-lg bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800">
+                            <h4 class="flex items-center mb-2 text-sm font-medium text-blue-900 dark:text-blue-300">
+                                <i class="mr-1 fas fa-boxes"></i>
+                                Ringkasan Stok
+                            </h4>
+                            <div class="space-y-2 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-blue-800 dark:text-blue-400">Stok Terkini:</span>
+                                    <span class="font-medium text-blue-900 dark:text-blue-300" id="summaryCurrentStock">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-yellow-600 dark:text-yellow-400">Stok Minimum:</span>
+                                    <span class="font-medium text-yellow-700 dark:text-yellow-300" id="summaryMinStock">0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-green-600 dark:text-green-400">Stok Maksimum:</span>
+                                    <span class="font-medium text-green-700 dark:text-green-300" id="summaryMaxStock">Tidak Terbatas</span>
+                                </div>
+                                <div class="pt-2 mt-2 border-t border-blue-200 dark:border-blue-700">
+                                    <div class="flex justify-between">
+                                        <span class="font-medium text-blue-900 dark:text-blue-300">Status:</span>
+                                        <span class="font-medium text-blue-900 dark:text-blue-300" id="summaryStockStatus">Aman</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Price Summary -->
+                        <div class="p-4 mt-6 border border-green-200 rounded-lg bg-green-50 dark:bg-green-900/20 dark:border-green-800">
+                            <h4 class="flex items-center mb-2 text-sm font-medium text-green-900 dark:text-green-300">
+                                <i class="mr-1 fas fa-chart-line"></i>
+                                Ringkasan Harga
+                            </h4>
+                            <div class="space-y-2 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-green-800 dark:text-green-400">Harga Beli:</span>
+                                    <span class="font-medium text-green-900 dark:text-green-300" id="summaryPurchasePrice">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-green-800 dark:text-green-400">Harga Jual:</span>
+                                    <span class="font-medium text-green-900 dark:text-green-300" id="summarySellingPrice">Rp 0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-red-600 dark:text-red-400">Harga Diskon:</span>
+                                    <span class="font-medium text-red-700 dark:text-red-300" id="summaryDiscountPrice">Rp 0</span>
+                                </div>
+                                <div class="pt-2 mt-2 border-t border-green-200 dark:border-green-700">
+                                    <div class="flex justify-between">
+                                        <span class="font-medium text-green-900 dark:text-green-300">Keuntungan:</span>
+                                        <span class="font-medium text-green-900 dark:text-green-300" id="summaryProfit">Rp 0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Quick Tips -->
-                        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-900/20 dark:border-blue-800">
-                            <h4 class="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2 flex items-center">
-                                <i class="fas fa-lightbulb mr-1"></i>
+                        <div class="p-4 mt-6 border border-orange-200 rounded-lg bg-orange-50 dark:bg-orange-900/20 dark:border-orange-800">
+                            <h4 class="flex items-center mb-2 text-sm font-medium text-orange-900 dark:text-orange-300">
+                                <i class="mr-1 fas fa-lightbulb"></i>
                                 Tips Pengisian Form
                             </h4>
-                            <ul class="text-xs text-blue-800 dark:text-blue-400 space-y-1">
+                            <ul class="space-y-1 text-xs text-orange-800 dark:text-orange-400">
                                 <li>• Gunakan nama produk yang jelas dan deskriptif</li>
                                 <li>• Pastikan harga jual lebih tinggi dari harga beli</li>
                                 <li>• Set stok minimum untuk mendapat notifikasi</li>
@@ -364,20 +562,20 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex items-center justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between pt-6 mt-8 border-t border-gray-200 dark:border-gray-700">
                 <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
                     <span>Semua field bertanda (*) wajib diisi</span>
                 </div>
                 <div class="flex items-center space-x-3">
-                                        <a href="{{ route('admin.products.index') }}"
+                    <a href="{{ route('admin.products.index') }}"
                        class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 transition-colors">
-                        <i class="fas fa-times mr-2"></i>
+                        <i class="mr-2 fas fa-times"></i>
                         Batal
                     </a>
                     <button type="submit"
                             class="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-save mr-2"></i>
+                        <i class="mr-2 fas fa-save"></i>
                         Simpan Produk
                     </button>
                 </div>
@@ -435,24 +633,112 @@
         // Currency Formatting for Prices
         const purchasePriceInput = document.getElementById('purchase_price_display');
         const sellingPriceInput = document.getElementById('selling_price_display');
+        const discountPriceInput = document.getElementById('discount_price_display');
         const purchasePriceRaw = document.getElementById('purchase_price_raw');
         const sellingPriceRaw = document.getElementById('selling_price_raw');
-        const profitMargin = document.getElementById('profitMargin');
+        const discountPriceRaw = document.getElementById('discount_price_raw');
+        const currentStockInput = document.getElementById('current_stock');
+        const minStockInput = document.getElementById('min_stock');
+        const maxStockInput = document.getElementById('max_stock');
 
         function formatCurrency(input, rawInput) {
             let value = input.value.replace(/[^0-9]/g, '');
             value = value === '' ? '0' : value;
             rawInput.value = value;
             input.value = new Intl.NumberFormat('id-ID').format(value);
+            updatePriceSummary();
         }
 
-        function calculateProfitMargin() {
+        function updateStockStatus() {
+            const currentStock = parseInt(currentStockInput.value) || 0;
+            const minStock = parseInt(minStockInput.value) || 0;
+            const maxStock = parseInt(maxStockInput.value) || 0;
+            
+            // Update summary display
+            document.getElementById('summaryCurrentStock').textContent = currentStock;
+            document.getElementById('summaryMinStock').textContent = minStock;
+            document.getElementById('summaryMaxStock').textContent = maxStock > 0 ? maxStock : 'Tidak Terbatas';
+            
+            // Check stock status
+            const stockWarning = document.getElementById('stockWarning');
+            const stockStatus = document.getElementById('stockStatus');
+            const stockStatusText = document.getElementById('stockStatusText');
+            const stockStatusBadge = document.getElementById('stockStatusBadge');
+            
+            let status = '';
+            let badgeClass = '';
+            let badgeText = '';
+            
+            if (currentStock === 0) {
+                status = 'Stok Habis';
+                badgeClass = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+                badgeText = 'Habis';
+                stockWarning.classList.remove('hidden');
+            } else if (currentStock <= minStock) {
+                status = 'Stok Menipis';
+                badgeClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+                badgeText = 'Menipis';
+                stockWarning.classList.remove('hidden');
+            } else if (maxStock > 0 && currentStock >= maxStock) {
+                status = 'Stok Maksimum';
+                badgeClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+                badgeText = 'Maksimum';
+                stockWarning.classList.add('hidden');
+            } else {
+                status = 'Stok Aman';
+                badgeClass = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+                badgeText = 'Aman';
+                stockWarning.classList.add('hidden');
+            }
+            
+            stockStatusText.textContent = status;
+            stockStatusBadge.className = `px-2 py-1 text-xs font-medium rounded-full ${badgeClass}`;
+            stockStatusBadge.textContent = badgeText;
+            stockStatusBadge.classList.remove('hidden');
+            
+            // Update stock status in summary
+            document.getElementById('summaryStockStatus').textContent = status;
+        }
+
+        function updatePriceSummary() {
             const purchase = parseInt(purchasePriceRaw.value) || 0;
             const selling = parseInt(sellingPriceRaw.value) || 0;
+            const discount = parseInt(discountPriceRaw.value) || 0;
 
+            // Update summary display
+            document.getElementById('summaryPurchasePrice').textContent = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(purchase);
+
+            document.getElementById('summarySellingPrice').textContent = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(selling);
+
+            document.getElementById('summaryDiscountPrice').textContent = discount > 0 ? 
+                new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(discount) : 'Rp 0';
+
+            // Calculate profit (use discount price if exists, otherwise use selling price)
+            const finalPrice = discount > 0 ? discount : selling;
+            const profit = finalPrice - purchase;
+            
+            document.getElementById('summaryProfit').textContent = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(profit);
+
+            // Update profit margin
             if (purchase > 0 && selling > 0) {
                 const margin = selling - purchase;
-                const percent = ((margin / purchase) * 100).toFixed(2);
+                const marginPercent = ((margin / purchase) * 100).toFixed(2);
 
                 document.getElementById('marginAmount').textContent = new Intl.NumberFormat('id-ID', {
                     style: 'currency',
@@ -460,26 +746,59 @@
                     minimumFractionDigits: 0
                 }).format(margin);
 
-                document.getElementById('marginPercent').textContent = percent;
-                profitMargin.classList.remove('hidden');
+                document.getElementById('marginPercent').textContent = marginPercent;
             } else {
-                profitMargin.classList.add('hidden');
+                document.getElementById('marginAmount').textContent = 'Rp 0';
+                document.getElementById('marginPercent').textContent = '0';
+            }
+
+            // Update discount info
+            if (discount > 0 && selling > 0) {
+                const discountAmount = selling - discount;
+                const discountPercent = ((discountAmount / selling) * 100).toFixed(2);
+
+                document.getElementById('discountAmount').textContent = new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0
+                }).format(discountAmount);
+
+                document.getElementById('discountPercent').textContent = discountPercent;
+            } else {
+                document.getElementById('discountAmount').textContent = 'Rp 0';
+                document.getElementById('discountPercent').textContent = '0';
             }
         }
 
+        // Event Listeners
         purchasePriceInput.addEventListener('input', function() {
             formatCurrency(purchasePriceInput, purchasePriceRaw);
-            calculateProfitMargin();
         });
 
         sellingPriceInput.addEventListener('input', function() {
             formatCurrency(sellingPriceInput, sellingPriceRaw);
-            calculateProfitMargin();
+        });
+
+        discountPriceInput.addEventListener('input', function() {
+            formatCurrency(discountPriceInput, discountPriceRaw);
+        });
+
+        currentStockInput.addEventListener('input', function() {
+            updateStockStatus();
+        });
+
+        minStockInput.addEventListener('input', function() {
+            updateStockStatus();
+        });
+
+        maxStockInput.addEventListener('input', function() {
+            updateStockStatus();
         });
 
         // Initialize values on load
         formatCurrency(purchasePriceInput, purchasePriceRaw);
         formatCurrency(sellingPriceInput, sellingPriceRaw);
-        calculateProfitMargin();
+        formatCurrency(discountPriceInput, discountPriceRaw);
+        updateStockStatus();
     </script>
 @endpush

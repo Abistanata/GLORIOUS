@@ -926,107 +926,171 @@
     </section>
 
     <!-- Services Section -->
-    <section id="services">
-        <div class="container">
-            <div class="section-header animate">
-                <h2 class="section-title">Layanan Kami</h2>
-                <p class="section-subtitle">Berbagai solusi teknologi terbaik untuk memenuhi kebutuhan perangkat komputer Anda</p>
+<section id="services">
+    <div class="container">
+        <div class="section-header animate">
+            <h2 class="section-title">Layanan Kami</h2>
+            <p class="section-subtitle">Berbagai solusi teknologi terbaik untuk memenuhi kebutuhan perangkat komputer Anda</p>
+        </div>
+        <div class="services-grid">
+            <!-- Service 1 -->
+            <div class="service-card animate">
+                <div class="service-image">
+                    <img src="images/laptop.jpg" alt="Service Laptop & PC" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1593640408182-31c70c8268f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';">
+                </div>
+                <div class="service-content">
+                    <div class="service-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3 class="service-title">Service Laptop & PC</h3>
+                    <p class="service-description">
+                        Layanan perbaikan dan perawatan lengkap untuk laptop dan komputer semua merk. Termasuk troubleshooting hardware, penggantian komponen, dan optimasi performa.
+                    </p>
+                    <ul class="service-features">
+                        <li class="service-feature">
+                           
+                            <span>Diagnosa dan perbaikan hardware</span>
+                        </li>
+                        <li class="service-feature">
+                           
+                            <span>Penggantian Sparepart</span>
+                        </li>
+                        <li class="service-feature">
+                          
+                            <span>Perbaikan engsel & speaker laptop</span>
+                        </li>
+                        <li class="service-feature">
+                          
+                            <span>Perbaikan Laptop mati & Motherboard</span>
+                        </li>
+                        <li class="service-feature">
+           
+                            <span>Upgrade agar performa laptop makin ngebut, NO LEMOT!</span>
+                        </li>
+                    </ul>
+                    <a href="#kontak" class="service-button">Konsultasi Sekarang</a>
+                </div>
             </div>
-            <div class="services-grid">
-                <!-- Service 1 -->
-                <div class="service-card animate">
-                    <div class="service-image">
-                        <img src="images/laptop.jpg" alt="Service Laptop & PC" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1593640408182-31c70c8268f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';">
-                    </div>
-                    <div class="service-content">
-                        <div class="service-icon">
-                            <i class="fas fa-laptop"></i>
-                        </div>
-                        <h3 class="service-title">Service Laptop & PC</h3>
-                        <p class="service-description">
-                            Layanan perbaikan dan perawatan lengkap untuk laptop dan komputer semua merk. Termasuk troubleshooting hardware, penggantian komponen, dan optimasi performa.
-                        </p>
-                        <ul class="service-features">
-                            <li>Diagnosa dan perbaikan hardware</li>
-                            <li>Penggantian komponen asli</li>
-                            <li>Optimasi sistem dan performa</li>
-                            <li>Cleaning dan perawatan rutin</li>
-                        </ul>
-                        <a href="#kontak" class="service-button">Konsultasi Sekarang</a>
-                    </div>
-                </div>
 
-                <!-- Service 2 -->
-                <div class="service-card animate">
-                    <div class="service-image">
-                        <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Install Software">
-                    </div>
-                    <div class="service-content">
-                        <div class="service-icon">
-                            <i class="fas fa-download"></i>
-                        </div>
-                        <h3 class="service-title">Install Software</h3>
-                        <p class="service-description">
-                            Instalasi software original, update sistem operasi, dan konfigurasi perangkat lunak sesuai kebutuhan Anda. Kami pastikan software berjalan lancar dan aman.
-                        </p>
-                        <ul class="service-features">
-                            <li>Instalasi Windows & Update</li>
-                            <li>Microsoft Office & Productivity Tools</li>
-                            <li>Browser & Software Pendukung</li>
-                            <li>Software keamanan & antivirus</li>
-                        </ul>
-                        <a href="#kontak" class="service-button">Konsultasi Sekarang</a>
-                    </div>
+            <!-- Service 2 -->
+            <div class="service-card animate">
+                <div class="service-image">
+                    <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Install Software">
                 </div>
-
-                <!-- Service 3 -->
-                <div class="service-card animate">
-                    <div class="service-image">
-                        <img src="images/printer.jpg" alt="Perbaikan Printer" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';">
+                <div class="service-content">
+                    <div class="service-icon">
+                        <i class="fas fa-download"></i>
                     </div>
-                    <div class="service-content">
-                        <div class="service-icon">
-                            <i class="fas fa-print"></i>
-                        </div>
-                        <h3 class="service-title">Perbaikan Printer</h3>
-                        <p class="service-description">
-                            Servis lengkap printer inkjet dan laserjet, termasuk penggantian sparepart, cleaning head, dan kalibrasi agar hasil cetak selalu optimal.
-                        </p>
-                        <ul class="service-features">
-                            <li>Perbaikan hardware printer</li>
-                            <li>Penggantian sparepart asli</li>
-                            <li>Cleaning dan kalibrasi head</li>
-                            <li>Optimasi hasil cetak</li>
-                        </ul>
-                        <a href="#kontak" class="service-button">Konsultasi Sekarang</a>
-                    </div>
+                    <h3 class="service-title">Install Software</h3>
+                    <p class="service-description">
+                        Layanan instalasi berbagai software sesuai kebutuhan Anda. Mulai dari sistem operasi, aplikasi office, desain grafis, hingga software khusus lainnya.
+                    </p>
+                    <ul class="service-features">
+                        <li class="service-feature">
+                          
+                            <span>Instalasi sistem operasi (Windows, Linux)</span>
+                        </li>
+                        <li class="service-feature">
+                           
+                            <span>Software office dan produktivitas</span>
+                        </li>
+                        <li class="service-feature">
+                            
+                            <span>Aplikasi desain dan multimedia</span>
+                        </li>
+                        <li class="service-feature">
+                         
+                            <span>Software keamanan dan antivirus</span>
+                        </li>
+                        <li class="service-feature">
+                       
+                            <span>Driver dan aplikasi pendukung</span>
+                        </li>
+                    </ul>
+                    <a href="#kontak" class="service-button">Konsultasi Sekarang</a>
                 </div>
+            </div>
 
-                <!-- Service 4 -->
-                <div class="service-card animate">
-                    <div class="service-image">
-                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Upgrade Hardware">
+            <!-- Service 3 -->
+            <div class="service-card animate">
+                <div class="service-image">
+                    <img src="images/printer.jpg" alt="Perbaikan Printer" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';">
+                </div>
+                <div class="service-content">
+                    <div class="service-icon">
+                        <i class="fas fa-print"></i>
                     </div>
-                    <div class="service-content">
-                        <div class="service-icon">
-                            <i class="fas fa-microchip"></i>
-                        </div>
-                        <h3 class="service-title">Upgrade Hardware</h3>
-                        <p class="service-description">
-                            Upgrade komponen hardware seperti RAM, SSD, VGA, dan lainnya untuk meningkatkan performa perangkat Anda sesuai kebutuhan.
-                        </p>
-                        <ul class="service-features">
-                            <li>Upgrade RAM & Storage</li>
-                            <li>Pemasangan kartu grafis (VGA)</li>
-                            <li>Optimasi performa gaming & desain</li>
-                            <li>Custom build sesuai kebutuhan</li>
-                        </ul>
-                        <a href="#kontak" class="service-button">Konsultasi Sekarang</a>
+                    <h3 class="service-title">Perbaikan Printer</h3>
+                    <p class="service-description">
+                        Servis lengkap printer inkjet, laserjet, dotmatrik. Mengkondisikan printer selalu siap digunakan dengan hasil yang optimal.
+                    </p>
+                    <ul class="service-features">
+                        <li class="service-feature">
+                            
+                            <span>Perbaikan hasil cetak</span>
+                        </li>
+                        <li class="service-feature">
+                            
+                            <span>Reset Counter</span>
+                        </li>
+                        <li class="service-feature">
+                           
+                            <span>Paper jam & kertas tidak lancar</span>
+                        </li>
+                        <li class="service-feature">
+                            
+                            <span>Normalisasi kinerja printer</span>
+                        </li>
+                        <li class="service-feature">
+                           
+                            <span>Pembersihan head dan roller</span>
+                        </li>
+                    </ul>
+                    <a href="#kontak" class="service-button">Konsultasi Sekarang</a>
+                </div>
+            </div>
+
+            <!-- Service 4 -->
+            <div class="service-card animate">
+                <div class="service-image">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Upgrade Hardware">
+                </div>
+                <div class="service-content">
+                    <div class="service-icon">
+                        <i class="fas fa-microchip"></i>
                     </div>
+                    <h3 class="service-title">Upgrade Hardware</h3>
+                    <p class="service-description">
+                        Upgrade komponen hardware seperti RAM, SSD, VGA, dan lainnya untuk meningkatkan performa perangkat Anda sesuai kebutuhan.
+                    </p>
+                    <ul class="service-features">
+                        <li class="service-feature">
+                            
+                            <span>Upgrade SSD</span>
+                        </li>
+                        <li class="service-feature">
+                            
+                            <span>Upgrade RAM</span>
+                        </li>
+                        <li class="service-feature">
+                            
+                            <span>Pemasangan kartu grafis (VGA)</span>
+                        </li>
+                        <li class="service-feature">
+                            
+                            <span>Optimasi performa gaming & desain</span>
+                        </li>
+                        <li class="service-feature">
+                            
+                            <span>Custom build sesuai kebutuhan</span>
+                        </li>
+                    </ul>
+                    <a href="#kontak" class="service-button">Konsultasi Sekarang</a>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Process Section -->
     <section class="process">

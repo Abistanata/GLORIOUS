@@ -19,29 +19,59 @@ class Product extends Model
         'description',
         'purchase_price',
         'selling_price',
+        'discount_price', // baru
         'image',
         'current_stock',
         'min_stock',
+        'max_stock', // baru
+        'condition', // baru
+        'shipping_info', // baru
+        'warranty', // baru
         'unit',
     ];
 
     protected $attributes = [
         'current_stock' => 0,
         'min_stock' => 0,
+        'discount_price' => 0,
+        'condition' => 'new',
         'unit' => 'pcs',
     ];
 
-    protected $appends = ['stock_status'];
+    protected $appends = [
+        'stock_status', 
+        'formatted_purchase_price', 
+        'formatted_selling_price',
+        'formatted_discount_price', // baru
+        'has_discount', // baru
+        'discount_percentage', // baru
+        'final_price', // baru
+        'profit_margin', // baru
+        'stock_percentage', // baru
+    ];
+
+    protected $casts = [
+        'purchase_price' => 'decimal:2',
+        'selling_price' => 'decimal:2',
+        'discount_price' => 'decimal:2',
+        'current_stock' => 'integer',
+        'min_stock' => 'integer',
+        'max_stock' => 'integer',
+    ];
 
     // Relationships
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class)->withDefault([
+            'name' => 'Tidak Berkategori'
+        ]);
     }
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(Supplier::class)->withDefault([
+            'name' => 'Tidak Ada Supplier'
+        ]);
     }
 
     public function attributes()
@@ -60,38 +90,123 @@ class Product extends Model
         return Attribute::make(
             get: function () {
                 $currentStock = $this->current_stock;
-                
+
                 if ($currentStock <= 0) {
                     return 'out_of_stock';
-                } elseif ($currentStock <= $this->min_stock) {
-                    return 'low_stock';
-                } else {
-                    return 'in_stock';
                 }
+
+                if ($currentStock <= $this->min_stock) {
+                    return 'low_stock';
+                }
+
+                if ($this->max_stock && $currentStock >= $this->max_stock) {
+                    return 'max_stock';
+                }
+
+                return 'in_stock';
             }
         );
     }
 
-    // Helper method for calculating available stock - SESUAIKAN DENGAN STRUCTURE ANDA
-    public function availableStock()
+    protected function currentStock(): Attribute
     {
-        // Jika menggunakan current_stock langsung dari database
-        return $this->current_stock;
-        
-        // OPSI 2: Jika menggunakan perhitungan dari stockTransactions
-        // if ($this->relationLoaded('stockTransactions')) {
-        //     $stockIn = $this->stockTransactions->where('type', 'Masuk')->sum('quantity');
-        //     $stockOut = $this->stockTransactions->where('type', 'Keluar')->sum('quantity');
-        //     return $stockIn - $stockOut;
-        // }
-        
-        // OPSI 3: Query langsung ke database
-        // $stockIn = $this->stockTransactions()->where('type', 'Masuk')->sum('quantity');
-        // $stockOut = $this->stockTransactions()->where('type', 'Keluar')->sum('quantity');
-        // return $stockIn - $stockOut;
+        return Attribute::make(
+            get: function ($value) {
+                // Selalu kembalikan value langsung dari database saat import
+                return $value;
+            },
+            set: fn ($value) => $value
+        );
     }
 
-    // Scope untuk filtering
+    protected function formattedPurchasePrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => 'Rp' . number_format($this->purchase_price, 0, ',', '.')
+        );
+    }
+
+    protected function formattedSellingPrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => 'Rp' . number_format($this->selling_price, 0, ',', '.')
+        );
+    }
+
+    protected function formattedDiscountPrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->discount_price > 0 
+                ? 'Rp' . number_format($this->discount_price, 0, ',', '.') 
+                : null
+        );
+    }
+
+    protected function hasDiscount(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->discount_price > 0 && $this->discount_price < $this->selling_price
+        );
+    }
+
+    protected function discountPercentage(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if (!$this->has_discount || $this->selling_price <= 0) {
+                    return 0;
+                }
+
+                return round((($this->selling_price - $this->discount_price) / $this->selling_price) * 100, 2);
+            }
+        );
+    }
+
+    protected function finalPrice(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if ($this->has_discount) {
+                    return $this->discount_price;
+                }
+                return $this->selling_price;
+            }
+        );
+    }
+
+    protected function profitMargin(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $cost = $this->purchase_price;
+                $selling = $this->final_price;
+
+                if ($cost <= 0 || $selling <= 0) {
+                    return 0;
+                }
+
+                return round((($selling - $cost) / $cost) * 100, 2);
+            }
+        );
+    }
+
+    protected function stockPercentage(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $current = $this->current_stock;
+                $max = $this->max_stock;
+
+                if ($max <= 0 || $current <= 0) {
+                    return 0;
+                }
+
+                return min(100, round(($current / $max) * 100, 2));
+            }
+        );
+    }
+
+    // Scopes
     public function scopeInStock($query)
     {
         return $query->where('current_stock', '>', 0);
@@ -99,8 +214,7 @@ class Product extends Model
 
     public function scopeLowStock($query)
     {
-        return $query->whereRaw('current_stock <= min_stock')
-                    ->where('current_stock', '>', 0);
+        return $query->whereRaw('current_stock <= min_stock AND current_stock > 0');
     }
 
     public function scopeOutOfStock($query)
@@ -108,20 +222,141 @@ class Product extends Model
         return $query->where('current_stock', '<=', 0);
     }
 
-    public function scopeByCategory($query, $categoryId)
+    public function scopeWithDiscount($query)
     {
-        return $query->where('category_id', $categoryId);
+        return $query->where('discount_price', '>', 0)
+                    ->whereColumn('discount_price', '<', 'selling_price');
     }
 
-    // Method untuk update stock
-    public function updateStock($quantity, $type = 'in')
+    public function scopeNewCondition($query)
     {
-        if ($type === 'in') {
-            $this->current_stock += $quantity;
-        } else {
-            $this->current_stock -= $quantity;
-        }
-        
+        return $query->where('condition', 'new');
+    }
+
+    public function scopeUsedCondition($query)
+    {
+        return $query->where('condition', 'used');
+    }
+
+    public function scopeRefurbishedCondition($query)
+    {
+        return $query->where('condition', 'refurbished');
+    }
+
+    // Helper methods
+    public function updateStockFromTransactions()
+    {
+        $this->current_stock = $this->stockTransactions()
+            ->selectRaw('SUM(CASE WHEN type = "Masuk" THEN quantity ELSE -quantity END) as stock')
+            ->value('stock') ?? 0;
+
         $this->save();
+    }
+
+    public function getStockStatusLabel()
+    {
+        return match($this->stock_status) {
+            'out_of_stock' => 'Stok Habis',
+            'low_stock' => 'Stok Menipis',
+            'max_stock' => 'Stok Maksimum',
+            default => 'Stok Aman'
+        };
+    }
+
+    public function getStockStatusColor()
+    {
+        return match($this->stock_status) {
+            'out_of_stock' => 'danger',
+            'low_stock' => 'warning',
+            'max_stock' => 'info',
+            default => 'success'
+        };
+    }
+
+    public function getConditionLabel()
+    {
+        return match($this->condition) {
+            'new' => 'Baru',
+            'used' => 'Bekas',
+            'refurbished' => 'Rekondisi',
+            default => 'Tidak Diketahui'
+        };
+    }
+
+    public function getShippingInfoLabel()
+    {
+        return match($this->shipping_info) {
+            'free' => 'Gratis Ongkir',
+            'calculated' => 'Dihitung Otomatis',
+            'flat_rate' => 'Tarif Flat',
+            'pickup' => 'Ambil di Tempat',
+            default => 'Belum Ditentukan'
+        };
+    }
+
+    public function getWarrantyLabel()
+    {
+        return match($this->warranty) {
+            'no_warranty' => 'Tidak Ada Garansi',
+            '1_month' => '1 Bulan',
+            '3_months' => '3 Bulan',
+            '6_months' => '6 Bulan',
+            '1_year' => '1 Tahun',
+            '2_years' => '2 Tahun',
+            'lifetime' => 'Seumur Hidup',
+            default => 'Belum Ditentukan'
+        };
+    }
+
+    public function isStockCritical()
+    {
+        return $this->current_stock <= $this->min_stock;
+    }
+
+    public function getStockWarningMessage()
+    {
+        if ($this->current_stock <= 0) {
+            return 'Stok produk habis. Segera lakukan restock.';
+        }
+
+        if ($this->isStockCritical()) {
+            return 'Stok produk menipis. Stok tersisa: ' . $this->current_stock;
+        }
+
+        if ($this->max_stock && $this->current_stock >= $this->max_stock) {
+            return 'Stok telah mencapai batas maksimum.';
+        }
+
+        return null;
+    }
+
+    public function getFormattedFinalPrice()
+    {
+        return 'Rp' . number_format($this->final_price, 0, ',', '.');
+    }
+
+    public function getDiscountAmount()
+    {
+        if ($this->has_discount) {
+            return $this->selling_price - $this->discount_price;
+        }
+        return 0;
+    }
+
+    public function getFormattedDiscountAmount()
+    {
+        $amount = $this->getDiscountAmount();
+        return $amount > 0 ? 'Rp' . number_format($amount, 0, ',', '.') : null;
+    }
+
+    public function getMarginAmount()
+    {
+        return $this->final_price - $this->purchase_price;
+    }
+
+    public function getFormattedMarginAmount()
+    {
+        $amount = $this->getMarginAmount();
+        return 'Rp' . number_format($amount, 0, ',', '.');
     }
 }
