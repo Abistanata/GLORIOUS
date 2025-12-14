@@ -10,15 +10,9 @@ class RoleMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @param  string  ...$roles
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        // Check if user is authenticated
         if (!Auth::check()) {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -27,32 +21,42 @@ class RoleMiddleware
                     'error' => 'UNAUTHENTICATED'
                 ], 401);
             }
-            return redirect('/login');
+            return redirect('/');
         }
 
         $user = Auth::user();
+        $userRole = strtolower(trim($user->role));
 
-        // Check if user has required role
-        if (!in_array($user->role, $roles)) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Akses ditolak. Anda tidak memiliki permission untuk mengakses halaman ini.',
-                    'error' => 'FORBIDDEN'
-                ], 403);
+        // ✅ NORMALISASI ROLE UNTUK PERBANDINGAN
+        $normalizedRoles = array_map(function($role) {
+            return strtolower(trim($role));
+        }, $roles);
+
+        // Cek jika user memiliki salah satu role yang diizinkan
+        foreach ($normalizedRoles as $allowedRole) {
+            if (str_contains($userRole, $allowedRole) || str_contains($allowedRole, $userRole)) {
+                return $next($request);
             }
-
-            // Redirect based on user role
-            $redirectUrl = match ($user->role) {
-                'Admin'          => '/admin/dashboard',
-                'Manajer Gudang' => '/manajergudang/dashboard',
-                'Staff Gudang'   => '/staff/dashboard',
-                default          => '/',
-            };
-
-            return redirect($redirectUrl)->with('error', 'Akses ditolak. Anda tidak memiliki permission untuk mengakses halaman tersebut.');
         }
 
-        return $next($request);
+        // Role tidak sesuai
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akses ditolak. Anda tidak memiliki permission untuk mengakses halaman ini.',
+                'user_role' => $user->role,
+                'required_roles' => $roles
+            ], 403);
+        }
+
+        // Redirect berdasarkan role user
+        $redirectUrl = match(true) {
+            str_contains($userRole, 'admin') => '/admin/dashboard',
+            str_contains($userRole, 'manajer') => '/manajergudang/dashboard',
+            str_contains($userRole, 'staff') => '/staff/dashboard',
+            default => '/',
+        };
+
+        return redirect($redirectUrl)->with('error', 'Akses ditolak. Anda tidak memiliki permission untuk mengakses halaman tersebut.');
     }
 }

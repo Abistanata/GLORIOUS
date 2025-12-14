@@ -10,18 +10,19 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ProductAttributeController;
 use App\Http\Controllers\StockTransactionController;
 
+
 /*
 |--------------------------------------------------------------------------
-| API Routes - Role-Based Access Control
+| API Routes - For Mobile Apps, External Clients (Sanctum)
 |--------------------------------------------------------------------------
 */
 
-// ================================
-// PUBLIC ROUTES (No Authentication)
-// ================================
 Route::prefix('auth')->group(function () {
-    Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']);
+    // API Login dengan Sanctum
+    Route::post('login', [AuthController::class, 'apiLogin'])->name('api.auth.login');
+    Route::post('register', [AuthController::class, 'apiRegister'])->name('api.auth.register');
+    Route::post('logout', [AuthController::class, 'apiLogout'])->middleware('auth:sanctum');
+    Route::get('me', [AuthController::class, 'apiMe'])->middleware('auth:sanctum');
 });
 
 // ================================
@@ -31,7 +32,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Profile - All authenticated users
     Route::get('profile', [ProfileController::class, 'me']);
-    Route::post('auth/logout', [AuthController::class, 'logout']);
+
+    // ================================
+    // CUSTOMER ROUTES
+    // ================================
+    Route::prefix('customer')->middleware('role:customer')->group(function () {
+        Route::get('profile', [AuthController::class, 'customerProfile']);
+        Route::put('profile', [AuthController::class, 'updateCustomerProfile']);
+        Route::get('orders', [AuthController::class, 'customerOrders']);
+        Route::get('wishlist', [AuthController::class, 'customerWishlist']);
+    });
 
     // ================================
     // ADMIN ONLY ROUTES
@@ -60,23 +70,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('reports/stock', [StockTransactionController::class, 'reportStock']);
         Route::post('reports/transactions', [StockTransactionController::class, 'reportTransactions']);
 
-        // User Management (when implemented)
-        // Route::apiResource('users', UserController::class);
-    });
-
-     Route::middleware(['admin'])->prefix('admin')->group(function () {
-
-        // User management
+        // User Management
         Route::prefix('users')->group(function () {
-            Route::get('/', [UserManagementController::class, 'index']); // GET /api/admin/users
-            Route::get('/statistics', [UserManagementController::class, 'statistics']); // GET /api/admin/users/statistics
-            Route::get('/{id}', [UserManagementController::class, 'show']); // GET /api/admin/users/{id}
-            Route::put('/{id}/role', [UserManagementController::class, 'updateRole']); // PUT /api/admin/users/{id}/role
-            Route::put('/{id}/info', [UserManagementController::class, 'updateInfo']); // PUT /api/admin/users/{id}/info
-            Route::delete('/{id}', [UserManagementController::class, 'destroy']); // DELETE /api/admin/users/{id}
+            Route::get('/', [UserManagementController::class, 'index']);
+            Route::get('/statistics', [UserManagementController::class, 'statistics']);
+            Route::get('/{id}', [UserManagementController::class, 'show']);
+            Route::put('/{id}/role', [UserManagementController::class, 'updateRole']);
+            Route::put('/{id}/info', [UserManagementController::class, 'updateInfo']);
+            Route::delete('/{id}', [UserManagementController::class, 'destroy']);
         });
     });
-
 
     // ================================
     // MANAJER GUDANG ROUTES

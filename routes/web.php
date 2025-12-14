@@ -17,11 +17,12 @@ use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\Main\AboutController;
 use App\Http\Controllers\Main\ProductsController;
 use App\Http\Controllers\Main\DashboardsController;
-use App\Http\Controllers\Main\WishlistController; // Tambahkan ini
+use App\Http\Controllers\Main\WishlistController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
-| WEB ROUTES
+| WEB ROUTES - For Web Browsers (Session Based)
 |--------------------------------------------------------------------------
 */
 
@@ -29,7 +30,6 @@ use App\Http\Controllers\Main\WishlistController; // Tambahkan ini
 // HALAMAN UTAMA WEBSITE (PUBLIC)
 // ===================================
 
-// Website utama - tanpa prefix
 Route::get('/', [DashboardsController::class, 'index'])->name('main.dashboard.index');
 Route::get('/about', [AboutController::class, 'index'])->name('main.about.index');
 Route::get('/services', [ServiceController::class, 'index'])->name('main.services.index');
@@ -38,60 +38,29 @@ Route::get('/products/category/{category_id}', [ProductsController::class, 'inde
 Route::get('/products/{id}', [ProductsController::class, 'show'])->name('main.products.show');
 
 // ===================================
-// WISHLIST ROUTES (PUBLIC/LOGGED IN USERS)
+// WISHLIST ROUTES
 // ===================================
 Route::prefix('wishlist')->name('wishlist.')->group(function () {
     Route::get('/', [WishlistController::class, 'index'])->name('index');
     Route::post('/add/{product}', [WishlistController::class, 'add'])->name('add');
     Route::delete('/remove/{product}', [WishlistController::class, 'remove'])->name('remove');
-    Route::post('/toggle/{product}', [WishlistController::class, 'toggle'])->name('toggle');
-    Route::get('/count', [WishlistController::class, 'count'])->name('count');
-    Route::delete('/clear', [WishlistController::class, 'clear'])->name('clear');
-    Route::post('/move-to-cart/{product}', [WishlistController::class, 'moveToCart'])->name('move-to-cart');
 });
+
 // ===================================
-// APLIKASI STOCKIFY (DENGAN PREFIX)
+// SATU-SATUNYA ENDPOINT LOGIN WEB (SESSION)
 // ===================================
+// SATU ENDPOINT UNTUK WEB
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot.password');
+Route::get('/check-session', [AuthController::class, 'checkSession'])->name('check.session');
 
-Route::prefix('stockify')->group(function () {
-    
-    // Route utama stockify - redirect berdasarkan auth
-    Route::get('/', function () {
-        if (auth()->check()) {
-            $user = auth()->user();
-            return redirect(match ($user->role) {
-                'Admin'          => route('admin.dashboard'),
-                'Manajer Gudang' => route('manajergudang.dashboard'),
-                'Staff Gudang'   => route('staff.dashboard'),
-                default          => route('login'),
-            });
-        }
-        return redirect()->route('login');
-    })->name('stockify.welcome');
-
-    // GUEST ROUTES
-    Route::middleware('guest')->group(function () {
-        Route::get('/login', fn() => view('auth.login'))->name('login');
-        Route::get('/register', fn() => view('auth.register'))->name('register');
-    });
-
-    // Auth actions (available for all)
-    Route::post('/login', [AuthController::class, 'login'])->name('login.process');
-    Route::post('/login/simple', [AuthController::class, 'simpleLogin'])->name('login.simple');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.process');
-
-    // Auth actions (require authentication)
-    Route::middleware('auth')->group(function () {
-        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-        Route::get('/me', [AuthController::class, 'me'])->name('auth.me');
-    });
-
-    // ===================================
-    // ADMIN ROUTES
-    // ===================================
-    Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
-        // Dashboard
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+// ===================================
+// ADMIN ROUTES
+// ===================================
+Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         // Resource Routes
         Route::resource('products', ProductController::class)->except(['destroy']);
@@ -171,10 +140,10 @@ Route::prefix('stockify')->group(function () {
     });
 
     // ===================================
-    // MANAJER GUDANG ROUTES
-    // ===================================
-    Route::middleware(['auth', 'role:Manajer Gudang'])->prefix('manajergudang')->name('manajergudang.')->group(function () {
-        Route::get('/dashboard', [ManagerDashboardController::class, 'index'])->name('dashboard');
+// MANAJER GUDANG ROUTES - FIX PREFIX
+// ===================================
+Route::middleware(['auth', 'role:Manajer Gudang'])->prefix('manajergudang')->name('manajergudang.')->group(function () {
+    Route::get('/dashboard', [ManagerDashboardController::class, 'index'])->name('dashboard');
         Route::resource('products', ProductController::class)->except(['destroy']);
         Route::get('/products', [ManagerDashboardController::class, 'productList'])->name('products.index');
         Route::get('/products/{product}', [ManagerDashboardController::class, 'productShow'])->name('products.show');
@@ -209,11 +178,13 @@ Route::prefix('stockify')->group(function () {
         Route::put('/profile', [ManagerDashboardController::class, 'updateProfile'])->name('profile.update');
     });
 
-    // ===================================
-    // STAFF GUDANG ROUTES
-    // ===================================
-    Route::middleware(['auth', 'role:Staff Gudang'])->prefix('staff')->name('staff.')->group(function () {
-        Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+   
+// ===================================
+// STAFF GUDANG ROUTES
+// ===================================
+Route::middleware(['auth', 'role:Staff Gudang'])->prefix('staff')->name('staff.')->group(function () {
+    Route::get('/dashboard', [StaffDashboardController::class, 'index'])->name('dashboard');
+    // ... existing staff routes ...
 
         // Stock Management Routes
         Route::prefix('stock')->name('stock.')->group(function () {
@@ -264,14 +235,20 @@ Route::prefix('stockify')->group(function () {
         Route::get('/profile', [StaffDashboardController::class, 'profile'])->name('profile');
         Route::put('/profile', [StaffDashboardController::class, 'updateProfile'])->name('profile.update');
     });
+
+// ===================================
+// CUSTOMER ROUTES (GUARD TERPISAH)
+// ===================================
+Route::middleware(['auth:customer'])->prefix('customer')->name('customer.')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('customer.dashboard');
+    })->name('dashboard');
 });
 
 // ===================================
-// FALLBACK
+// FALLBACK ROUTE YANG LEBIH AMAN
 // ===================================
 Route::fallback(function () {
-    if (auth()->check()) {
-        return redirect('/stockify');
-    }
-    return redirect('/stockify/login');
+    // Hanya untuk 404 yang benar-benar tidak ada
+    return response()->view('errors.404', [], 404);
 });

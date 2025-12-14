@@ -1312,64 +1312,60 @@
         </div>
     </section>
 
-    <!-- Process Section -->
-    <section class="py-20 bg-dark">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    Proses Layanan
+     <!-- Process Section -->
+    <section class="py-20 px-4 bg-dark">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold mb-4 text-light">
+                    Proses Layanan <span class="gradient-text">Terstandar</span>
                 </h2>
-                <p class="section-subtitle">
-                    Langkah-langkah mudah untuk mendapatkan layanan terbaik dari kami
+                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                    Kami mengikuti proses yang sistematis untuk memastikan kualitas terbaik
                 </p>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Step 1 -->
-                <div class="process-step">
-                    <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mb-6 mx-auto border-2 border-primary/30">
-                        <span class="text-2xl font-bold text-primary">1</span>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+                <!-- Connecting Line -->
+                <div class="hidden md:block absolute top-12 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-primary/50 to-primary/20 z-0"></div>
+                
+                <div class="relative z-10">
+                    <div class="w-24 h-24 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow">
+                        <i class="fas fa-comments text-3xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 text-white">Konsultasi</h3>
-                    <p class="text-gray-400">
-                        Ceritakan masalah perangkat Anda dan dapatkan analisa awal dari teknisi kami.
-                    </p>
-                    <div class="process-connector hidden lg:block"></div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-light mb-2">Konsultasi</div>
+                        <p class="text-gray-400">Diskusikan kebutuhan dan masalah perangkat Anda</p>
+                    </div>
                 </div>
                 
-                <!-- Step 2 -->
-                <div class="process-step">
-                    <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mb-6 mx-auto border-2 border-primary/30">
-                        <span class="text-2xl font-bold text-primary">2</span>
+                <div class="relative z-10">
+                    <div class="w-24 h-24 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow">
+                        <i class="fas fa-search text-3xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 text-white">Diagnosa</h3>
-                    <p class="text-gray-400">
-                        Kami melakukan pemeriksaan menyeluruh untuk mengidentifikasi masalah secara akurat.
-                    </p>
-                    <div class="process-connector hidden lg:block"></div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-light mb-2">Diagnosa</div>
+                        <p class="text-gray-400">Analisa mendalam untuk identifikasi masalah</p>
+                    </div>
                 </div>
                 
-                <!-- Step 3 -->
-                <div class="process-step">
-                    <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mb-6 mx-auto border-2 border-primary/30">
-                        <span class="text-2xl font-bold text-primary">3</span>
+                <div class="relative z-10">
+                    <div class="w-24 h-24 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow">
+                        <i class="fas fa-tools text-3xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 text-white">Perbaikan</h3>
-                    <p class="text-gray-400">
-                        Proses perbaikan dilakukan dengan komponen berkualitas dan standar terbaik.
-                    </p>
-                    <div class="process-connector hidden lg:block"></div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-light mb-2">Perbaikan</div>
+                        <p class="text-gray-400">Proses perbaikan dengan standar kualitas terbaik</p>
+                    </div>
                 </div>
                 
-                <!-- Step 4 -->
-                <div class="process-step">
-                    <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mb-6 mx-auto border-2 border-primary/30">
-                        <span class="text-2xl font-bold text-primary">4</span>
+                <div class="relative z-10">
+                    <div class="w-24 h-24 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow">
+                        <i class="fas fa-shield-alt text-3xl text-white"></i>
                     </div>
-                    <h3 class="text-xl font-bold mb-4 text-white">Testing & Garansi</h3>
-                    <p class="text-gray-400">
-                        Perangkat diuji secara menyeluruh dan dilengkapi dengan garansi layanan.
-                    </p>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-light mb-2">Garansi</div>
+                        <p class="text-gray-400">Testing menyeluruh dengan garansi layanan</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1663,94 +1659,134 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-darker">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    Hubungi Kami
+    <section id="kontak" class="py-20 px-4 bg-dark-lighter">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-heading font-bold mb-4 text-light">
+                    Konsultasi <span class="gradient-text">Gratis</span>
                 </h2>
-                <p class="section-subtitle">
-                    Kami siap membantu kebutuhan teknologi Anda. Jangan ragu untuk menghubungi kami.
+                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                    Tim ahli kami siap membantu Anda. Hubungi kami untuk konsultasi tanpa biaya
                 </p>
             </div>
-            
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div class="contact-card">
-                    <h3 class="text-2xl font-bold mb-6 text-white">Kirim Pesan</h3>
-                    <p class="text-gray-400 mb-8">Isi form berikut dan kami akan segera merespons</p>
+                <!-- Contact Info -->
+                <div class="space-y-8">
+                    <div class="bg-dark rounded-2xl p-8 border border-gray-800">
+                        <h3 class="text-2xl font-bold text-light mb-6">Informasi Kontak</h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-phone-alt text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-light mb-1">Telepon</h4>
+                                    <a href="tel:082133803940" class="text-gray-400 hover:text-primary transition-colors text-lg">0821-3380-3940</a>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fab fa-whatsapp text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-light mb-1">WhatsApp</h4>
+                                    <a href="https://wa.me/6282133803940" target="_blank" 
+                                       class="inline-flex items-center gap-2 text-gray-400 hover:text-primary transition-colors text-lg group">
+                                        Chat Sekarang
+                                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-map-marker-alt text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-light mb-1">Lokasi</h4>
+                                    <p class="text-gray-400">Jl. Argandaru No.4, Bukateja, Purbalingga</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-clock text-primary"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-light mb-1">Jam Operasional</h4>
+                                    <p class="text-gray-400">Senin - Sabtu: 08:00 - 17:00 WIB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <form action="#" method="POST" class="space-y-6">
-                        <div>
-                            <label for="name" class="block text-gray-300 mb-3 font-medium">Nama Lengkap</label>
-                            <input type="text" id="name" class="w-full bg-gray-light border border-gray-700 rounded-xl py-4 px-5 text-white focus:outline-none focus:ring-3 focus:ring-primary focus:border-transparent transition-all duration-300" placeholder="Masukkan nama lengkap" required>
+                    <!-- Quick Links -->
+                    <div class="bg-dark rounded-2xl p-8 border border-gray-800">
+                        <h3 class="text-2xl font-bold text-light mb-6">Layanan Cepat</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <a href="#service-pc-laptop" class="bg-dark-light hover:bg-primary/10 rounded-xl p-4 flex items-center gap-3 group transition-all">
+                                <i class="fas fa-laptop-code text-primary group-hover:scale-110 transition-transform"></i>
+                                <span class="text-light group-hover:text-primary">PC & Laptop</span>
+                            </a>
+                            <a href="#service-upgrade-hardware" class="bg-dark-light hover:bg-primary/10 rounded-xl p-4 flex items-center gap-3 group transition-all">
+                                <i class="fas fa-microchip text-primary group-hover:scale-110 transition-transform"></i>
+                                <span class="text-light group-hover:text-primary">Upgrade Hardware</span>
+                            </a>
+                            <a href="#service-printer" class="bg-dark-light hover:bg-primary/10 rounded-xl p-4 flex items-center gap-3 group transition-all">
+                                <i class="fas fa-print text-primary group-hover:scale-110 transition-transform"></i>
+                                <span class="text-light group-hover:text-primary">Printer</span>
+                            </a>
+                            <a href="#service-software" class="bg-dark-light hover:bg-primary/10 rounded-xl p-4 flex items-center gap-3 group transition-all">
+                                <i class="fas fa-download text-primary group-hover:scale-110 transition-transform"></i>
+                                <span class="text-light group-hover:text-primary">Software</span>
+                            </a>
                         </div>
-                        <div>
-                            <label for="email" class="block text-gray-300 mb-3 font-medium">Email</label>
-                            <input type="email" id="email" class="w-full bg-gray-light border border-gray-700 rounded-xl py-4 px-5 text-white focus:outline-none focus:ring-3 focus:ring-primary focus:border-transparent transition-all duration-300" placeholder="Masukkan alamat email" required>
-                        </div>
-                        <div>
-                            <label for="message" class="block text-gray-300 mb-3 font-medium">Pesan</label>
-                            <textarea id="message" rows="5" class="w-full bg-gray-light border border-gray-700 rounded-xl py-4 px-5 text-white focus:outline-none focus:ring-3 focus:ring-primary focus:border-transparent transition-all duration-300 resize-none" placeholder="Tulis pesan Anda" required></textarea>
-                        </div>
-                        <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 px-5 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl">
-                            Kirim Sekarang
-                        </button>
-                    </form>
+                    </div>
                 </div>
                 
-                <div class="space-y-8">
-                    <div class="contact-card">
-                        <div class="flex items-start">
-                            <div class="w-14 h-14 bg-primary/20 rounded-full flex items-center justify-center mr-5">
-                                <i class="fas fa-phone-alt text-xl text-primary"></i>
+                <!-- Contact Form -->
+                <div class="bg-dark rounded-2xl p-8 border border-gray-800">
+                    <h3 class="text-2xl font-bold text-light mb-6">Kirim Pesan</h3>
+                    <form class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-gray-400 mb-2">Nama Lengkap</label>
+                                <input type="text" class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="Masukkan nama Anda">
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold mb-3 text-white">Telepon</h3>
-                                <p class="text-gray-300 text-lg">0821-3380-3940</p>
-                                <p class="text-gray-400 mt-2">Senin - Minggu, 08:00 - 22:00 WIB</p>
+                                <label class="block text-gray-400 mb-2">Nomor Telepon</label>
+                                <input type="tel" class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="0821-xxx-xxxx">
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="contact-card">
-                        <div class="flex items-start">
-                            <div class="w-14 h-14 bg-primary/20 rounded-full flex items-center justify-center mr-5">
-                                <i class="fab fa-whatsapp text-xl text-primary"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold mb-3 text-white">WhatsApp</h3>
-                                <a href="https://wa.me/6282133803940" target="_blank" class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1">
-                                    <i class="fab fa-whatsapp mr-3"></i> Chat Sekarang
-                                </a>
-                                <p class="text-gray-400 mt-3">Respon cepat via WhatsApp</p>
-                            </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 mb-2">Email</label>
+                            <input type="email" class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="email@contoh.com">
                         </div>
-                    </div>
-                    
-                    <div class="contact-card">
-                        <div class="flex items-start">
-                            <div class="w-14 h-14 bg-primary/20 rounded-full flex items-center justify-center mr-5">
-                                <i class="fas fa-map-marker-alt text-xl text-primary"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold mb-3 text-white">Alamat</h3>
-                                <p class="text-gray-300 text-lg">Jl. Argandaru No.4, Bukateja, Purbalingga</p>
-                                <p class="text-gray-400 mt-2">Buka: Senin - Minggu, 08:00 - 22:00 WIB</p>
-                            </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 mb-2">Layanan yang Dibutuhkan</label>
+                            <select class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors">
+                                <option value="">Pilih layanan</option>
+                                <option value="pc-laptop">Servis PC & Laptop</option>
+                                <option value="upgrade">Upgrade Hardware</option>
+                                <option value="printer">Servis Printer</option>
+                                <option value="software">Install Software</option>
+                            </select>
                         </div>
-                    </div>
-                    
-                    <div class="bg-dark rounded-2xl overflow-hidden border border-gray-700">
-                        <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.0596510563556!2d109.4235094749978!3d-7.006158792999033!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e656ff33b6e6d8b%3A0x6fa8848c2db925cd!2sNo%204%2C%20Jl.%20Argandaru%2C%20Dusun%205%2C%20Bukateja%2C%20Kabupaten%20Purbalingga%2C%20Jawa%20Tengah%2053382!5e0!3m2!1sid!2sid!4v1693380000000!5m2!1sid!2sid" 
-                            width="100%" 
-                            height="280" 
-                            style="border:0;" 
-                            allowfullscreen="" 
-                            loading="lazy"
-                            class="w-full">
-                        </iframe>
-                    </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 mb-2">Pesan</label>
+                            <textarea rows="4" class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="Jelaskan kebutuhan Anda secara detail"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full bg-gradient-primary hover:shadow-glow-primary text-white py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105">
+                            Kirim Pesan  
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
