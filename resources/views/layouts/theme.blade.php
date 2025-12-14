@@ -2096,102 +2096,79 @@
             this.showPopup('error-popup');
         },
         
-        /**
-         * Handle Login - FIXED untuk Customer dan User
-         */
-        async handleLogin() {
-            const identifier = document.getElementById('login-identifier')?.value;
-            const password = document.getElementById('login-password')?.value;
-            const rememberMe = document.getElementById('remember-me')?.checked;
+        // Cari fungsi handleLogin dan update endpoint
+async handleLogin() {
+    const identifier = document.getElementById('login-identifier')?.value;
+    const password = document.getElementById('login-password')?.value;
+    const rememberMe = document.getElementById('remember-me')?.checked;
+    const type = 'user'; // ✅ Default type untuk popup (admin/staff)
 
-            if (!identifier || !password) {
-                this.showError('Login Gagal', 'Harap isi semua field yang diperlukan');
-                return;
-            }
+    if (!identifier || !password) {
+        this.showError('Login Gagal', 'Harap isi semua field yang diperlukan');
+        return;
+    }
 
-            // ✅ DETEKSI TYPE OTOMATIS: Customer atau User?
-            let type = 'user'; // default untuk admin/staff
-            const isEmail = identifier.includes('@');
-            const cleanedPhone = identifier.replace(/[^0-9]/g, '');
-            const isPhone = cleanedPhone.length >= 10 && cleanedPhone.length <= 15;
+    const loginButton = document.querySelector('#customer-login-form button[type="submit"]');
+    const spinner = loginButton?.querySelector('.spinner');
+    const buttonText = loginButton?.querySelector('.login-button-text');
+
+    if (spinner) spinner.classList.remove('hidden');
+    if (buttonText) buttonText.textContent = 'Memproses...';
+
+    try {
+        // ✅ GANTI ENDPOINT KE /login (bukan /api/auth/login)
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': this.csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                login: identifier,
+                password: password,
+                remember: rememberMe,
+                type: type // ✅ TAMBAHKAN TYPE
+            })
+        });
+
+        const data = await response.json();
+
+        if (spinner) spinner.classList.add('hidden');
+        if (buttonText) buttonText.textContent = 'Masuk ke Akun';
+
+        if (response.ok && data.success) {
+            // Save user data
+            this.currentUser = data.user;
+            localStorage.setItem('glorious_user', JSON.stringify(data.user));
             
-            // Jika bukan email (tidak ada @) dan panjang wajar, kemungkinan customer
-            if (!isEmail && identifier.length <= 50 && !identifier.includes(' ')) {
-                type = 'customer';
+            // Update UI
+            this.updateUserState();
+            
+            // Show success
+            this.hidePopup('customer-login-popup');
+            this.showSuccess('Login Berhasil', data.message || 'Selamat datang kembali!');
+            
+            // ✅ REDIRECT BERDASARKAN RESPONSE DARI BACKEND
+            if (data.redirect) {
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 1500);
             }
-
-            const loginButton = document.querySelector('#customer-login-form button[type="submit"]');
-            const spinner = loginButton?.querySelector('.spinner');
-            const buttonText = loginButton?.querySelector('.login-button-text');
-
-            if (spinner) spinner.classList.remove('hidden');
-            if (buttonText) buttonText.textContent = 'Memproses...';
-
-            try {
-                // ✅ PAKAI /login (SESSION BASED)
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': this.csrfToken,
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        login: identifier,
-                        password: password,
-                        remember: rememberMe,
-                        type: type // ✅ KIRIM TYPE YANG DITEKSI
-                    })
-                });
-
-                const data = await response.json();
-
-                if (spinner) spinner.classList.add('hidden');
-                if (buttonText) buttonText.textContent = 'Masuk ke Akun';
-
-                if (response.ok && data.success) {
-                    // Save user data
-                    this.currentUser = data.user;
-                    localStorage.setItem('glorious_user', JSON.stringify(data.user));
-                    
-                    // Update UI
-                    this.updateUserState();
-                    
-                    // Hide login popup
-                    this.hidePopup('customer-login-popup');
-                    
-                    // Show success message
-                    this.showToast(data.message || 'Login berhasil!', 'success');
-                    
-                    // ✅ REDIRECT BERDASARKAN RESPONSE DARI BACKEND
-                    if (data.redirect) {
-                        setTimeout(() => {
-                            window.location.href = data.redirect;
-                        }, 1500);
-                    }
-                    // Jika customer, tidak perlu redirect
-                    
-                } else {
-                    // Coba dengan type sebaliknya jika gagal
-                    if (type === 'user') {
-                        this.showError('Login Gagal', 'Coba login sebagai customer atau periksa kredensial Anda');
-                    } else {
-                        this.showError('Login Gagal', data.message || 'Username/email atau password salah');
-                    }
-                }
-            } catch (error) {
-                if (spinner) spinner.classList.add('hidden');
-                if (buttonText) buttonText.textContent = 'Masuk ke Akun';
-                
-                this.showError('Error Sistem', 'Terjadi kesalahan saat menghubungi server');
-                console.error('Login error:', error);
-            }
-        },
+            
+        } else {
+            this.showError('Login Gagal', data.message || 'Email atau password salah');
+        }
+    } catch (error) {
+        if (spinner) spinner.classList.add('hidden');
+        if (buttonText) buttonText.textContent = 'Masuk ke Akun';
         
-        /**
-         * Handle Registration - FIXED untuk Customer saja
-         */
+        this.showError('Error Sistem', 'Terjadi kesalahan saat menghubungi server');
+        console.error('Login error:', error);
+    }
+},
+        
         async handleRegistration() {
             const name = document.getElementById('register-name')?.value;
             const username = document.getElementById('register-username')?.value;
@@ -2232,14 +2209,12 @@
             if (buttonText) buttonText.textContent = 'Mendaftarkan...';
 
             try {
-                // ✅ PAKAI /register (bukan /api/auth/register)
-                const response = await fetch('/register', {
+                const response = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': this.csrfToken,
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
                         name: name,
@@ -2248,8 +2223,7 @@
                         phone: phone,
                         password: password,
                         password_confirmation: passwordConfirm,
-                        terms: true,
-                        type: 'customer' // ✅ SELALU CUSTOMER UNTUK REGISTER VIA WEB
+                        terms: true // Sesuai dengan validation "accepted" di AuthController
                     })
                 });
 
@@ -2259,29 +2233,16 @@
                 if (buttonText) buttonText.textContent = 'Daftar Sekarang';
 
                 if (response.ok && data.success) {
-                    // TIDAK langsung login setelah register
+                    // Save user data
+                    this.currentUser = data.user;
+                    localStorage.setItem('glorious_user', JSON.stringify(data.user));
+                    
+                    // Update UI
+                    this.updateUserState();
+                    
+                    // Show success
                     this.hidePopup('customer-registration-popup');
-                    
-                    // Tampilkan sukses
-                    this.showSuccess(
-                        'Pendaftaran Berhasil', 
-                        'Akun Anda telah berhasil dibuat! Silakan login dengan username dan password Anda.'
-                    );
-                    
-                    // Auto isi form login setelah 2 detik
-                    setTimeout(() => {
-                        this.showPopup('customer-login-popup');
-                        const loginIdentifier = document.getElementById('login-identifier');
-                        if (loginIdentifier) {
-                            loginIdentifier.value = username;
-                        }
-                        // Kosongkan password
-                        const loginPassword = document.getElementById('login-password');
-                        if (loginPassword) {
-                            loginPassword.value = '';
-                        }
-                    }, 2000);
-                    
+                    this.showSuccess('Pendaftaran Berhasil', data.message || 'Selamat! Akun Anda telah berhasil dibuat.');
                 } else {
                     const errorMessage = data.errors 
                         ? Object.values(data.errors).join(', ')
@@ -2297,21 +2258,12 @@
             }
         },
         
-        /**
-         * Handle Forgot Password - FIXED
-         */
         async handleForgotPassword() {
             const identifier = document.getElementById('forgot-password-identifier')?.value;
             
             if (!identifier) {
                 this.showError('Reset Password', 'Harap masukkan email atau nomor telepon');
                 return;
-            }
-            
-            // ✅ DETEKSI TYPE
-            let type = 'user';
-            if (!identifier.includes('@') && identifier.length <= 15) {
-                type = 'customer';
             }
             
             const forgotButton = document.querySelector('#forgot-password-form button[type="submit"]');
@@ -2322,18 +2274,15 @@
             if (buttonText) buttonText.textContent = 'Mengirim...';
             
             try {
-                // ✅ PAKAI /forgot-password (bukan /api/auth/forgot-password)
-                const response = await fetch('/forgot-password', {
+                const response = await fetch('/api/auth/forgot-password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': this.csrfToken,
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        identifier: identifier,
-                        type: type // ✅ KIRIM TYPE
+                        identifier: identifier
                     })
                 });
                 
@@ -2342,9 +2291,9 @@
                 if (spinner) spinner.classList.add('hidden');
                 if (buttonText) buttonText.textContent = 'Kirim Reset Link';
                 
-                if (response.ok && data.success) {
+                if (response.ok) {
                     this.hidePopup('forgot-password-popup');
-                    this.showSuccess('Reset Password', data.message || 'Instruksi reset password telah dikirim.');
+                    this.showSuccess('Reset Password', 'Link reset password telah dikirim. Silakan cek email atau WhatsApp Anda.');
                 } else {
                     this.showError('Reset Password Gagal', data.message || 'Terjadi kesalahan saat mengirim reset link');
                 }
@@ -2357,32 +2306,21 @@
             }
         },
         
-        /**
-         * Handle Logout - FIXED
-         */
         async handleLogout() {
             try {
-                // ✅ DETEKSI TYPE USER YANG LOGOUT
-                const userType = this.currentUser?.role === 'customer' ? 'customer' : 'user';
-                
-                const response = await fetch('/logout', {
+                const response = await fetch('/api/auth/logout', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': this.csrfToken,
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        type: userType // ✅ KIRIM TYPE
-                    })
+                        'Accept': 'application/json'
+                    }
                 });
-
-                const data = await response.json();
                 
-                // Clear local storage
+                // Clear local storage regardless of server response
                 this.currentUser = null;
                 localStorage.removeItem('glorious_user');
+                localStorage.removeItem('glorious_token');
                 
                 // Update UI
                 this.updateUserState();
@@ -2391,13 +2329,14 @@
                 this.hidePopup('profile-popup');
                 
                 // Show success message
-                this.showToast(data.message || 'Logout berhasil', 'success');
+                this.showSuccess('Logout Berhasil', 'Anda telah berhasil logout dari sistem');
                 
             } catch (error) {
                 console.error('Logout error:', error);
                 // Still clear local storage on error
                 this.currentUser = null;
                 localStorage.removeItem('glorious_user');
+                localStorage.removeItem('glorious_token');
                 this.updateUserState();
                 this.hidePopup('profile-popup');
             }
@@ -2415,7 +2354,7 @@
                 // User is logged in
                 if (userStatus) userStatus.textContent = this.currentUser.name || 'Pengguna';
                 if (userName) userName.textContent = this.currentUser.name || 'Pengguna';
-                if (userUsername) userUsername.textContent = this.currentUser.username ? `@${this.currentUser.username}` : '';
+                if (userUsername) userUsername.textContent = `@${this.currentUser.username}`;
                 
                 if (userInfo) userInfo.classList.remove('hidden');
                 if (guestButtons) guestButtons.classList.add('hidden');
@@ -2430,35 +2369,32 @@
             }
         },
         
-        /**
-         * Check Session - FIXED
-         */
         async checkSession() {
             try {
-                // ✅ PAKAI /check-session (method baru di AuthController)
-                const response = await fetch('/check-session', {
+                const response = await fetch('/api/auth/me', {
                     method: 'GET',
                     headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'Accept': 'application/json'
                     }
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
-                    if (data.success && data.authenticated) {
-                        this.currentUser = data.user;
-                        localStorage.setItem('glorious_user', JSON.stringify(data.user));
+                    if (data.success) {
+                        this.currentUser = data.data.user;
+                        localStorage.setItem('glorious_user', JSON.stringify(data.data.user));
                         this.updateUserState();
                     } else {
                         // Clear invalid session
                         localStorage.removeItem('glorious_user');
+                        localStorage.removeItem('glorious_token');
                         this.currentUser = null;
                         this.updateUserState();
                     }
                 } else {
                     // Clear invalid session
                     localStorage.removeItem('glorious_user');
+                    localStorage.removeItem('glorious_token');
                     this.currentUser = null;
                     this.updateUserState();
                 }
@@ -2466,6 +2402,7 @@
                 console.error('Session check error:', error);
                 // On error, assume user is logged out
                 localStorage.removeItem('glorious_user');
+                localStorage.removeItem('glorious_token');
                 this.currentUser = null;
                 this.updateUserState();
             }
