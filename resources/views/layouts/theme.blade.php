@@ -231,12 +231,21 @@
             transform: scale(1.1);
         }
         
-        /* Popup overlay */
+        /* FIXED: Popup overlay yang benar */
         .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
-            z-index: 9999;
+            padding: 20px;
         }
         
         .popup-overlay.active {
@@ -244,21 +253,30 @@
             visibility: visible;
         }
         
+        /* FIXED: Popup content dengan overflow auto */
         .popup-content {
-            transform: translateY(20px);
+            background: linear-gradient(145deg, #1E1E1E, #121212);
+            border: 1px solid rgba(255, 107, 0, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px) scale(0.95);
             opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
         }
         
         .popup-overlay.active .popup-content {
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
             opacity: 1;
         }
         
-        /* Compact popup styles */
-        .popup-content {
-            max-height: 85vh;
-            overflow-y: auto;
+        /* Popup content khusus untuk registration yang lebih besar */
+        .popup-content.large {
+            max-width: 900px;
         }
         
         /* Custom scrollbar untuk popup */
@@ -282,10 +300,17 @@
         
         /* Responsive untuk mobile */
         @media (max-width: 640px) {
+            .popup-overlay {
+                padding: 10px;
+            }
+            
             .popup-content {
-                margin: 1rem;
-                padding: 1rem !important;
-                max-height: 90vh;
+                max-height: 95vh;
+                margin: 10px;
+            }
+            
+            .popup-content.large {
+                max-width: 100%;
             }
         }
         
@@ -420,6 +445,23 @@
             right: 20px;
             z-index: 10000;
             animation: slideDown 0.3s ease-out;
+        }
+        
+        /* FIXED: Untuk popup registration yang lebih kompleks */
+        .registration-container {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        @media (min-width: 1024px) {
+            .registration-container {
+                flex-direction: row;
+            }
+        }
+        
+        /* FIXED: Menghilangkan overflow hidden yang menyebabkan terpotong */
+        body.popup-open {
+            overflow: hidden;
         }
     </style>
 
@@ -557,7 +599,7 @@
                     </a>
 
                     <!-- Wishlist -->
-                    <a href="{{ route('wishlist.index') }}" class="relative group">
+                    <button id="wishlist-button" class="relative group">
                         <div class="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-dark-light transition-all">
                             <i class="fas fa-heart text-xl text-light group-hover:text-red-500 transition-colors"></i>
                             @if(isset($wishlistCount) && $wishlistCount > 0)
@@ -566,7 +608,7 @@
                                 </span>
                             @endif
                         </div>
-                    </a>
+                    </button>
 
                     <!-- Cart -->
                     <button id="cart-button" class="relative group">
@@ -593,14 +635,14 @@
                 <!-- Menu Mobile Toggle -->
                 <div class="lg:hidden flex items-center space-x-3">
                     <!-- Wishlist Mobile -->
-                    <a href="{{ route('wishlist.index') }}" class="relative">
+                    <button id="wishlist-button-mobile" class="relative">
                         <i class="fas fa-heart text-xl text-light hover:text-primary transition-colors"></i>
                         @if(isset($wishlistCount) && $wishlistCount > 0)
                             <span class="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                                 {{ $wishlistCount }}
                             </span>
                         @endif
-                    </a>
+                    </button>
 
                     <!-- Cart Mobile -->
                     <button id="cart-button-mobile" class="relative">
@@ -751,487 +793,408 @@
     </div>
 
     <!-- Profile Popup -->
-    <div id="profile-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-sm relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-primary"></div>
-                <div class="absolute -top-20 -right-20 w-40 h-40 bg-gradient-primary rounded-full opacity-10 blur-3xl"></div>
-                <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-primary/20 rounded-full opacity-5 blur-3xl"></div>
+    <div id="profile-popup" class="popup-overlay fixed inset-0 z-[9999]">
+        <div class="popup-content max-w-sm">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary rounded-t-lg"></div>
+            
+            <button id="close-profile-popup" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors close-button z-50">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div class="p-6">
+                <!-- Header -->
+                <div class="text-center mb-6">
+                    <div class="relative w-16 h-16 mx-auto mb-4">
+                        <div class="absolute inset-0 bg-gradient-primary rounded-full blur-xl opacity-50"></div>
+                        <div class="relative w-full h-full bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-primary">
+                            <i class="fas fa-user-gear text-xl text-white"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white font-heading mb-2">Glorious Computer</h3>
+                    <p class="text-gray-400 text-sm">Solusi Teknologi Terpercaya</p>
+                </div>
                 
-                <button id="close-profile-popup" 
-                        class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors close-button z-50">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
+                <!-- User Status -->
+                <div class="bg-dark-light/30 rounded-xl p-4 mb-4 text-center border border-gray-800">
+                    <p class="text-gray-400 text-sm mb-2">Status Pengguna</p>
+                    <div class="inline-flex items-center bg-dark rounded-full px-4 py-2 border border-gray-700 mb-2">
+                        <i class="fas fa-user-clock text-primary mr-2"></i>
+                        <span class="text-white font-medium text-sm" id="user-status">Tamu</span>
+                    </div>
+                    <div id="user-info" class="mt-2 hidden">
+                        <p class="text-white text-sm font-medium" id="user-name"></p>
+                        <p class="text-gray-400 text-xs mt-1" id="user-username"></p>
+                    </div>
+                </div>
                 
-                <div class="relative z-10 p-8">
-                    <!-- Header -->
-                    <div class="text-center mb-8">
-                        <div class="relative w-20 h-20 mx-auto mb-4">
-                            <div class="absolute inset-0 bg-gradient-primary rounded-full blur-xl opacity-50"></div>
-                            <div class="relative w-full h-full bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-primary">
-                                <i class="fas fa-user-gear text-2xl text-white"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white font-heading mb-2">Glorious Computer</h3>
-                        <p class="text-gray-400">Solusi Teknologi Terpercaya</p>
-                    </div>
+                <!-- Guest Buttons -->
+                <div class="space-y-3" id="guest-buttons">
+                    <button id="profile-login-button"
+                            class="w-full btn-primary text-white py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-center group">
+                        <i class="fas fa-sign-in-alt mr-3 group-hover:animate-pulse"></i>
+                        Login Pelanggan
+                    </button>
                     
-                    <!-- User Status -->
-                    <div class="bg-dark-light/30 rounded-xl p-5 mb-6 text-center border border-gray-800">
-                        <p class="text-gray-400 text-sm mb-2">Status Pengguna</p>
-                        <div class="inline-flex items-center bg-dark rounded-full px-5 py-2 border border-gray-700 mb-3">
-                            <i class="fas fa-user-clock text-primary mr-2"></i>
-                            <span class="text-white font-medium" id="user-status">Tamu</span>
-                        </div>
-                        <div id="user-info" class="mt-3 hidden">
-                            <p class="text-white text-lg font-medium" id="user-name"></p>
-                            <p class="text-gray-400 text-sm mt-1" id="user-username"></p>
-                        </div>
-                    </div>
+                    <button id="profile-register-button"
+                            class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-center group">
+                        <i class="fas fa-user-plus mr-3 group-hover:animate-bounce"></i>
+                        Daftar Pelanggan
+                    </button>
                     
-                    <!-- Guest Buttons -->
-                    <div class="space-y-4" id="guest-buttons">
-                        <button id="profile-login-button"
-                                class="w-full btn-primary text-white py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center group">
-                            <i class="fas fa-sign-in-alt mr-3 group-hover:animate-pulse"></i>
-                            Login Pelanggan
-                        </button>
-                        
-                        <button id="profile-register-button"
-                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center group">
-                            <i class="fas fa-user-plus mr-3 group-hover:animate-bounce"></i>
-                            Daftar Pelanggan
-                        </button>
-                        
-                        <a href="https://wa.me/6282133803940" 
-                           target="_blank"
-                           class="w-full bg-gradient-to-r from-green-600/20 to-green-700/20 hover:from-green-600/30 hover:to-green-700/30 border border-green-700/30 hover:border-green-500 text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center group shadow-lg">
-                            <i class="fab fa-whatsapp mr-3 group-hover:animate-heartbeat"></i>
-                            Konsultasi via WhatsApp
-                        </a>
-                    </div>
+                    <a href="https://wa.me/6282133803940" 
+                       target="_blank"
+                       class="w-full bg-gradient-to-r from-green-600/20 to-green-700/20 hover:from-green-600/30 hover:to-green-700/30 border border-green-700/30 hover:border-green-500 text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group shadow-lg">
+                        <i class="fab fa-whatsapp mr-3 group-hover:animate-heartbeat"></i>
+                        Konsultasi via WhatsApp
+                    </a>
+                </div>
 
-                    <!-- User Buttons -->
-                    <div class="space-y-4 hidden" id="user-buttons">
-                        <button id="user-dashboard-button"
-                                class="w-full btn-primary text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center group">
-                            <i class="fas fa-tachometer-alt mr-3"></i>
-                            Dashboard
-                        </button>
-                        
-                        <a href="{{ route('wishlist.index') }}"
-                           class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center group">
-                            <i class="fas fa-heart mr-3"></i>
-                            Wishlist Saya
-                        </a>
-                        
-                        <button id="user-orders-button"
-                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center group">
-                            <i class="fas fa-shopping-bag mr-3"></i>
-                            Pesanan Saya
-                        </button>
-                        
-                        <button id="user-logout-button"
-                                class="w-full bg-gradient-to-r from-red-600/20 to-red-700/20 hover:from-red-600/30 hover:to-red-700/30 border border-red-700/30 hover:border-red-500 text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center group">
-                            <i class="fas fa-sign-out-alt mr-3"></i>
-                            Logout
-                        </button>
-                    </div>
+                <!-- User Buttons -->
+                <div class="space-y-3 hidden" id="user-buttons">
+                    <button id="user-dashboard-button"
+                            class="w-full btn-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        Dashboard
+                    </button>
                     
-                    <!-- Footer Note -->
-                    <div class="mt-8 pt-6 border-t border-gray-800/50">
-                        <p class="text-gray-500 text-sm text-center">
-                            <i class="fas fa-shield-alt mr-2 text-primary"></i>
-                            Data Anda aman bersama kami sejak 2003
-                        </p>
-                    </div>
+                    <a href="{{ route('wishlist.index') }}"
+                       class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
+                        <i class="fas fa-heart mr-3"></i>
+                        Wishlist Saya
+                    </a>
+                    
+                    <button id="user-orders-button"
+                            class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
+                        <i class="fas fa-shopping-bag mr-3"></i>
+                        Pesanan Saya
+                    </button>
+                    
+                    <button id="user-logout-button"
+                            class="w-full bg-gradient-to-r from-red-600/20 to-red-700/20 hover:from-red-600/30 hover:to-red-700/30 border border-red-700/30 hover:border-red-500 text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
+                        <i class="fas fa-sign-out-alt mr-3"></i>
+                        Logout
+                    </button>
+                </div>
+                
+                <!-- Footer Note -->
+                <div class="mt-6 pt-4 border-t border-gray-800/50">
+                    <p class="text-gray-500 text-xs text-center">
+                        <i class="fas fa-shield-alt mr-2 text-primary"></i>
+                        Data Anda aman bersama kami sejak 2003
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Customer Login Form Popup -->
-    <div id="customer-login-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-sm relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
-                <div class="absolute -top-32 -right-32 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-secondary/10 rounded-full blur-3xl"></div>
+    <div id="customer-login-popup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary rounded-t-lg"></div>
+            
+            {{-- <button id="close-login-popup" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors close-button z-50">
+                <i class="fas fa-times text-xl"></i>
+            </button> --}}
+            
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="relative w-16 h-16 mx-auto mb-4">
+                        <div class="absolute inset-0 bg-gradient-primary rounded-full blur-xl opacity-50"></div>
+                        <div class="relative w-full h-full bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-primary">
+                            <i class="fas fa-user-lock text-xl text-white"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white font-heading mb-2">Masuk Akun</h3>
+                    <p class="text-gray-400 text-sm">Selamat datang kembali di Glorious Computer</p>
+                </div>
                 
-                <div class="relative z-10 p-8">
-                    <button id="close-login-popup" 
-                            class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors close-button">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                    
-                    <div class="text-center mb-8">
-                        <div class="relative w-20 h-20 mx-auto mb-4">
-                            <div class="absolute inset-0 bg-gradient-primary rounded-full blur-xl opacity-50"></div>
-                            <div class="relative w-full h-full bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-primary">
-                                <i class="fas fa-user-lock text-2xl text-white"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white font-heading mb-2">Masuk Akun</h3>
-                        <p class="text-gray-400">Selamat datang kembali di Glorious Computer</p>
+                <!-- Login Form -->
+                <form id="customer-login-form" class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-gray-300 font-medium text-sm">Username/Email/Phone</label>
+                        <input type="text" 
+                               id="login-identifier"
+                               name="login"
+                               placeholder="Masukkan username, email, atau nomor telepon"
+                               class="w-full form-input px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all text-sm"
+                               required>
                     </div>
                     
-                    <!-- Login Form - DIREVISI untuk sesuai dengan AuthController -->
-                    <form id="customer-login-form" class="space-y-6">
-                        <!-- Login identifier (username/email/phone) -->
-                        <div class="space-y-2">
-                            <div class="flex items-center">
-                                <i class="fas fa-user-circle text-primary mr-2"></i>
-                                <label class="text-gray-300 font-medium">Username/Email/Phone</label>
-                            </div>
-                            <input type="text" 
-                                   id="login-identifier"
-                                   name="login"
-                                   placeholder="Masukkan username, email, atau nomor telepon"
-                                   class="w-full form-input px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="text-gray-300 font-medium text-sm">Password</label>
+                            <button type="button" id="forgot-password-button" class="text-primary hover:text-primary-light text-xs transition-colors">
+                                Lupa password?
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <input type="password" 
+                                   id="login-password"
+                                   name="password"
+                                   placeholder="••••••••"
+                                   class="w-full form-input px-4 py-3 pr-10 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all text-sm"
                                    required>
-                        </div>
-                        
-                        <!-- Password -->
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center">
-                                    <i class="fas fa-key text-primary mr-2"></i>
-                                    <label class="text-gray-300 font-medium">Password</label>
-                                </div>
-                                <button type="button" id="forgot-password-button" class="text-primary hover:text-primary-light text-sm transition-colors">
-                                    Lupa password?
-                                </button>
-                            </div>
-                            <div class="relative">
-                                <input type="password" 
-                                       id="login-password"
-                                       name="password"
-                                       placeholder="••••••••"
-                                       class="w-full form-input px-4 py-3.5 pr-12 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
-                                       required>
-                                <button type="button" 
-                                        class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                                        data-target="login-password">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Remember Me -->
-                        <div class="flex items-center space-x-3">
-                            <input type="checkbox" 
-                                   id="remember-me" 
-                                   name="remember"
-                                   class="form-checkbox"
-                                   value="1">
-                            <label for="remember-me" class="text-gray-400 cursor-pointer select-none">
-                                Ingat saya
-                            </label>
-                        </div>
-                        
-                        <!-- Submit Button -->
-                        <button type="submit"
-                                class="w-full btn-primary text-white py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center">
-                            <span class="login-button-text">Masuk ke Akun</span>
-                            <div class="spinner w-5 h-5 ml-2 hidden"></div>
-                        </button>
-                    </form>
-                    
-                    <div class="relative my-8">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-800"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-4 bg-dark-lighter text-gray-500">atau</span>
+                            <button type="button" 
+                                    class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                    data-target="login-password">
+                                <i class="fas fa-eye text-sm"></i>
+                            </button>
                         </div>
                     </div>
                     
-                    <div class="space-y-4">
-                        <button id="switch-to-register-button"
-                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
-                            <i class="fas fa-user-plus mr-3 group-hover:scale-110 transition-transform"></i>
-                            Buat Akun Baru
-                        </button>
-                        
-                        <button id="back-from-login-button"
-                                class="w-full bg-transparent hover:bg-dark-light/30 border border-gray-700 hover:border-gray-600 text-gray-400 hover:text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
-                            <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i>
-                            Kembali
-                        </button>
+                    <div class="flex items-center space-x-3">
+                        <input type="checkbox" 
+                               id="remember-me" 
+                               name="remember"
+                               class="form-checkbox"
+                               value="1">
+                        <label for="remember-me" class="text-gray-400 text-sm cursor-pointer select-none">
+                            Ingat saya
+                        </label>
                     </div>
                     
-                    <div class="mt-8 pt-6 border-t border-gray-800/50">
-                        <p class="text-gray-500 text-sm text-center mb-4">Butuh bantuan cepat?</p>
-                        <a href="https://wa.me/6282133803940" 
-                           target="_blank"
-                           class="w-full bg-gradient-to-r from-green-600/20 to-green-700/20 hover:from-green-600/30 hover:to-green-700/30 border border-green-700/30 hover:border-green-500 text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group shadow-lg">
-                            <i class="fab fa-whatsapp mr-3 text-green-400 group-hover:animate-heartbeat"></i>
-                            Konsultasi via WhatsApp
-                        </a>
+                    <button type="submit"
+                            class="w-full btn-primary text-white py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-center mt-4">
+                        <span class="login-button-text">Masuk ke Akun</span>
+                        <div class="spinner w-4 h-4 ml-2 hidden"></div>
+                    </button>
+                </form>
+                
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-800"></div>
                     </div>
+                    <div class="relative flex justify-center text-xs">
+                        <span class="px-4 bg-gradient-to-br from-dark-lighter to-dark text-gray-500">atau masuk dengan</span>
+                    </div>
+                </div>
+
+                <!-- Social Login Buttons -->
+                <div class="space-y-3 mb-4">
+                    <button id="google-login-button"
+                            class="w-full bg-white hover:bg-gray-100 text-gray-900 py-3 rounded-lg font-medium transition-all flex items-center justify-center group border border-gray-300 text-sm">
+                        <svg class="w-4 h-4 mr-3" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Masuk dengan Google
+                    </button>
+                </div>
+
+                <div class="relative my-4">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-800"></div>
+                    </div>
+                    <div class="relative flex justify-center text-xs">
+                        <span class="px-4 bg-gradient-to-br from-dark-lighter to-dark text-gray-500">belum punya akun?</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <button id="switch-to-register-button"
+                            class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
+                        <i class="fas fa-user-plus mr-3 text-xs"></i>
+                        Buat Akun Baru
+                    </button>
+
+                    <button id="back-from-login-button"
+                            class="w-full bg-transparent hover:bg-dark-light/30 border border-gray-700 hover:border-gray-600 text-gray-400 hover:text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
+                        <i class="fas fa-arrow-left mr-3"></i>
+                        Kembali
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Customer Registration Form Popup -->
-    <div id="customer-registration-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-4xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
-                <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-accent/10 rounded-full blur-3xl"></div>
-                
-                <div class="relative z-10">
-                    <button id="close-registration-popup" 
-                            class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors close-button z-10">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
+    <div id="customer-registration-popup" class="popup-overlay">
+        <div class="popup-content large">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary rounded-t-lg"></div>
+            
+            {{-- <button id="close-registration-popup"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors close-button z-50">
+                <i class="fas fa-times text-xl"></i>
+            </button> --}}
+
+            <div class="registration-container">
+                <div class="lg:w-2/5 bg-gradient-to-br from-primary/10 to-primary-dark/10 p-6 lg:p-8">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-glow">
+                            <span class="text-white font-bold">GC</span>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-white font-heading">Glorious Computer</h2>
+                            <p class="gradient-text font-semibold text-xs">Solusi Teknologi Terpercaya</p>
+                        </div>
+                    </div>
                     
-                    <div class="grid grid-cols-1 lg:grid-cols-5 min-h-[600px]">
-                        <div class="lg:col-span-2 bg-gradient-to-br from-primary/10 to-primary-dark/10 p-8 lg:p-12 flex flex-col justify-center relative overflow-hidden">
-                            <div class="absolute inset-0 opacity-5">
-                                <div class="absolute top-10 left-10 w-40 h-40 border-2 border-primary rounded-full"></div>
-                                <div class="absolute bottom-10 right-10 w-32 h-32 border-2 border-primary rounded-full"></div>
-                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-2 border-primary rounded-full"></div>
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-white font-heading mb-3">
+                            Bergabung dengan <span class="gradient-text">Komunitas Kami</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-primary mr-3 text-sm"></i>
+                                <span class="text-gray-300 text-sm">Layanan Service Komputer & Laptop</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-primary mr-3 text-sm"></i>
+                                <span class="text-gray-300 text-sm">Upgrade Hardware Terjangkau</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-primary mr-3 text-sm"></i>
+                                <span class="text-gray-300 text-sm">Konsultasi Teknologi Gratis</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-3/5 p-6 lg:p-8">
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-white font-heading mb-2">Daftar Akun Baru</h3>
+                        <p class="text-gray-400 text-sm">Bergabung dengan komunitas Glorious Computer</p>
+                    </div>
+                    
+                    <!-- Registration Form -->
+                    <form id="customer-registration-form" class="space-y-4">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-gray-300 font-medium text-sm">Nama Lengkap</label>
+                                <input type="text" 
+                                       id="register-name"
+                                       name="name"
+                                       placeholder="Masukkan nama lengkap"
+                                       class="w-full form-input px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all text-sm"
+                                       required>
                             </div>
                             
-                            <div class="relative z-10">
-                                <div class="flex items-center space-x-4 mb-8">
-                                    <div class="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-glow">
-                                        <span class="text-white font-bold text-xl">GC</span>
+                            <div class="space-y-2">
+                                <label class="text-gray-300 font-medium text-sm">Username</label>
+                                <input type="text" 
+                                       id="register-username"
+                                       name="username"
+                                       placeholder="Pilih username unik"
+                                       class="w-full form-input px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all text-sm"
+                                       required>
+                                <p class="text-gray-500 text-xs mt-1">Huruf, angka, dan underscore, tanpa spasi</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-gray-300 font-medium text-sm">Email (Opsional)</label>
+                                <input type="email" 
+                                       id="register-email"
+                                       name="email"
+                                       placeholder="nama@email.com"
+                                       class="w-full form-input px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all text-sm">
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <label class="text-gray-300 font-medium text-sm">Nomor WhatsApp</label>
+                                <div class="relative">
+                                    <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
+                                        +62
                                     </div>
-                                    <div>
-                                        <h2 class="text-2xl font-bold text-white font-heading">Glorious Computer</h2>
-                                        <p class="gradient-text font-semibold text-sm">Solusi Teknologi Terpercaya</p>
-                                    </div>
+                                    <input type="tel" 
+                                           id="register-phone"
+                                           name="phone"
+                                           placeholder="812-xxxx-xxxx"
+                                           class="w-full form-input pl-12 px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all text-sm"
+                                           required>
                                 </div>
-                                
-                                <div class="mb-8">
-                                    <h3 class="text-3xl font-bold text-white font-heading mb-4">
-                                        Bergabung dengan <span class="gradient-text">Komunitas Kami</span>
-                                    </h3>
-                                    <p class="text-gray-300 mb-6">
-                                        Dapatkan akses eksklusif ke layanan terbaik, promo spesial, dan solusi teknologi terkini.
-                                    </p>
-                                    <div class="space-y-4">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-check-circle text-primary mr-3"></i>
-                                            <span class="text-gray-300">Layanan Service Komputer & Laptop</span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <i class="fas fa-check-circle text-primary mr-3"></i>
-                                            <span class="text-gray-300">Upgrade Hardware Terjangkau</span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <i class="fas fa-check-circle text-primary mr-3"></i>
-                                            <span class="text-gray-300">Konsultasi Teknologi Gratis</span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <i class="fas fa-check-circle text-primary mr-3"></i>
-                                            <span class="text-gray-300">Notifikasi Promo & Diskon</span>
-                                        </div>
-                                    </div>
+                                <p class="text-gray-500 text-xs mt-1">Untuk komunikasi via WhatsApp</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="text-gray-300 font-medium text-sm">Password</label>
+                                <div class="relative">
+                                    <input type="password" 
+                                           id="register-password"
+                                           name="password"
+                                           placeholder="Buat password yang kuat"
+                                           class="w-full form-input px-4 py-3 pr-10 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all text-sm"
+                                           required>
+                                    <button type="button" 
+                                            class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                            data-target="register-password">
+                                        <i class="fas fa-eye text-sm"></i>
+                                    </button>
                                 </div>
-                                
-                                <div class="mt-12">
-                                    <div class="flex items-center justify-center space-x-6">
-                                        <div class="text-center">
-                                            <div class="text-3xl font-bold text-white">20+</div>
-                                            <div class="text-gray-400 text-sm">Tahun Pengalaman</div>
-                                        </div>
-                                        <div class="h-12 w-px bg-gray-700"></div>
-                                        <div class="text-center">
-                                            <div class="text-3xl font-bold text-white">5000+</div>
-                                            <div class="text-gray-400 text-sm">Pelanggan Puas</div>
-                                        </div>
-                                    </div>
+                                <div class="password-strength">
+                                    <div id="password-strength-bar" class="password-strength-bar"></div>
+                                </div>
+                                <p class="text-gray-500 text-xs">Minimal 6 karakter</p>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <label class="text-gray-300 font-medium text-sm">Konfirmasi Password</label>
+                                <div class="relative">
+                                    <input type="password" 
+                                           id="register-password-confirm"
+                                           name="password_confirmation"
+                                           placeholder="Ketik ulang password"
+                                           class="w-full form-input px-4 py-3 pr-10 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all text-sm"
+                                           required>
+                                    <button type="button" 
+                                            class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                            data-target="register-password-confirm">
+                                        <i class="fas fa-eye text-sm"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="lg:col-span-3 p-8 lg:p-12">
-                            <div class="mb-8">
-                                <h3 class="text-2xl lg:text-3xl font-bold text-white font-heading mb-2">Daftar Akun Baru</h3>
-                                <p class="text-gray-400">Bergabung dengan komunitas Glorious Computer</p>
-                            </div>
-                            
-                            <!-- Registration Form - DIREVISI untuk sesuai dengan AuthController -->
-                            <form id="customer-registration-form" class="space-y-6">
-                                <!-- Name & Username -->
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    <div class="space-y-2">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-user text-primary mr-2"></i>
-                                            <label class="text-gray-300 font-medium">Nama Lengkap</label>
-                                        </div>
-                                        <input type="text" 
-                                               id="register-name"
-                                               name="name"
-                                               placeholder="Masukkan nama lengkap Anda"
-                                               class="w-full form-input px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
-                                               required>
-                                    </div>
-                                    
-                                    <div class="space-y-2">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-at text-primary mr-2"></i>
-                                            <label class="text-gray-300 font-medium">Username</label>
-                                        </div>
-                                        <input type="text" 
-                                               id="register-username"
-                                               name="username"
-                                               placeholder="Pilih username unik"
-                                               class="w-full form-input px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
-                                               required>
-                                        <p class="text-gray-500 text-xs mt-1">Username hanya boleh mengandung huruf, angka, dan underscore</p>
-                                    </div>
-                                </div>
-                                
-                                <!-- Email & Phone -->
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    <div class="space-y-2">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-envelope text-primary mr-2"></i>
-                                            <label class="text-gray-300 font-medium">Email (Opsional)</label>
-                                        </div>
-                                        <input type="email" 
-                                               id="register-email"
-                                               name="email"
-                                               placeholder="nama@email.com"
-                                               class="w-full form-input px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all">
-                                    </div>
-                                    
-                                    <div class="space-y-2">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-phone text-primary mr-2"></i>
-                                            <label class="text-gray-300 font-medium">Nomor WhatsApp</label>
-                                        </div>
-                                        <div class="relative">
-                                            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                                +62
-                                            </div>
-                                            <input type="tel" 
-                                                   id="register-phone"
-                                                   name="phone"
-                                                   placeholder="812-xxxx-xxxx"
-                                                   class="w-full form-input pl-12 px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
-                                                   required>
-                                        </div>
-                                        <p class="text-gray-500 text-xs mt-1">Untuk komunikasi via WhatsApp</p>
-                                    </div>
-                                </div>
-                                
-                                <!-- Password & Confirm Password -->
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    <div class="space-y-2">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-lock text-primary mr-2"></i>
-                                            <label class="text-gray-300 font-medium">Password</label>
-                                        </div>
-                                        <div class="relative">
-                                            <input type="password" 
-                                                   id="register-password"
-                                                   name="password"
-                                                   placeholder="Buat password yang kuat"
-                                                   class="w-full form-input px-4 py-3.5 pr-12 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
-                                                   required>
-                                            <button type="button" 
-                                                    class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                                                    data-target="register-password">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </div>
-                                        <div class="password-strength">
-                                            <div id="password-strength-bar" class="password-strength-bar"></div>
-                                        </div>
-                                        <p class="text-gray-500 text-xs">Minimal 6 karakter</p>
-                                    </div>
-                                    
-                                    <div class="space-y-2">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-lock text-primary mr-2"></i>
-                                            <label class="text-gray-300 font-medium">Konfirmasi Password</label>
-                                        </div>
-                                        <div class="relative">
-                                            <input type="password" 
-                                                   id="register-password-confirm"
-                                                   name="password_confirmation"
-                                                   placeholder="Ketik ulang password Anda"
-                                                   class="w-full form-input px-4 py-3.5 pr-12 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
-                                                   required>
-                                            <button type="button" 
-                                                    class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
-                                                    data-target="register-password-confirm">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Terms & Conditions -->
-                                <div class="flex items-start space-x-3 bg-dark-light/30 p-4 rounded-xl border border-gray-800 mt-6">
-                                    <input type="checkbox" 
-                                           id="register-terms"
-                                           name="terms"
-                                           class="form-checkbox mt-1"
-                                           required
-                                           value="1">
-                                    <label for="register-terms" class="text-gray-400 text-sm cursor-pointer select-none">
-                                        Saya setuju dengan 
-                                        <a href="#" class="text-primary hover:text-primary-light transition-colors">Syarat & Ketentuan</a>
-                                        dan 
-                                        <a href="#" class="text-primary hover:text-primary-light transition-colors">Kebijakan Privasi</a>
-                                        Glorious Computer
-                                    </label>
-                                </div>
-                                
-                                <!-- Submit Button -->
-                                <button type="submit"
-                                        class="w-full btn-primary text-white py-4 rounded-xl font-semibold text-lg transition-all mt-6 flex items-center justify-center">
-                                    <span class="register-button-text">Daftar Sekarang</span>
-                                    <div class="spinner w-5 h-5 ml-2 hidden"></div>
-                                </button>
-                            </form>
-                            
-                            <div class="relative my-8">
-                                <div class="absolute inset-0 flex items-center">
-                                    <div class="w-full border-t border-gray-800"></div>
-                                </div>
-                                <div class="relative flex justify-center text-sm">
-                                    <span class="px-4 bg-gradient-to-br from-dark-lighter to-dark text-gray-500">sudah punya akun?</span>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                <button id="switch-to-login-button"
-                                        class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
-                                    <i class="fas fa-sign-in-alt mr-3 group-hover:scale-110 transition-transform"></i>
-                                    Masuk ke Akun
-                                </button>
-                                
-                                <button id="back-from-registration-button"
-                                        class="w-full bg-transparent hover:bg-dark-light/30 border border-gray-700 hover:border-gray-600 text-gray-400 hover:text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
-                                    <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i>
-                                    Kembali
-                                </button>
-                            </div>
-                            
-                            <div class="mt-8 pt-6 border-t border-gray-800/50">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-2 text-gray-500 text-sm">
-                                        <i class="fas fa-shield-alt text-primary"></i>
-                                        <span>Keamanan data terjamin sejak 2003</span>
-                                    </div>
-                                    <a href="https://wa.me/6282133803940" 
-                                       target="_blank"
-                                       class="text-primary hover:text-primary-light text-sm transition-colors">
-                                        <i class="fab fa-whatsapp mr-1"></i>
-                                        Butuh bantuan?
-                                    </a>
-                                </div>
-                            </div>
+                        <div class="flex items-start space-x-3 bg-dark-light/30 p-3 rounded-lg border border-gray-800 mt-4">
+                            <input type="checkbox" 
+                                   id="register-terms"
+                                   name="terms"
+                                   class="form-checkbox mt-1"
+                                   required
+                                   value="1">
+                            <label for="register-terms" class="text-gray-400 text-xs cursor-pointer select-none">
+                                Saya setuju dengan 
+                                <a href="#" class="text-primary hover:text-primary-light transition-colors">Syarat & Ketentuan</a>
+                                dan 
+                                <a href="#" class="text-primary hover:text-primary-light transition-colors">Kebijakan Privasi</a>
+                            </label>
                         </div>
+                        
+                        <button type="submit"
+                                class="w-full btn-primary text-white py-3 rounded-lg font-semibold text-sm transition-all mt-4 flex items-center justify-center">
+                            <span class="register-button-text">Daftar Sekarang</span>
+                            <div class="spinner w-4 h-4 ml-2 hidden"></div>
+                        </button>
+                    </form>
+                    
+                    <div class="relative my-4">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-800"></div>
+                        </div>
+                        <div class="relative flex justify-center text-xs">
+                            <span class="px-4 bg-gradient-to-br from-dark-lighter to-dark text-gray-500">sudah punya akun?</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                        <button id="switch-to-login-button"
+                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
+                            <i class="fas fa-sign-in-alt mr-3 text-xs"></i>
+                            Masuk ke Akun
+                        </button>
+                        
+                        <button id="back-from-registration-button"
+                                class="w-full bg-transparent hover:bg-dark-light/30 border border-gray-700 hover:border-gray-600 text-gray-400 hover:text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
+                            <i class="fas fa-arrow-left mr-3"></i>
+                            Kembali
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1239,164 +1202,135 @@
     </div>
 
     <!-- Forgot Password Popup -->
-    <div id="forgot-password-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
-                <div class="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-secondary/10 rounded-full blur-3xl"></div>
-                
-                <div class="relative z-10 p-8">
-                    <button id="close-forgot-password-popup" 
-                            class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors close-button">
-                        <i class="fas fa-times text-xl"></i>
+    <div id="forgot-password-popup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary rounded-t-lg"></div>
+            
+            <button id="close-forgot-password-popup" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors close-button z-50">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div class="p-6">
+                <div class="text-center mb-6">
+                    <div class="relative w-16 h-16 mx-auto mb-4">
+                        <div class="absolute inset-0 bg-gradient-primary rounded-full blur-xl opacity-50"></div>
+                        <div class="relative w-full h-full bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-primary">
+                            <i class="fas fa-key text-xl text-white"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white font-heading mb-2">Lupa Password</h3>
+                    <p class="text-gray-400 text-sm">Masukkan email atau nomor telepon untuk reset password</p>
+                </div>
+                    
+                <form id="forgot-password-form" class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-gray-300 font-medium text-sm">Email atau Nomor Telepon</label>
+                        <input type="text" 
+                               id="forgot-password-identifier"
+                               placeholder="Masukkan email atau nomor telepon terdaftar"
+                               class="w-full form-input px-4 py-3 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all text-sm"
+                               required>
+                    </div>
+                    
+                    <button type="submit"
+                            class="w-full btn-primary text-white py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-center">
+                        <span class="forgot-password-button-text">Kirim Reset Link</span>
+                        <div class="spinner w-4 h-4 ml-2 hidden"></div>
                     </button>
-                    
-                    <div class="text-center mb-8">
-                        <div class="relative w-20 h-20 mx-auto mb-4">
-                            <div class="absolute inset-0 bg-gradient-primary rounded-full blur-xl opacity-50"></div>
-                            <div class="relative w-full h-full bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-primary">
-                                <i class="fas fa-key text-2xl text-white"></i>
-                            </div>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white font-heading mb-2">Lupa Password</h3>
-                        <p class="text-gray-400">Masukkan email atau nomor telepon untuk reset password</p>
+                </form>
+                
+                <div class="relative my-4">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-800"></div>
                     </div>
-                    
-                    <form id="forgot-password-form" class="space-y-6">
-                        <div class="space-y-2">
-                            <div class="flex items-center">
-                                <i class="fas fa-envelope text-primary mr-2"></i>
-                                <label class="text-gray-300 font-medium">Email atau Nomor Telepon</label>
-                            </div>
-                            <input type="text" 
-                                   id="forgot-password-identifier"
-                                   placeholder="Masukkan email atau nomor telepon terdaftar"
-                                   class="w-full form-input px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
-                                   required>
-                        </div>
-                        
-                        <button type="submit"
-                                class="w-full btn-primary text-white py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center">
-                            <span class="forgot-password-button-text">Kirim Reset Link</span>
-                            <div class="spinner w-5 h-5 ml-2 hidden"></div>
-                        </button>
-                    </form>
-                    
-                    <div class="relative my-8">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-800"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-4 bg-dark-lighter text-gray-500">atau</span>
-                        </div>
+                    <div class="relative flex justify-center text-xs">
+                        <span class="px-4 bg-dark-lighter text-gray-500">atau</span>
                     </div>
-                    
-                    <div class="space-y-4">
-                        <button id="back-to-login-button"
-                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
-                            <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i>
-                            Kembali ke Login
-                        </button>
-                        
-                        <a href="https://wa.me/6282133803940" 
-                           target="_blank"
-                           class="w-full bg-gradient-to-r from-green-600/20 to-green-700/20 hover:from-green-600/30 hover:to-green-700/30 border border-green-700/30 hover:border-green-500 text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group shadow-lg">
-                            <i class="fab fa-whatsapp mr-3 text-green-400 group-hover:animate-heartbeat"></i>
-                            Hubungi Support WhatsApp
-                        </a>
-                    </div>
+                </div>
+                
+                <div class="space-y-3">
+                    <button id="back-to-login-button"
+                            class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
+                        <i class="fas fa-arrow-left mr-3"></i>
+                        Kembali ke Login
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Success Message Popup -->
-    <div id="success-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
-                <div class="absolute -top-20 -right-20 w-40 h-40 bg-green-500/10 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-green-500/5 rounded-full blur-3xl"></div>
-                
-                <div class="relative z-10 p-8 text-center">
-                    <div class="relative w-24 h-24 mx-auto mb-6">
-                        <div class="absolute inset-0 bg-green-500 rounded-full blur-xl opacity-20"></div>
-                        <div class="relative w-full h-full bg-green-500 rounded-full flex items-center justify-center">
-                            <i class="fas fa-check text-3xl text-white"></i>
-                        </div>
-                    </div>
-                    
-                    <h3 class="text-2xl font-bold text-white font-heading mb-4" id="success-title">Sukses!</h3>
-                    <p class="text-gray-300 mb-8" id="success-message"></p>
-                    
-                    <div class="space-y-4">
-                        <button id="close-success-popup"
-                                class="w-full btn-primary text-white py-4 rounded-xl font-semibold text-lg transition-all">
-                            <i class="fas fa-check-circle mr-2"></i>
-                            Oke, Mengerti
-                        </button>
+    <div id="success-popup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-green-500 rounded-t-lg"></div>
+            
+            <div class="p-6 text-center">
+                <div class="relative w-20 h-20 mx-auto mb-4">
+                    <div class="absolute inset-0 bg-green-500 rounded-full blur-xl opacity-20"></div>
+                    <div class="relative w-full h-full bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-check text-2xl text-white"></i>
                     </div>
                 </div>
+                
+                <h3 class="text-xl font-bold text-white font-heading mb-3" id="success-title">Sukses!</h3>
+                <p class="text-gray-300 mb-6 text-sm" id="success-message"></p>
+                
+                <button id="close-success-popup"
+                        class="w-full btn-primary text-white py-3 rounded-lg font-semibold text-sm transition-all">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    Oke, Mengerti
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Error Message Popup -->
-    <div id="error-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
-                <div class="absolute top-0 left-0 right-0 h-1 bg-red-500"></div>
-                <div class="absolute -top-20 -right-20 w-40 h-40 bg-red-500/10 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-red-500/5 rounded-full blur-3xl"></div>
+    <div id="error-popup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="absolute top-0 left-0 right-0 h-1 bg-red-500 rounded-t-lg"></div>
+            
+            <button id="close-error-popup" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors close-button z-50">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div class="p-6 text-center">
+                <div class="relative w-20 h-20 mx-auto mb-4">
+                    <div class="absolute inset-0 bg-red-500 rounded-full blur-xl opacity-20"></div>
+                    <div class="relative w-full h-full bg-red-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-2xl text-white"></i>
+                    </div>
+                </div>
                 
-                <div class="relative z-10 p-8 text-center">
-                    <button id="close-error-popup" 
-                            class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors close-button">
-                        <i class="fas fa-times text-xl"></i>
+                <h3 class="text-xl font-bold text-white font-heading mb-3" id="error-title">Terjadi Kesalahan</h3>
+                <p class="text-gray-300 mb-6 text-sm" id="error-message"></p>
+                
+                <div class="space-y-3">
+                    <button id="close-error-button"
+                            class="w-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 hover:border-red-400 text-white py-3 rounded-lg font-semibold text-sm transition-all">
+                        <i class="fas fa-times-circle mr-2"></i>
+                        Tutup
                     </button>
-                    
-                    <div class="relative w-24 h-24 mx-auto mb-6">
-                        <div class="absolute inset-0 bg-red-500 rounded-full blur-xl opacity-20"></div>
-                        <div class="relative w-full h-full bg-red-500 rounded-full flex items-center justify-center">
-                            <i class="fas fa-exclamation-triangle text-3xl text-white"></i>
-                        </div>
-                    </div>
-                    
-                    <h3 class="text-2xl font-bold text-white font-heading mb-4" id="error-title">Terjadi Kesalahan</h3>
-                    <p class="text-gray-300 mb-8" id="error-message"></p>
-                    
-                    <div class="space-y-4">
-                        <button id="close-error-button"
-                                class="w-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 hover:border-red-400 text-white py-4 rounded-xl font-semibold text-lg transition-all">
-                            <i class="fas fa-times-circle mr-2"></i>
-                            Tutup
-                        </button>
-                        
-                        <a href="https://wa.me/6282133803940" 
-                           target="_blank"
-                           class="w-full bg-gradient-to-r from-green-600/20 to-green-700/20 hover:from-green-600/30 hover:to-green-700/30 border border-green-700/30 hover:border-green-500 text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
-                            <i class="fab fa-whatsapp mr-3 text-green-400"></i>
-                            Minta Bantuan Support
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Overlay Loading -->
-    <div id="loading-overlay" class="popup-overlay fixed inset-0 bg-dark/95 z-50 flex items-center justify-center backdrop-blur-lg">
-        <div class="text-center">
-            <div class="relative">
-                <div class="w-28 h-28 border-4 border-primary/20 rounded-full"></div>
-                <div class="absolute top-0 left-0 w-28 h-28 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="spinner w-16 h-16"></div>
+    <div id="loading-overlay" class="popup-overlay">
+        <div class="popup-content bg-transparent border-none shadow-none">
+            <div class="text-center">
+                <div class="relative">
+                    <div class="w-20 h-20 border-4 border-primary/20 rounded-full"></div>
+                    <div class="absolute top-0 left-0 w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="spinner w-12 h-12"></div>
+                    </div>
                 </div>
+                <p class="mt-6 text-light text-lg font-medium animate-pulse">Memproses...</p>
+                <p class="text-gray-400 text-xs mt-2">Harap tunggu sebentar</p>
             </div>
-            <p class="mt-8 text-light text-xl font-medium animate-pulse">Memproses...</p>
-            <p class="text-gray-400 text-sm mt-3">Harap tunggu sebentar</p>
         </div>
     </div>
 
@@ -1537,7 +1471,7 @@
     </footer>
 
 <script>
-    // Global state management
+    // Global state management dengan perbaikan close
     const PopupManager = {
         currentUser: null,
         activePopup: null,
@@ -1556,6 +1490,18 @@
             
             // Check if user is logged in via session
             this.checkSession();
+            
+            // Setup password strength checker
+            this.setupPasswordStrengthChecker();
+        },
+        
+        setupPasswordStrengthChecker() {
+            const passwordInput = document.getElementById('register-password');
+            if (passwordInput) {
+                passwordInput.addEventListener('input', (e) => {
+                    this.checkPasswordStrength(e.target.value);
+                });
+            }
         },
         
         initializeUserState() {
@@ -1617,19 +1563,56 @@
             // Cart buttons
             const cartButton = document.getElementById('cart-button');
             const cartButtonMobile = document.getElementById('cart-button-mobile');
-            
+
             if (cartButton) {
                 cartButton.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    this.toggleCart();
+                    if (!this.currentUser) {
+                        this.showPopup('customer-login-popup');
+                    } else {
+                        this.toggleCart();
+                    }
                 });
             }
             if (cartButtonMobile) {
                 cartButtonMobile.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    this.toggleCart();
+                    if (!this.currentUser) {
+                        this.showPopup('customer-login-popup');
+                    } else {
+                        this.toggleCart();
+                    }
+                });
+            }
+
+            // Wishlist buttons (desktop and mobile)
+            const wishlistButton = document.getElementById('wishlist-button');
+            const wishlistButtonMobile = document.getElementById('wishlist-button-mobile');
+
+            if (wishlistButton) {
+                wishlistButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!this.currentUser) {
+                        this.showPopup('customer-login-popup');
+                    } else {
+                        window.location.href = '/wishlist';
+                    }
+                });
+            }
+
+            if (wishlistButtonMobile) {
+                wishlistButtonMobile.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!this.currentUser) {
+                        this.showPopup('customer-login-popup');
+                        this.hideMobileMenu();
+                    } else {
+                        window.location.href = '/wishlist';
+                    }
                 });
             }
             
@@ -1835,16 +1818,36 @@
                 });
             }
             
-            // Close popup when clicking outside
-            document.addEventListener('click', (e) => {
-                if (this.activePopup && e.target.classList.contains('popup-overlay')) {
+            // Social login buttons
+            const googleLoginButton = document.getElementById('google-login-button');
+            const facebookLoginButton = document.getElementById('facebook-login-button');
+
+            if (googleLoginButton) {
+                googleLoginButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showToast('Fitur login Google sedang dalam pengembangan', 'info');
+                });
+            }
+
+            if (facebookLoginButton) {
+                facebookLoginButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showToast('Fitur login Facebook sedang dalam pengembangan', 'info');
+                });
+            }
+
+            // FIXED: Close popup dengan Escape key untuk semua popup
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.activePopup) {
                     this.hidePopup(this.activePopup);
                 }
             });
             
-            // Close popup with Escape key
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && this.activePopup) {
+            // FIXED: Close popup ketika klik di luar content popup
+            document.addEventListener('click', (e) => {
+                if (this.activePopup && e.target.classList.contains('popup-overlay')) {
                     this.hidePopup(this.activePopup);
                 }
             });
@@ -1880,6 +1883,18 @@
                         this.hidePopup(popupId);
                     });
                 }
+                
+                // Juga handle close-error-popup khusus
+                if (popupId === 'error-popup') {
+                    const closeErrorPopup = document.getElementById('close-error-popup');
+                    if (closeErrorPopup) {
+                        closeErrorPopup.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.hidePopup('error-popup');
+                        });
+                    }
+                }
             });
         },
         
@@ -1901,8 +1916,16 @@
                 }
                 
                 popup.classList.add('active');
-                document.body.style.overflow = 'hidden';
+                document.body.classList.add('popup-open');
                 this.activePopup = popupId;
+                
+                // Focus pada input pertama jika ada
+                setTimeout(() => {
+                    const firstInput = popup.querySelector('input');
+                    if (firstInput) {
+                        firstInput.focus();
+                    }
+                }, 100);
             }
         },
         
@@ -1911,7 +1934,7 @@
             if (popup) {
                 popup.classList.remove('active');
                 if (!this.activePopup || this.activePopup === popupId) {
-                    document.body.style.overflow = 'auto';
+                    document.body.classList.remove('popup-open');
                     this.activePopup = null;
                 }
             }
@@ -1922,7 +1945,7 @@
             popups.forEach(popup => {
                 popup.classList.remove('active');
             });
-            document.body.style.overflow = 'auto';
+            document.body.classList.remove('popup-open');
             this.activePopup = null;
         },
         
@@ -2096,78 +2119,72 @@
             this.showPopup('error-popup');
         },
         
-        // Cari fungsi handleLogin dan update endpoint
-async handleLogin() {
-    const identifier = document.getElementById('login-identifier')?.value;
-    const password = document.getElementById('login-password')?.value;
-    const rememberMe = document.getElementById('remember-me')?.checked;
-    const type = 'user'; // ✅ Default type untuk popup (admin/staff)
+        async handleLogin() {
+            const identifier = document.getElementById('login-identifier')?.value;
+            const password = document.getElementById('login-password')?.value;
+            const rememberMe = document.getElementById('remember-me')?.checked;
+            const type = 'user';
 
-    if (!identifier || !password) {
-        this.showError('Login Gagal', 'Harap isi semua field yang diperlukan');
-        return;
-    }
-
-    const loginButton = document.querySelector('#customer-login-form button[type="submit"]');
-    const spinner = loginButton?.querySelector('.spinner');
-    const buttonText = loginButton?.querySelector('.login-button-text');
-
-    if (spinner) spinner.classList.remove('hidden');
-    if (buttonText) buttonText.textContent = 'Memproses...';
-
-    try {
-        // ✅ GANTI ENDPOINT KE /login (bukan /api/auth/login)
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': this.csrfToken,
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                login: identifier,
-                password: password,
-                remember: rememberMe,
-                type: type // ✅ TAMBAHKAN TYPE
-            })
-        });
-
-        const data = await response.json();
-
-        if (spinner) spinner.classList.add('hidden');
-        if (buttonText) buttonText.textContent = 'Masuk ke Akun';
-
-        if (response.ok && data.success) {
-            // Save user data
-            this.currentUser = data.user;
-            localStorage.setItem('glorious_user', JSON.stringify(data.user));
-            
-            // Update UI
-            this.updateUserState();
-            
-            // Show success
-            this.hidePopup('customer-login-popup');
-            this.showSuccess('Login Berhasil', data.message || 'Selamat datang kembali!');
-            
-            // ✅ REDIRECT BERDASARKAN RESPONSE DARI BACKEND
-            if (data.redirect) {
-                setTimeout(() => {
-                    window.location.href = data.redirect;
-                }, 1500);
+            if (!identifier || !password) {
+                this.showError('Login Gagal', 'Harap isi semua field yang diperlukan');
+                return;
             }
-            
-        } else {
-            this.showError('Login Gagal', data.message || 'Email atau password salah');
-        }
-    } catch (error) {
-        if (spinner) spinner.classList.add('hidden');
-        if (buttonText) buttonText.textContent = 'Masuk ke Akun';
-        
-        this.showError('Error Sistem', 'Terjadi kesalahan saat menghubungi server');
-        console.error('Login error:', error);
-    }
-},
+
+            const loginButton = document.querySelector('#customer-login-form button[type="submit"]');
+            const spinner = loginButton?.querySelector('.spinner');
+            const buttonText = loginButton?.querySelector('.login-button-text');
+
+            if (spinner) spinner.classList.remove('hidden');
+            if (buttonText) buttonText.textContent = 'Memproses...';
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        login: identifier,
+                        password: password,
+                        remember: rememberMe,
+                        type: type
+                    })
+                });
+
+                const data = await response.json();
+
+                if (spinner) spinner.classList.add('hidden');
+                if (buttonText) buttonText.textContent = 'Masuk ke Akun';
+
+                if (response.ok && data.success) {
+                    this.currentUser = data.user;
+                    localStorage.setItem('glorious_user', JSON.stringify(data.user));
+                    
+                    this.updateUserState();
+                    
+                    this.hidePopup('customer-login-popup');
+                    this.showSuccess('Login Berhasil', data.message || 'Selamat datang kembali!');
+                    
+                    if (data.redirect) {
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 1500);
+                    }
+                    
+                } else {
+                    this.showError('Login Gagal', data.message || 'Email atau password salah');
+                }
+            } catch (error) {
+                if (spinner) spinner.classList.add('hidden');
+                if (buttonText) buttonText.textContent = 'Masuk ke Akun';
+                
+                this.showError('Error Sistem', 'Terjadi kesalahan saat menghubungi server');
+                console.error('Login error:', error);
+            }
+        },
         
         async handleRegistration() {
             const name = document.getElementById('register-name')?.value;
@@ -2178,7 +2195,6 @@ async handleLogin() {
             const passwordConfirm = document.getElementById('register-password-confirm')?.value;
             const terms = document.getElementById('register-terms')?.checked;
 
-            // Validation
             if (!name || !username || !phone || !password || !passwordConfirm) {
                 this.showError('Pendaftaran Gagal', 'Harap isi semua field yang diperlukan');
                 return;
@@ -2194,7 +2210,6 @@ async handleLogin() {
                 return;
             }
 
-            // Validasi format username sesuai dengan AuthController
             const usernameRegex = /^[a-zA-Z0-9_]+$/;
             if (!usernameRegex.test(username)) {
                 this.showError('Pendaftaran Gagal', 'Username hanya boleh mengandung huruf, angka, dan underscore');
@@ -2223,7 +2238,7 @@ async handleLogin() {
                         phone: phone,
                         password: password,
                         password_confirmation: passwordConfirm,
-                        terms: true // Sesuai dengan validation "accepted" di AuthController
+                        terms: true
                     })
                 });
 
@@ -2233,14 +2248,11 @@ async handleLogin() {
                 if (buttonText) buttonText.textContent = 'Daftar Sekarang';
 
                 if (response.ok && data.success) {
-                    // Save user data
                     this.currentUser = data.user;
                     localStorage.setItem('glorious_user', JSON.stringify(data.user));
                     
-                    // Update UI
                     this.updateUserState();
                     
-                    // Show success
                     this.hidePopup('customer-registration-popup');
                     this.showSuccess('Pendaftaran Berhasil', data.message || 'Selamat! Akun Anda telah berhasil dibuat.');
                 } else {

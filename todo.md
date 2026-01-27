@@ -1,17 +1,30 @@
-# TODO: Fix Discount Price Integration and Stock Update Issues
+# TODO: Customer Login & Cart/Wishlist Implementation
 
-## Tasks
-- [ ] Update main dashboard index.blade.php to use proper discount price logic
-- [ ] Update main products index.blade.php to use proper discount price logic
-- [ ] Investigate and fix stock update synchronization issue
-- [ ] Test discount display on main dashboard and product pages
-- [ ] Test stock updates from admin and verify they appear immediately on main views
-- [ ] Clear any caches if needed
+## 1. Routing Changes
+- [ ] Modify AuthController loginCustomer() to not redirect to dashboard
+- [ ] Modify AuthController register() to not redirect to dashboard
+- [ ] Update login to stay on current page or redirect to home
 
-## Progress
-- [x] Analyze current code and identify issues
-- [x] Create comprehensive plan
-- [x] Update main products index.blade.php to use proper discount price logic
-- [x] Update main dashboard index.blade.php to use proper discount price logic
-- [ ] Fix stock synchronization
-- [ ] Testing and verification
+## 2. Product Detail Page (show.blade.php)
+- [ ] Add "Tambah ke Cart" button
+- [ ] Add "Tambah ke Wishlist" button
+- [ ] Integrate with localStorage cart system
+- [ ] Update JavaScript for cart/wishlist functionality
+- [ ] Handle guest vs authenticated user states
+
+## 3. Register Error Fix
+- [ ] Identify cause of 500 error in registration
+- [ ] Fix validation or database issues
+- [ ] Test registration process
+
+## 4. JavaScript Updates
+- [ ] Update cart functionality in theme.blade.php
+- [ ] Update wishlist functionality
+- [ ] Ensure localStorage integration works
+- [ ] Test guest and authenticated user flows
+
+## 5. Testing
+- [ ] Test customer login stays on page
+- [ ] Test cart/wishlist buttons work
+- [ ] Test registration works without errors
+- [ ] Test both guest and authenticated flows

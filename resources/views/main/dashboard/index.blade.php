@@ -1,83 +1,9 @@
-<!DOCTYPE html>
 @extends('layouts.theme')
 
 @section('title', 'Home - Glorious Computer')
 
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glorious Computer - Solusi Teknologi & Service</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#FF6B00',
-                        'primary-dark': '#E05D00',
-                        'primary-light': '#FF8C42',
-                        secondary: '#2D3748',
-                        dark: '#121212',
-                        darker: '#0A0A0A',
-                        light: '#F5F5F5',
-                        gray: '#8A8A8A',
-                        'gray-light': '#2A2A2A',
-                        'card-dark': '#171717',
-                        'card-light': '#1E1E1E',
-                        'accent': '#FF8C00',
-                    },
-                    fontFamily: {
-                        'inter': ['Inter', 'sans-serif'],
-                    },
-                    animation: {
-                        'fade-in-up': 'fadeInUp 0.8s ease-out',
-                        'fade-in-right': 'fadeInRight 0.8s ease-out',
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(30px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        },
-                        fadeInRight: {
-                            '0%': { opacity: '0', transform: 'translateX(30px)' },
-                            '100%': { opacity: '1', transform: 'translateX(0)' },
-                        },
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        pulseGlow: {
-                            '0%, 100%': { boxShadow: '0 0 20px rgba(255, 107, 0, 0.3)' },
-                            '50%': { boxShadow: '0 0 30px rgba(255, 107, 0, 0.5)' },
-                        }
-                    },
-                    typography: {
-                        DEFAULT: {
-                            css: {
-                                color: '#f5f5f5',
-                                h1: {
-                                    fontWeight: '800',
-                                },
-                                h2: {
-                                    fontWeight: '700',
-                                },
-                                h3: {
-                                    fontWeight: '600',
-                                },
-                            },
-                        },
-                    },
-                }
-            }
-        }
-    </script>
-
-    <style>
+@push('styles')
+<style>
     * {
         margin: 0;
         padding: 0;
@@ -1098,8 +1024,10 @@
         }
     }
     </style>
-</head>
-<body class="font-inter bg-darker text-light">
+@endpush
+
+@section('content')
+<div class="bg-darker text-light font-inter">
     <!-- Modern Hero Section -->
     <section class="hero-modern">
         <div class="floating-elements">
@@ -1553,16 +1481,17 @@
                                            class="btn-detail">
                                             <i class="fas fa-eye mr-2"></i>Detail
                                         </a>
-                                        <a href="https://wa.me/6282133803940?text=Halo,%20saya%20tertarik%20dengan%20produk:%0A%0A*{{ urlencode($product->name) }}*%0AHarga: Rp {{ number_format($finalPrice, 0, ',', '.') }}%0A%0ASpesifikasi:%20{{ urlencode(Str::limit($product->specification, 100)) }}%0AKondisi: {{ urlencode($condition) }}%0AGaransi: {{ urlencode($warranty) }}%0A%0AApakah%20masih%20tersedia?" 
-                                           target="_blank"
+                                        <button onclick="handleBuyProduct({{ $product->id }}, '{{ urlencode($product->name) }}', {{ $finalPrice }}, '{{ urlencode(Str::limit($product->specification, 100)) }}', '{{ urlencode($condition) }}', '{{ urlencode($warranty) }}', {{ $currentStock }})"
+                                           data-auth-required="customer"
+                                           data-auth-reason="buy"
                                            class="btn-buy btn-whatsapp {{ $currentStock == 0 ? 'btn-disabled' : '' }}"
-                                           @if($currentStock == 0) onclick="return false;" @endif>
+                                           @if($currentStock == 0) disabled @endif>
                                             @if($currentStock == 0)
                                                 <i class="fas fa-times mr-2"></i>Habis
                                             @else
                                                 <i class="fab fa-whatsapp mr-2"></i>Beli
                                             @endif
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1812,7 +1741,11 @@
         </div>
     </section>
 
-    <script>
+    </div>
+@endsection
+
+@push('scripts')
+<script>
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -1877,5 +1810,4 @@
             });
         });
     </script>
-</body>
-</html>
+@endpush

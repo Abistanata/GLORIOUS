@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\DB;
 
 class ProductsController extends Controller
 {
-    // Method index yang sudah ada
+    /**
+     * Display a listing of products with filters and search
+     */
     public function index(Request $request)
     {
         $productsQuery = Product::with(['category', 'supplier']);
@@ -80,6 +82,33 @@ class ProductsController extends Controller
         }
 
         $products = $productsQuery->paginate(12);
+        
+        // Generate WhatsApp message untuk setiap produk
+        $products->getCollection()->transform(function ($product) {
+            // Hitung harga final (cek apakah sedang diskon)
+            $finalPrice = $product->is_on_sale && $product->discount_price > 0 
+                ? $product->discount_price 
+                : $product->selling_price;
+            
+            // Ambil current stock (sudah dihitung dari subquery)
+            $currentStock = $product->current_stock ?? 0;
+            
+            // Ambil kondisi dan garansi (sesuaikan dengan field di database Anda)
+            $condition = $product->condition ?? 'Baru';
+            $warranty = $product->warranty ?? 'Garansi Toko';
+            
+            // Generate WhatsApp message
+            $product->whatsapp_message = $this->getWhatsAppMessage(
+                $product,
+                $finalPrice,
+                $currentStock,
+                $condition,
+                $warranty
+            );
+            
+            return $product;
+        });
+        
         $categories = Category::all();
         $totalProducts = Product::count();
         $totalCategories = Category::count();
@@ -97,7 +126,9 @@ class ProductsController extends Controller
         ));
     }
 
-    // Method show yang diperbaiki
+    /**
+     * Display the specified product
+     */
     public function show($id)
     {
         $product = Product::with(['category', 'supplier'])
@@ -111,33 +142,35 @@ class ProductsController extends Controller
         // Update current_stock attribute
         $product->current_stock = $currentStock;
 
-       // Get related products menggunakan raw query
-$relatedProductIds = DB::table('products')
-    ->select('products.id')
-    ->where('products.category_id', $product->category_id)
-    ->where('products.id', '!=', $product->id)
-    ->whereIn('products.id', function($query) {
-        $query->select('product_id')
-              ->from('stock_transactions')
-              ->groupBy('product_id')
-              ->havingRaw('COALESCE(SUM(CASE WHEN type = "Masuk" THEN quantity ELSE -quantity END), 0) > 0');
-    })
-    ->limit(4)
-    ->pluck('id');
+        // Get related products menggunakan raw query
+        $relatedProductIds = DB::table('products')
+            ->select('products.id')
+            ->where('products.category_id', $product->category_id)
+            ->where('products.id', '!=', $product->id)
+            ->whereIn('products.id', function($query) {
+                $query->select('product_id')
+                      ->from('stock_transactions')
+                      ->groupBy('product_id')
+                      ->havingRaw('COALESCE(SUM(CASE WHEN type = "Masuk" THEN quantity ELSE -quantity END), 0) > 0');
+            })
+            ->limit(4)
+            ->pluck('id');
 
-$relatedProducts = Product::with(['category'])
-    ->whereIn('id', $relatedProductIds)
-    ->get();
+        $relatedProducts = Product::with(['category'])
+            ->whereIn('id', $relatedProductIds)
+            ->get();
 
-// Hitung stok untuk setiap related product
-foreach ($relatedProducts as $relatedProduct) {
-    $relatedProduct->current_stock = $this->calculateProductStock($relatedProduct->id);
-}
+        // Hitung stok untuk setiap related product
+        foreach ($relatedProducts as $relatedProduct) {
+            $relatedProduct->current_stock = $this->calculateProductStock($relatedProduct->id);
+        }
 
         return view('main.products.show', compact('product', 'relatedProducts'));
     }
 
-    // Method untuk dashboard yang diperbaiki
+    /**
+     * Display dashboard with latest and sale products
+     */
     public function dashboard()
     {
         // Query untuk produk terbaru dengan stok > 0 - FIXED QUERY
@@ -195,7 +228,9 @@ foreach ($relatedProducts as $relatedProduct) {
         ));
     }
 
-    // Method baru untuk mencari produk - FIXED QUERY
+    /**
+     * Search products
+     */
     public function search(Request $request)
     {
         $search = $request->get('q');
@@ -224,7 +259,9 @@ foreach ($relatedProducts as $relatedProduct) {
         return view('main.products.search', compact('products', 'search'));
     }
 
-    // Method untuk produk berdasarkan kategori - FIXED QUERY
+    /**
+     * Display products by category
+     */
     public function byCategory(Category $category)
     {
         $products = Product::with(['category'])
@@ -246,7 +283,9 @@ foreach ($relatedProducts as $relatedProduct) {
         return view('main.products.category', compact('products', 'category'));
     }
 
-    // Method untuk produk diskon - FIXED QUERY
+    /**
+     * Display products on sale
+     */
     public function onSale()
     {
         $products = Product::with(['category'])
@@ -270,7 +309,9 @@ foreach ($relatedProducts as $relatedProduct) {
         return view('main.products.sale', compact('products'));
     }
 
-    // Method untuk produk dengan stok habis - FIXED QUERY
+    /**
+     * Display out of stock products
+     */
     public function outOfStock()
     {
         $products = Product::with(['category'])
@@ -291,15 +332,9 @@ foreach ($relatedProducts as $relatedProduct) {
         return view('main.products.out-of-stock', compact('products'));
     }
 
-    // Method alternatif untuk menghitung stok dengan cara yang lebih aman
-    private function calculateProductStock($productId)
-    {
-        return StockTransaction::where('product_id', $productId)
-            ->selectRaw('COALESCE(SUM(CASE WHEN type = "Masuk" THEN quantity ELSE -quantity END), 0) as stock')
-            ->value('stock') ?? 0;
-    }
-
-    // Method untuk mendapatkan produk dengan stok menggunakan JOIN (Alternatif)
+    /**
+     * Display products with stock using JOIN
+     */
     public function withStock()
     {
         $products = Product::with(['category'])
@@ -311,5 +346,61 @@ foreach ($relatedProducts as $relatedProduct) {
             ->paginate(12);
 
         return view('main.products.with-stock', compact('products'));
+    }
+
+    /**
+     * Calculate product stock from transactions
+     *
+     * @param int $productId
+     * @return int
+     */
+    private function calculateProductStock($productId)
+    {
+        return StockTransaction::where('product_id', $productId)
+            ->selectRaw('COALESCE(SUM(CASE WHEN type = "Masuk" THEN quantity ELSE -quantity END), 0) as stock')
+            ->value('stock') ?? 0;
+    }
+
+    /**
+     * Generate WhatsApp message for product inquiry
+     *
+     * @param Product $product
+     * @param float $finalPrice
+     * @param int $currentStock
+     * @param string $condition
+     * @param string $warranty
+     * @return string
+     */
+    private function getWhatsAppMessage($product, $finalPrice, $currentStock, $condition, $warranty)
+    {
+        $message = "Halo, saya tertarik dengan produk berikut:\n\n";
+        $message .= "📦 *Produk:* {$product->name}\n";
+        $message .= "🏷️ *SKU:* {$product->sku}\n";
+        $message .= "💰 *Harga:* Rp " . number_format($finalPrice, 0, ',', '.') . "\n";
+        
+        // Tampilkan info diskon jika ada
+        if ($product->is_on_sale && $product->discount_price > 0 && $product->discount_price < $product->selling_price) {
+            $discount = round((($product->selling_price - $product->discount_price) / $product->selling_price) * 100);
+            $message .= "🔥 *Diskon:* {$discount}% (Hemat Rp " . number_format($product->selling_price - $product->discount_price, 0, ',', '.') . ")\n";
+            $message .= "~~Rp " . number_format($product->selling_price, 0, ',', '.') . "~~\n";
+        }
+        
+        $message .= "📊 *Stok:* " . ($currentStock > 0 ? $currentStock . " unit tersedia" : "Habis") . "\n";
+        
+        if (!empty($condition)) {
+            $message .= "🔧 *Kondisi:* {$condition}\n";
+        }
+        
+        if (!empty($warranty)) {
+            $message .= "✅ *Garansi:* {$warranty}\n";
+        }
+        
+        if ($product->category) {
+            $message .= "📂 *Kategori:* {$product->category->name}\n";
+        }
+        
+        $message .= "\nApakah produk ini masih tersedia? Saya ingin order.";
+        
+        return $message;
     }
 }

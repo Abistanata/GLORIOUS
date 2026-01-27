@@ -581,18 +581,30 @@ public function userDestroy(User $user)
 
     // Categories Management
     public function categoryList(Request $request)
-    {
-        $query = Category::withCount('products');
+{
+    $query = Category::withCount('products');
 
-        if ($request->filled('search')) {
-            $search = $request->input('search');
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        $categories = $query->paginate(10);
-
-        return view('pages.admin.categories.index', compact('categories'));
+    if ($request->filled('search')) {
+        $search = $request->input('search');
+        $query->where('name', 'like', "%{$search}%");
     }
+
+    $categories = $query->paginate(10);
+    
+    // Statistik
+    $totalCategories = Category::count();
+    $totalProducts = Product::count();
+    
+    // TAMBAHKAN PERHITUNGAN RATA-RATA
+    $averageProducts = $totalCategories > 0 ? round($totalProducts / $totalCategories, 1) : 0;
+
+    return view('pages.admin.categories.index', compact(
+        'categories', 
+        'totalCategories',
+        'totalProducts',
+        'averageProducts' // TAMBAHKAN INI
+    ));
+}
 
     public function categoryCreate()
     {

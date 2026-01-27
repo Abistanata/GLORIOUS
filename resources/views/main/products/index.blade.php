@@ -286,18 +286,36 @@
                             
                             <!-- Action Buttons -->
                             <div class="flex gap-2">
-                                <a href="{{ route('main.products.show', $product->id) }}" 
+                                <a href="{{ route('main.products.show', $product->id) }}"
                                    class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-2.5 px-3 rounded-lg transition-colors text-sm flex items-center justify-center gap-2">
                                     <i class="fas fa-eye text-xs"></i>
                                     <span>Detail</span>
                                 </a>
-                                <a href="https://wa.me/6282133803940?text=Halo Glorious Computer,%20saya%20tertarik%20dengan%20produk:%0A%0A*{{ urlencode($product->name) }}*%0A%0AHarga: Rp {{ number_format($finalPrice, 0, ',', '.') }}%0AStok: {{ $currentStock }}%0AKondisi: {{ urlencode($condition) }}%0AGaransi: {{ urlencode($warranty) }}%0A%0ASpesifikasi:%20{{ urlencode(Str::limit($product->specification, 150)) }}%0A%0AMohon info lebih lanjut dan ketersediaan produknya." 
-                                   target="_blank"
-                                   class="flex-1 bg-primary hover:bg-primary-dark text-white font-medium py-2.5 px-3 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
-                                   @if($currentStock == 0) onclick="return false;" @endif>
-                                    <i class="fab fa-whatsapp"></i>
-                                    <span>{{ $currentStock == 0 ? 'Habis' : 'Beli' }}</span>
-                                </a>
+                                <button type="button"
+                                        onclick="addToCart({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $finalPrice }}, '{{ $imageUrl }}', {{ $currentStock }})"
+                                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-3 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                        @if($currentStock == 0) disabled @endif>
+                                    <i class="fas fa-shopping-cart text-xs"></i>
+                                    <span>{{ $currentStock == 0 ? 'Habis' : 'Keranjang' }}</span>
+                                </button>
+                                <button type="button"
+                                        onclick="toggleWishlist({{ $product->id }}, '{{ addslashes($product->name) }}', {{ $finalPrice }}, '{{ $imageUrl }}')"
+                                        class="bg-gray-700 hover:bg-red-600 text-white font-medium py-2.5 px-3 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 wishlist-btn"
+                                        data-product-id="{{ $product->id }}">
+                                    <i class="fas fa-heart text-xs"></i>
+                                </button>
+                            </div>
+
+                            <!-- WhatsApp Buy Button (Separate Row) -->
+                            <div class="mt-3">
+                               <a href="https://wa.me/6282133803940?text={{ urlencode($product->whatsapp_message) }}"
+   target="_blank"
+   rel="noopener noreferrer"
+   class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-3 rounded-lg transition-colors text-sm flex items-center justify-center gap-2 {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+   @if($currentStock == 0) onclick="return false;" @endif>
+    <i class="fab fa-whatsapp"></i>
+    <span>{{ $currentStock == 0 ? 'Habis' : 'Beli via WhatsApp' }}</span>
+</a>
                             </div>
                         </div>
                     </div>

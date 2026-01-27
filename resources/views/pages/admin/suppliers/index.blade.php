@@ -110,7 +110,7 @@
                                 </svg>
                             </a>
                             @if($supplier->products_count == 0)
-                                <a href="{{ route('admin.suppliers.confirm-delete', $supplier->id) }}"
+                                <a href="{{ route('admin.suppliers.delete', $supplier->id) }}"
                                    class="p-2 text-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-gray-700 dark:text-red-400"
                                    title="Hapus">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

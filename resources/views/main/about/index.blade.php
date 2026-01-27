@@ -1,15 +1,9 @@
-<!DOCTYPE html>
 @extends('layouts.theme')
 
 @section('title', 'Tentang Kami - Glorious Computer')
 
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tentang Kami - Glorious Computer</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+@push('styles')
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -586,8 +580,10 @@
             transform: translateY(0);
         }
     </style>
-</head>
-<body>
+@endpush
+
+@section('content')
+<div class="bg-darker text-light">
     <!-- Hero Section - Minimalist -->
     <section class="hero-minimalist">
         <div class="container">
@@ -716,7 +712,11 @@
         </div>
     </section>
 
-    <script>
+</div>
+@endsection
+
+@push('scripts')
+<script>
         // Fade in animation on scroll
         function fadeInOnScroll() {
             const elements = document.querySelectorAll('.fade-in');
@@ -738,5 +738,4 @@
         // Initial check for elements in view
         setTimeout(fadeInOnScroll, 100);
     </script>
-</body>
-</html>
+@endpush

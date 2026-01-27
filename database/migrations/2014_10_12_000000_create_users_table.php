@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('username')->unique();
+            $table->string('email')->nullable()->unique(); // Email opsional (nullable)
+            $table->string('phone')->unique(); // Nomor WhatsApp (wajib, unique)
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('profile_photo_path', 2048)->nullable();
-            $table->enum('role', ['Admin', 'Staff Gudang', 'Manajer Gudang'])->default('Staff Gudang');
+            $table->enum('role', ['Admin', 'Staff Gudang', 'Manajer Gudang', 'Customer'])->default('Customer');
             $table->rememberToken();
             $table->timestamps();
         });

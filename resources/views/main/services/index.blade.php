@@ -537,7 +537,7 @@
                 </p>
                 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="https://wa.me/6282133803940" target="_blank" 
+                    <a href="https://wa.me/6282133803940" target="_blank" rel="noopener noreferrer"
                        class="bg-gradient-primary hover:shadow-glow-primary text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3">
                         <i class="fab fa-whatsapp text-xl"></i>
                         Hubungi via WhatsApp
@@ -553,6 +553,7 @@
     </section>
 </div>
 
+@push('scripts')
 <script>
     // Smooth scroll to sections
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -587,4 +588,5 @@
         observer.observe(card);
     });
 </script>
+@endpush
 @endsection

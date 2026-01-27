@@ -2,6 +2,10 @@
 
 @section('title', $product->name . ' - Glorious Computer')
 
+@section('head')
+<meta name="user-authenticated" content="{{ Auth::check() ? 'true' : 'false' }}">
+@endsection
+
 @section('content')
 <div class="min-h-screen bg-darker pt-24 pb-16">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -174,16 +178,23 @@
                     <!-- Quick Actions -->
                     <div class="flex gap-3">
                         @php
-                            $isInWishlist = false; // Implement logic di controller
+                            $isInWishlist = false; // Will be checked via JavaScript
+                            $isInCart = false; // Will be checked via JavaScript
                         @endphp
-                        
-                        <button onclick="toggleWishlist({{ $product->id }})" 
+
+                        <button onclick="addToCart({{ $product->id }}, '{{ $product->name }}', {{ $finalPrice }}, '{{ $product->image }}')"
+                                class="flex-1 {{ $isInCart ? 'bg-green-500 hover:bg-green-600' : 'bg-primary hover:bg-primary-dark' }} text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 border {{ $isInCart ? 'border-green-500' : 'border-primary' }}">
+                            <i class="fas fa-shopping-cart"></i>
+                            {{ $isInCart ? 'Di Keranjang' : 'Tambah ke Cart' }}
+                        </button>
+
+                        <button onclick="toggleWishlist({{ $product->id }})"
                                 class="flex-1 {{ $isInWishlist ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-800 hover:bg-gray-700' }} text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 border {{ $isInWishlist ? 'border-red-500' : 'border-gray-700' }}">
                             <i class="{{ $isInWishlist ? 'fas' : 'far' }} fa-heart"></i>
                             {{ $isInWishlist ? 'Di Wishlist' : 'Wishlist' }}
                         </button>
-                        
-                        <button onclick="shareProduct()" 
+
+                        <button onclick="shareProduct()"
                                 class="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 border border-gray-700">
                             <i class="fas fa-share-alt"></i>
                             Bagikan
@@ -255,6 +266,9 @@
                         <div class="flex flex-col sm:flex-row gap-3">
                             <a href="https://wa.me/6282133803940?text={{ $whatsappMessage }}" 
                                target="_blank"
+                               rel="noopener noreferrer"
+                               data-auth-required="customer"
+                               data-auth-reason="buy"
                                class="flex-1 bg-primary hover:bg-primary-dark text-white py-3 px-6 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-3 hover:shadow-lg {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
                                @if($currentStock == 0) onclick="return false;" @endif>
                                 <i class="fab fa-whatsapp text-lg"></i>
@@ -475,14 +489,125 @@
         document.body.classList.remove('overflow-hidden');
     }
 
+    // Add to Cart dengan localStorage
+    function addToCart(productId, productName, price, image) {
+        try {
+            // Check if user is logged in as customer
+            const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.getAttribute('content') === 'true';
+
+            if (!isAuthenticated) {
+                // For guests, use localStorage
+                let cart = JSON.parse(localStorage.getItem('glorious_cart') || '[]');
+
+                // Check if product already in cart
+                const existingItem = cart.find(item => item.id === productId);
+
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({
+                        id: productId,
+                        name: productName,
+                        price: price,
+                        image: image,
+                        quantity: 1
+                    });
+                }
+
+                localStorage.setItem('glorious_cart', JSON.stringify(cart));
+                updateCartCount();
+
+                // Show success message
+                showNotification('Produk berhasil ditambahkan ke keranjang!', 'success');
+
+                // Update button state
+                const button = event.target.closest('button');
+                button.innerHTML = '<i class="fas fa-check"></i> Di Keranjang';
+                button.classList.remove('bg-primary', 'hover:bg-primary-dark');
+                button.classList.add('bg-green-500', 'hover:bg-green-600');
+
+                return;
+            }
+
+            // For authenticated users, send to backend
+            fetch('/api/cart/add', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateCartCount();
+                    showNotification('Produk berhasil ditambahkan ke keranjang!', 'success');
+
+                    const button = event.target.closest('button');
+                    button.innerHTML = '<i class="fas fa-check"></i> Di Keranjang';
+                    button.classList.remove('bg-primary', 'hover:bg-primary-dark');
+                    button.classList.add('bg-green-500', 'hover:bg-green-600');
+                } else {
+                    showNotification('Gagal menambahkan produk ke keranjang', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+            });
+
+        } catch (error) {
+            console.error('Cart error:', error);
+            showNotification('Terjadi kesalahan sistem', 'error');
+        }
+    }
+
     // Toggle Wishlist dengan AJAX
     function toggleWishlist(productId) {
+        try {
+            const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.getAttribute('content') === 'true';
+
+            if (!isAuthenticated) {
+                // For guests, use localStorage
+                let wishlist = JSON.parse(localStorage.getItem('glorious_wishlist') || '[]');
+
+                const existingIndex = wishlist.indexOf(productId);
+
+                if (existingIndex > -1) {
+                    // Remove from wishlist
+                    wishlist.splice(existingIndex, 1);
+                    showNotification('Produk dihapus dari wishlist', 'info');
+                } else {
+                    // Add to wishlist
+                    wishlist.push(productId);
+                    showNotification('Produk ditambahkan ke wishlist!', 'success');
+                }
+
+                localStorage.setItem('glorious_wishlist', JSON.stringify(wishlist));
+                updateWishlistButton(productId, existingIndex === -1);
+                return;
+            }
+
+            // For authenticated users, use AJAX
+            if (typeof PopupManager !== 'undefined' && PopupManager && !PopupManager.isCustomerLoggedIn()) {
+                PopupManager.promptCustomerLogin({ reason: 'wishlist', redirectUrl: window.location.href });
+                return;
+            }
+        } catch (e) {
+            // ignore
+        }
+
         const button = event.target.closest('button');
         const icon = button.querySelector('i');
         const text = button.querySelector('span') || button;
-        
+
         // Kirim request ke backend
-        fetch(`/wishlist/toggle/${productId}`, {
+        fetch(`/wishlist/add/${productId}`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -490,27 +615,117 @@
                 'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (response.status === 401 || response.status === 419) {
+                try {
+                    if (typeof PopupManager !== 'undefined' && PopupManager) {
+                        PopupManager.promptCustomerLogin({ reason: 'wishlist', redirectUrl: window.location.href });
+                    }
+                } catch (e) {}
+                return Promise.reject('unauthorized');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
-                if (data.isInWishlist) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas', 'text-red-500');
-                    button.classList.remove('bg-gray-800', 'border-gray-700');
-                    button.classList.add('bg-red-500', 'border-red-500', 'hover:bg-red-600');
-                    button.querySelector('span').textContent = 'Di Wishlist';
-                } else {
-                    icon.classList.remove('fas', 'text-red-500');
-                    icon.classList.add('far');
-                    button.classList.remove('bg-red-500', 'border-red-500', 'hover:bg-red-600');
-                    button.classList.add('bg-gray-800', 'border-gray-700', 'hover:bg-gray-700');
-                    button.querySelector('span').textContent = 'Wishlist';
-                }
+                updateWishlistButton(productId, data.isInWishlist);
+                showNotification(data.isInWishlist ? 'Produk ditambahkan ke wishlist!' : 'Produk dihapus dari wishlist', 'success');
             }
         })
         .catch(error => {
             console.error('Error:', error);
+            showNotification('Terjadi kesalahan saat memproses wishlist', 'error');
         });
+    }
+
+    // Update wishlist button state
+    function updateWishlistButton(productId, isInWishlist) {
+        const buttons = document.querySelectorAll(`button[onclick*="toggleWishlist(${productId})"]`);
+
+        buttons.forEach(button => {
+            const icon = button.querySelector('i');
+            const text = button.querySelector('span') || button;
+
+            if (isInWishlist) {
+                icon.classList.remove('far');
+                icon.classList.add('fas', 'text-red-500');
+                button.classList.remove('bg-gray-800', 'border-gray-700', 'hover:bg-gray-700');
+                button.classList.add('bg-red-500', 'border-red-500', 'hover:bg-red-600');
+                if (text.tagName === 'SPAN') {
+                    text.textContent = 'Di Wishlist';
+                } else {
+                    button.innerHTML = '<i class="fas fa-heart text-red-500"></i> Di Wishlist';
+                }
+            } else {
+                icon.classList.remove('fas', 'text-red-500');
+                icon.classList.add('far');
+                button.classList.remove('bg-red-500', 'border-red-500', 'hover:bg-red-600');
+                button.classList.add('bg-gray-800', 'border-gray-700', 'hover:bg-gray-700');
+                if (text.tagName === 'SPAN') {
+                    text.textContent = 'Wishlist';
+                } else {
+                    button.innerHTML = '<i class="far fa-heart"></i> Wishlist';
+                }
+            }
+        });
+    }
+
+    // Update cart count
+    function updateCartCount() {
+        try {
+            const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.getAttribute('content') === 'true';
+
+            if (!isAuthenticated) {
+                const cart = JSON.parse(localStorage.getItem('glorious_cart') || '[]');
+                const count = cart.reduce((total, item) => total + item.quantity, 0);
+
+                // Update cart badge in header
+                const cartBadges = document.querySelectorAll('#cart-button .bg-primary, #cart-button-mobile .bg-primary');
+                cartBadges.forEach(badge => {
+                    badge.textContent = count > 0 ? count : '';
+                    badge.style.display = count > 0 ? 'flex' : 'none';
+                });
+            }
+        } catch (error) {
+            console.error('Error updating cart count:', error);
+        }
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full`;
+
+        const colors = {
+            success: 'bg-green-500 text-white',
+            error: 'bg-red-500 text-white',
+            warning: 'bg-yellow-500 text-black',
+            info: 'bg-blue-500 text-white'
+        };
+
+        notification.classList.add(...colors[type].split(' '));
+        notification.innerHTML = `
+            <div class="flex items-center gap-2">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+        `;
+
+        document.body.appendChild(notification);
+
+        // Animate in
+        setTimeout(() => {
+            notification.classList.remove('translate-x-full');
+        }, 100);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
     }
 
     // Share Product

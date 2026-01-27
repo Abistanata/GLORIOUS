@@ -275,8 +275,21 @@
 
 @push('scripts')
 <script>
+    function ensureCustomerLogin(reason = 'login_required') {
+        try {
+            if (typeof PopupManager !== 'undefined' && PopupManager && !PopupManager.isCustomerLoggedIn()) {
+                PopupManager.promptCustomerLogin({ reason, redirectUrl: window.location.href });
+                return false;
+            }
+        } catch (e) {
+            // ignore
+        }
+        return true;
+    }
+
     // Remove from wishlist
     function removeFromWishlist(productId) {
+        if (!ensureCustomerLogin('wishlist')) return;
         if (confirm('Remove this item from wishlist?')) {
             // AJAX call to remove from wishlist
             fetch(`/wishlist/${productId}`, {
@@ -286,7 +299,13 @@
                     'Content-Type': 'application/json'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (response.status === 401 || response.status === 419) {
+                    ensureCustomerLogin('wishlist');
+                    return Promise.reject('unauthorized');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     location.reload();
@@ -297,6 +316,7 @@
 
     // Add to cart
     function addToCart(productId) {
+        if (!ensureCustomerLogin('cart')) return;
         // AJAX call to add to cart
         fetch(`/cart/${productId}`, {
             method: 'POST',
@@ -305,7 +325,13 @@
                 'Content-Type': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (response.status === 401 || response.status === 419) {
+                ensureCustomerLogin('cart');
+                return Promise.reject('unauthorized');
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 showToast('Product added to cart!', 'success');
