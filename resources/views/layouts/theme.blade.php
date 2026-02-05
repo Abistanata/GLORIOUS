@@ -73,6 +73,27 @@
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
+    <!-- Auth State untuk JavaScript -->
+    <script>
+       window.authState = {
+    isAuthenticated: {{ auth()->check() ? 'true' : 'false' }},
+    user: @auth
+        @json([
+            'id' => auth()->id(),
+            'name' => auth()->user()->name,
+            'username' => auth()->user()->username,
+            'role' => auth()->user()->role,
+        ])
+    @else
+        null
+    @endauth,
+    sessionId: '{{ session()->getId() }}'
+};
+        
+        // Debug info (opsional, untuk development)
+        window.debugMode = {{ env('APP_DEBUG', false) ? 'true' : 'false' }};
+    </script>
+
     <style>
         :root {
             --primary: #FF6B00;
@@ -893,10 +914,10 @@
         <div class="popup-content">
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary rounded-t-lg"></div>
             
-            {{-- <button id="close-login-popup" 
+            <button id="close-login-popup" 
                     class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors close-button z-50">
                 <i class="fas fa-times text-xl"></i>
-            </button> --}}
+            </button>
             
             <div class="p-6">
                 <div class="text-center mb-6">
@@ -1016,10 +1037,10 @@
         <div class="popup-content large">
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary rounded-t-lg"></div>
             
-            {{-- <button id="close-registration-popup"
+            <button id="close-registration-popup"
                     class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors close-button z-50">
                 <i class="fas fa-times text-xl"></i>
-            </button> --}}
+            </button>
 
             <div class="registration-container">
                 <div class="lg:w-2/5 bg-gradient-to-br from-primary/10 to-primary-dark/10 p-6 lg:p-8">
@@ -1470,8 +1491,26 @@
         </div>
     </footer>
 
+    {{-- Debug info untuk development --}}
+    @if(env('APP_DEBUG'))
+    <div id="debug-info" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; z-index: 9999; font-size: 12px; border-radius: 5px; display: none;">
+        <strong>Debug Info:</strong><br>
+        Auth: {{ auth()->check() ? 'YES' : 'NO' }}<br>
+        User: {{ auth()->check() ? auth()->user()->username : 'Guest' }}<br>
+        Session: {{ session()->getId() }}<br>
+        <button onclick="document.getElementById('debug-info').style.display='none'" style="margin-top: 5px; padding: 2px 5px; font-size: 10px;">Hide</button>
+    </div>
+    <script>
+        if (window.debugMode) {
+            document.getElementById('debug-info').style.display = 'block';
+        }
+    </script>
+    @endif
+
 <script>
-    // Global state management dengan perbaikan close
+    // ============================================
+    // GLOBAL STATE MANAGEMENT - REVISED VERSION
+    // ============================================
     const PopupManager = {
         currentUser: null,
         activePopup: null,
@@ -1488,11 +1527,16 @@
             // Hide all popups on initial load
             this.hideAllPopups();
             
-            // Check if user is logged in via session
-            this.checkSession();
-            
             // Setup password strength checker
             this.setupPasswordStrengthChecker();
+            
+            // Show debug info
+            if (window.debugMode) {
+                console.log('PopupManager initialized:', {
+                    authState: window.authState,
+                    user: this.currentUser
+                });
+            }
         },
         
         setupPasswordStrengthChecker() {
@@ -1505,9 +1549,17 @@
         },
         
         initializeUserState() {
-            const savedUser = localStorage.getItem('glorious_user');
-            if (savedUser) {
-                this.currentUser = JSON.parse(savedUser);
+            // Gunakan state dari Blade sebagai sumber kebenaran
+            if (window.authState && window.authState.isAuthenticated && window.authState.user) {
+                this.currentUser = window.authState.user;
+                if (window.debugMode) {
+                    console.log('User initialized from Blade authState:', this.currentUser);
+                }
+            } else {
+                this.currentUser = null;
+                if (window.debugMode) {
+                    console.log('No user session found in Blade authState');
+                }
             }
         },
         
@@ -1550,7 +1602,9 @@
                 });
             });
             
-            // Profile popup button
+            // ============================================
+            // FIXED: Profile popup button - Gunakan auth state dari Blade
+            // ============================================
             const profilePopupButton = document.getElementById('profile-popup-button');
             if (profilePopupButton) {
                 profilePopupButton.addEventListener('click', (e) => {
@@ -1560,7 +1614,9 @@
                 });
             }
             
-            // Cart buttons
+            // ============================================
+            // FIXED: Cart buttons - Perbaikan utama untuk auto logout
+            // ============================================
             const cartButton = document.getElementById('cart-button');
             const cartButtonMobile = document.getElementById('cart-button-mobile');
 
@@ -1568,26 +1624,34 @@
                 cartButton.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!this.currentUser) {
-                        this.showPopup('customer-login-popup');
-                    } else {
+                    
+                    // Gunakan auth state dari Blade sebagai sumber kebenaran
+                    if (window.authState && window.authState.isAuthenticated) {
                         this.toggleCart();
+                    } else {
+                        this.showPopup('customer-login-popup');
                     }
                 });
             }
+            
             if (cartButtonMobile) {
                 cartButtonMobile.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!this.currentUser) {
-                        this.showPopup('customer-login-popup');
-                    } else {
+                    
+                    // Gunakan auth state dari Blade sebagai sumber kebenaran
+                    if (window.authState && window.authState.isAuthenticated) {
                         this.toggleCart();
+                    } else {
+                        this.showPopup('customer-login-popup');
+                        this.hideMobileMenu();
                     }
                 });
             }
 
-            // Wishlist buttons (desktop and mobile)
+            // ============================================
+            // FIXED: Wishlist buttons - Perbaikan utama untuk auto logout
+            // ============================================
             const wishlistButton = document.getElementById('wishlist-button');
             const wishlistButtonMobile = document.getElementById('wishlist-button-mobile');
 
@@ -1595,10 +1659,12 @@
                 wishlistButton.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!this.currentUser) {
-                        this.showPopup('customer-login-popup');
-                    } else {
+                    
+                    // Gunakan auth state dari Blade sebagai sumber kebenaran
+                    if (window.authState && window.authState.isAuthenticated) {
                         window.location.href = '/wishlist';
+                    } else {
+                        this.showPopup('customer-login-popup');
                     }
                 });
             }
@@ -1607,11 +1673,13 @@
                 wishlistButtonMobile.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!this.currentUser) {
+                    
+                    // Gunakan auth state dari Blade sebagai sumber kebenaran
+                    if (window.authState && window.authState.isAuthenticated) {
+                        window.location.href = '/wishlist';
+                    } else {
                         this.showPopup('customer-login-popup');
                         this.hideMobileMenu();
-                    } else {
-                        window.location.href = '/wishlist';
                     }
                 });
             }
@@ -1838,14 +1906,14 @@
                 });
             }
 
-            // FIXED: Close popup dengan Escape key untuk semua popup
+            // Close popup dengan Escape key untuk semua popup
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && this.activePopup) {
                     this.hidePopup(this.activePopup);
                 }
             });
             
-            // FIXED: Close popup ketika klik di luar content popup
+            // Close popup ketika klik di luar content popup
             document.addEventListener('click', (e) => {
                 if (this.activePopup && e.target.classList.contains('popup-overlay')) {
                     this.hidePopup(this.activePopup);
@@ -1984,8 +2052,10 @@
         
         async loadCart() {
             try {
-                // Load cart from API
-                // This would be implemented with actual API calls
+                // Load cart dari API jika user login
+                if (window.authState && window.authState.isAuthenticated) {
+                    // Implementasi loading cart dari server
+                }
             } catch (error) {
                 console.error('Error loading cart:', error);
             }
@@ -2119,11 +2189,13 @@
             this.showPopup('error-popup');
         },
         
+        // ============================================
+        // FIXED: handleLogin() dengan reload halaman
+        // ============================================
         async handleLogin() {
             const identifier = document.getElementById('login-identifier')?.value;
             const password = document.getElementById('login-password')?.value;
             const rememberMe = document.getElementById('remember-me')?.checked;
-            const type = 'user';
 
             if (!identifier || !password) {
                 this.showError('Login Gagal', 'Harap isi semua field yang diperlukan');
@@ -2143,14 +2215,12 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': this.csrfToken,
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
                         login: identifier,
                         password: password,
-                        remember: rememberMe,
-                        type: type
+                        remember: rememberMe ? 1 : 0
                     })
                 });
 
@@ -2160,22 +2230,21 @@
                 if (buttonText) buttonText.textContent = 'Masuk ke Akun';
 
                 if (response.ok && data.success) {
-                    this.currentUser = data.user;
-                    localStorage.setItem('glorious_user', JSON.stringify(data.user));
-                    
-                    this.updateUserState();
-                    
+                    // HIDE popup terlebih dahulu
                     this.hidePopup('customer-login-popup');
+                    
+                    // Tampilkan pesan sukses
                     this.showSuccess('Login Berhasil', data.message || 'Selamat datang kembali!');
                     
-                    if (data.redirect) {
-                        setTimeout(() => {
-                            window.location.href = data.redirect;
-                        }, 1500);
-                    }
+                    // ============================================
+                    // ✅ FIX UTAMA: RELOAD HALAMAN SETELAH LOGIN SUKSES
+                    // ============================================
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                     
                 } else {
-                    this.showError('Login Gagal', data.message || 'Email atau password salah');
+                    this.showError('Login Gagal', data.message || 'Username/email/phone atau password salah');
                 }
             } catch (error) {
                 if (spinner) spinner.classList.add('hidden');
@@ -2186,6 +2255,9 @@
             }
         },
         
+        // ============================================
+        // FIXED: handleRegistration() dengan reload halaman
+        // ============================================
         async handleRegistration() {
             const name = document.getElementById('register-name')?.value;
             const username = document.getElementById('register-username')?.value;
@@ -2224,7 +2296,7 @@
             if (buttonText) buttonText.textContent = 'Mendaftarkan...';
 
             try {
-                const response = await fetch('/api/auth/register', {
+                const response = await fetch('/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2238,7 +2310,7 @@
                         phone: phone,
                         password: password,
                         password_confirmation: passwordConfirm,
-                        terms: true
+                        terms: 1
                     })
                 });
 
@@ -2248,16 +2320,21 @@
                 if (buttonText) buttonText.textContent = 'Daftar Sekarang';
 
                 if (response.ok && data.success) {
-                    this.currentUser = data.user;
-                    localStorage.setItem('glorious_user', JSON.stringify(data.user));
-                    
-                    this.updateUserState();
-                    
+                    // HIDE popup terlebih dahulu
                     this.hidePopup('customer-registration-popup');
+                    
+                    // Tampilkan pesan sukses
                     this.showSuccess('Pendaftaran Berhasil', data.message || 'Selamat! Akun Anda telah berhasil dibuat.');
+                    
+                    // ============================================
+                    // ✅ FIX UTAMA: RELOAD HALAMAN SETELAH REGISTRASI SUKSES
+                    // ============================================
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 } else {
                     const errorMessage = data.errors 
-                        ? Object.values(data.errors).join(', ')
+                        ? Object.values(data.errors).flat().join(', ')
                         : data.message || 'Terjadi kesalahan saat mendaftar';
                     this.showError('Pendaftaran Gagal', errorMessage);
                 }
@@ -2318,9 +2395,12 @@
             }
         },
         
+        // ============================================
+        // FIXED: handleLogout() dengan reload halaman
+        // ============================================
         async handleLogout() {
             try {
-                const response = await fetch('/api/auth/logout', {
+                const response = await fetch('/logout', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2329,31 +2409,25 @@
                     }
                 });
                 
-                // Clear local storage regardless of server response
-                this.currentUser = null;
-                localStorage.removeItem('glorious_user');
-                localStorage.removeItem('glorious_token');
-                
-                // Update UI
-                this.updateUserState();
-                
-                // Hide popup
-                this.hidePopup('profile-popup');
-                
-                // Show success message
-                this.showSuccess('Logout Berhasil', 'Anda telah berhasil logout dari sistem');
+                // ============================================
+                // ✅ FIX UTAMA: RELOAD HALAMAN SETELAH LOGOUT
+                // ============================================
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
                 
             } catch (error) {
                 console.error('Logout error:', error);
-                // Still clear local storage on error
-                this.currentUser = null;
-                localStorage.removeItem('glorious_user');
-                localStorage.removeItem('glorious_token');
-                this.updateUserState();
-                this.hidePopup('profile-popup');
+                // Tetap reload halaman meskipun error
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
             }
         },
         
+        // ============================================
+        // FIXED: updateUserState() menggunakan Blade auth state
+        // ============================================
         updateUserState() {
             const userStatus = document.getElementById('user-status');
             const userInfo = document.getElementById('user-info');
@@ -2362,15 +2436,26 @@
             const guestButtons = document.getElementById('guest-buttons');
             const userButtons = document.getElementById('user-buttons');
             
-            if (this.currentUser) {
+            // Gunakan state dari Blade sebagai sumber kebenaran
+            const isAuthenticated = window.authState && window.authState.isAuthenticated;
+            const user = window.authState && window.authState.user;
+            
+            if (isAuthenticated && user) {
                 // User is logged in
-                if (userStatus) userStatus.textContent = this.currentUser.name || 'Pengguna';
-                if (userName) userName.textContent = this.currentUser.name || 'Pengguna';
-                if (userUsername) userUsername.textContent = `@${this.currentUser.username}`;
+                if (userStatus) userStatus.textContent = user.name || 'Pengguna';
+                if (userName) userName.textContent = user.name || 'Pengguna';
+                if (userUsername) userUsername.textContent = `@${user.username}`;
                 
                 if (userInfo) userInfo.classList.remove('hidden');
                 if (guestButtons) guestButtons.classList.add('hidden');
                 if (userButtons) userButtons.classList.remove('hidden');
+                
+                // Update currentUser untuk internal state
+                this.currentUser = user;
+                
+                if (window.debugMode) {
+                    console.log('User state updated (authenticated):', user);
+                }
             } else {
                 // User is guest
                 if (userStatus) userStatus.textContent = 'Tamu';
@@ -2378,45 +2463,99 @@
                 if (userInfo) userInfo.classList.add('hidden');
                 if (guestButtons) guestButtons.classList.remove('hidden');
                 if (userButtons) userButtons.classList.add('hidden');
-            }
-        },
-        
-        async checkSession() {
-            try {
-                const response = await fetch('/api/auth/me', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        this.currentUser = data.data.user;
-                        localStorage.setItem('glorious_user', JSON.stringify(data.data.user));
-                        this.updateUserState();
-                    } else {
-                        // Clear invalid session
-                        localStorage.removeItem('glorious_user');
-                        localStorage.removeItem('glorious_token');
-                        this.currentUser = null;
-                        this.updateUserState();
-                    }
-                } else {
-                    // Clear invalid session
-                    localStorage.removeItem('glorious_user');
-                    localStorage.removeItem('glorious_token');
-                    this.currentUser = null;
-                    this.updateUserState();
-                }
-            } catch (error) {
-                console.error('Session check error:', error);
-                // On error, assume user is logged out
-                localStorage.removeItem('glorious_user');
-                localStorage.removeItem('glorious_token');
+                // Update currentUser untuk internal state
                 this.currentUser = null;
-                this.updateUserState();
+                
+                if (window.debugMode) {
+                    console.log('User state updated (guest)');
+                }
+            }
+            
+            // Update mobile menu juga
+            this.updateMobileMenu();
+        },
+
+        updateMobileMenu() {
+            const mobileLoginButton = document.getElementById('mobile-login-button');
+            const mobileRegisterButton = document.getElementById('mobile-register-button');
+            
+            // Gunakan state dari Blade sebagai sumber kebenaran
+            const isAuthenticated = window.authState && window.authState.isAuthenticated;
+            
+            if (isAuthenticated) {
+                // User is logged in - hide login/register buttons
+                if (mobileLoginButton) {
+                    mobileLoginButton.parentElement.innerHTML = `
+                        <a href="/wishlist" 
+                           class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                            <i class="fas fa-heart mr-3 text-primary group-hover:text-white"></i>
+                            <span class="font-medium">Wishlist Saya</span>
+                        </a>
+                        
+                        <button id="mobile-orders-button"
+                                class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                            <i class="fas fa-shopping-bag mr-3 text-primary group-hover:text-white"></i>
+                            <span class="font-medium">Pesanan Saya</span>
+                        </button>
+                        
+                        <button id="mobile-logout-button"
+                                class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                            <i class="fas fa-sign-out-alt mr-3 text-primary group-hover:text-white"></i>
+                            <span class="font-medium">Logout</span>
+                        </button>
+                    `;
+                    
+                    // Re-attach logout handler
+                    const mobileLogoutButton = document.getElementById('mobile-logout-button');
+                    if (mobileLogoutButton) {
+                        mobileLogoutButton.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.hideMobileMenu();
+                            this.handleLogout();
+                        });
+                    }
+                }
+            } else {
+                // User is guest - show login/register buttons
+                if (mobileLoginButton) {
+                    mobileLoginButton.parentElement.innerHTML = `
+                        <button id="mobile-login-button" 
+                                class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                            <i class="fas fa-sign-in-alt mr-3 text-primary group-hover:text-white"></i>
+                            <span class="font-medium">Login Pelanggan</span>
+                        </button>
+                        
+                        <button id="mobile-register-button" 
+                                class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                            <i class="fas fa-user-plus mr-3 text-primary group-hover:text-white"></i>
+                            <span class="font-medium">Daftar Pelanggan</span>
+                        </button>
+                    `;
+                    
+                    // Re-attach event listeners
+                    const newMobileLoginButton = document.getElementById('mobile-login-button');
+                    const newMobileRegisterButton = document.getElementById('mobile-register-button');
+                    
+                    if (newMobileLoginButton) {
+                        newMobileLoginButton.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.showPopup('customer-login-popup');
+                            this.hideMobileMenu();
+                        });
+                    }
+                    
+                    if (newMobileRegisterButton) {
+                        newMobileRegisterButton.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.showPopup('customer-registration-popup');
+                            this.hideMobileMenu();
+                        });
+                    }
+                }
             }
         }
     };
@@ -2424,6 +2563,11 @@
     // Initialize when DOM is loaded
     document.addEventListener('DOMContentLoaded', () => {
         PopupManager.init();
+        
+        // Log debug info jika dalam mode debug
+        if (window.debugMode) {
+            console.log('DOM Loaded, Auth State:', window.authState);
+        }
     });
 
     // Global function for password strength check

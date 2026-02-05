@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens; // Jika menggunakan Sanctum
 
 class AuthController extends Controller
 {
@@ -28,19 +29,24 @@ class AuthController extends Controller
             $validated = $request->validate([
                 'name' => 'required|string|max:100',
                 'username' => 'required|string|unique:users,username|min:3|max:50|regex:/^[a-zA-Z0-9_]+$/',
-                'phone' => 'required|string|unique:users,phone|min:10|max:15',
+                'phone' => 'required|string|unique:users,phone|min:8|max:20',
                 'password' => 'required|string|min:6|confirmed',
                 'email' => 'nullable|email|unique:users,email',
-                'terms' => 'accepted',
+                'terms' => 'sometimes|accepted',
             ], [
                 'username.regex' => 'Username hanya boleh mengandung huruf, angka, dan underscore',
                 'terms.accepted' => 'Anda harus menyetujui syarat dan ketentuan',
-                'phone.min' => 'Nomor telepon minimal 10 digit',
-                'phone.max' => 'Nomor telepon maksimal 15 digit',
+                'phone.min' => 'Nomor telepon minimal 8 digit',
+                'phone.max' => 'Nomor telepon maksimal 20 digit',
+                'phone.unique' => 'Nomor telepon ini sudah terdaftar',
+                'email.unique' => 'Email ini sudah terdaftar',
+                'username.unique' => 'Username ini sudah terdaftar',
             ]);
 
             // Format nomor telepon
             $phone = $validated['phone'];
+            $phone = preg_replace('/[^0-9]/', '', $phone);
+            
             if (Str::startsWith($phone, '+62')) {
                 $phone = Str::replaceFirst('+62', '', $phone);
             } elseif (Str::startsWith($phone, '62')) {
@@ -50,39 +56,55 @@ class AuthController extends Controller
             if (!Str::startsWith($phone, '0')) {
                 $phone = '0' . $phone;
             }
+            
+            if (strlen($phone) < 10) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Nomor telepon terlalu pendek setelah diformat',
+                        'errors' => ['phone' => ['Nomor telepon minimal 10 digit setelah diformat']]
+                    ], 422);
+                }
+                return back()->withErrors(['phone' => 'Nomor telepon minimal 10 digit setelah diformat'])->withInput();
+            }
 
-            // Buat user dengan role Customer (default)
-            $user = User::create([
+            // Cek apakah email sudah ada
+            if (!empty($validated['email'])) {
+                $existingEmail = User::where('email', $validated['email'])->first();
+                if ($existingEmail) {
+                    if ($request->expectsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Email sudah terdaftar',
+                            'errors' => ['email' => ['Email ini sudah terdaftar']]
+                        ], 422);
+                    }
+                    return back()->withErrors(['email' => 'Email ini sudah terdaftar'])->withInput();
+                }
+            }
+
+            // Buat user dengan role Customer
+            $userData = [
                 'name' => $validated['name'],
                 'username' => $validated['username'],
                 'phone' => $phone,
                 'whatsapp' => $phone,
-                'email' => $validated['email'] ?? null,
                 'password' => Hash::make($validated['password']),
-                'role' => 'Customer', // Default role adalah Customer
+                'role' => 'Customer',
                 'status' => 'active',
-            ]);
-
-            // Auto login
-            Auth::login($user, $request->has('remember'));
-            
-            // Update last login
-            $user->update(['last_login_at' => now()]);
-
-            $response = [
-                'success' => true,
-                'message' => 'Registrasi berhasil! Selamat bergabung dengan Glorious Computer.',
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'username' => $user->username,
-                    'email' => $user->email,
-                    'phone' => $user->phone,
-                    'role' => $user->role,
-                    'created_at' => $user->created_at->format('Y-m-d H:i:s'),
-                ],
-                'redirect' => '/customer/dashboard',
+                'last_login_at' => now(),
             ];
+
+            if (!empty($validated['email'])) {
+                $userData['email'] = $validated['email'];
+            }
+
+            $user = User::create($userData);
+
+            // Auto login untuk web
+            if (!$request->expectsJson()) {
+                Auth::login($user, $request->has('remember'));
+            }
 
             Log::info('User registered successfully', [
                 'user_id' => $user->id,
@@ -90,8 +112,30 @@ class AuthController extends Controller
                 'role' => $user->role
             ]);
 
+            $response = [
+                'success' => true,
+                'message' => 'Registrasi berhasil! Selamat bergabung.',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'role' => $user->role,
+                    'status' => $user->status,
+                    'created_at' => $user->created_at->format('Y-m-d H:i:s'),
+                ]
+            ];
+
+            // Tambahkan token jika API request
             if ($request->expectsJson()) {
-                return response()->json($response);
+                // Jika menggunakan Sanctum
+                if (method_exists($user, 'createToken')) {
+                    $token = $user->createToken('auth_token')->plainTextToken;
+                    $response['access_token'] = $token;
+                    $response['token_type'] = 'Bearer';
+                }
+                return response()->json($response, 201);
             }
 
             return redirect('/customer/dashboard')
@@ -130,8 +174,20 @@ class AuthController extends Controller
                 return response()->json($errorResponse, 500);
             }
 
-            return back()->withErrors(['error' => 'Registrasi gagal. Silakan coba lagi.'])->withInput();
+            return back()
+                ->withErrors(['error' => 'Registrasi gagal. Silakan coba lagi.'])
+                ->withInput();
         }
+    }
+
+    /**
+     * API Register - khusus untuk API calls
+     * Method alternatif jika route mengarah ke apiRegister
+     */
+    public function apiRegister(Request $request)
+    {
+        // Panggil method register biasa
+        return $this->register($request);
     }
 
     /**
@@ -150,43 +206,52 @@ class AuthController extends Controller
             $password = $validated['password'];
             $remember = $validated['remember'] ?? false;
 
-            Log::info('Login attempt', [
-                'login' => $login,
-                'remember' => $remember,
-                'ip' => $request->ip()
-            ]);
+            // Format login jika berupa nomor telepon
+            if (is_numeric($login) || Str::startsWith($login, '+') || Str::startsWith($login, '0')) {
+                $phone = preg_replace('/[^0-9]/', '', $login);
+                if (Str::startsWith($phone, '62')) {
+                    $phone = '0' . substr($phone, 2);
+                } elseif (!Str::startsWith($phone, '0')) {
+                    $phone = '0' . $phone;
+                }
+                $login = $phone;
+            }
 
-            // Cari user berdasarkan email, username, atau phone
-            $user = User::where('email', $login)
-                ->orWhere('username', $login)
-                ->orWhere('phone', $login)
-                ->first();
+            // Cari user
+            $user = User::where(function ($query) use ($login) {
+                $query->where('email', $login)
+                    ->orWhere('username', $login)
+                    ->orWhere('phone', $login)
+                    ->orWhere('whatsapp', $login);
+            })->first();
 
-            if (!$user) {
-                Log::warning('User not found for login', ['login' => $login]);
+            if (!$user || !Hash::check($password, $user->password)) {
                 return $this->loginFailedResponse($request);
             }
 
-            // Cek password
-            if (!Hash::check($password, $user->password)) {
-                Log::warning('Password mismatch', ['user_id' => $user->id]);
-                return $this->loginFailedResponse($request);
+            // Cek status
+            if ($user->status !== 'active') {
+                $errorResponse = [
+                    'success' => false,
+                    'message' => 'Akun tidak aktif. Silakan hubungi administrator.',
+                ];
+
+                if ($request->expectsJson()) {
+                    return response()->json($errorResponse, 403);
+                }
+
+                return back()->withErrors(['login' => 'Akun tidak aktif.'])->withInput();
             }
 
             // Login berhasil
-            Auth::login($user, $remember);
-            $request->session()->regenerate();
+            if (!$request->expectsJson()) {
+                Auth::login($user, $remember);
+                $request->session()->regenerate();
+            }
+            
             $user->update(['last_login_at' => now()]);
 
             $role = $user->role ?? 'Customer';
-            
-            Log::info('Login successful', [
-                'user_id' => $user->id,
-                'name' => $user->name,
-                'role' => $role
-            ]);
-
-            // Tentukan redirect URL berdasarkan role
             $redirectUrl = $this->getRedirectUrlByRole($role);
             
             $response = [
@@ -199,12 +264,18 @@ class AuthController extends Controller
                     'username' => $user->username,
                     'phone' => $user->phone,
                     'role' => $role,
-                    'last_login' => now()->format('Y-m-d H:i:s'),
+                    'status' => $user->status,
                 ],
                 'redirect' => $redirectUrl,
             ];
 
+            // Tambahkan token untuk API
             if ($request->expectsJson()) {
+                if (method_exists($user, 'createToken')) {
+                    $token = $user->createToken('auth_token')->plainTextToken;
+                    $response['access_token'] = $token;
+                    $response['token_type'] = 'Bearer';
+                }
                 return response()->json($response);
             }
 
@@ -212,18 +283,9 @@ class AuthController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             $errors = $e->errors();
-            $errorMessage = 'Validasi gagal: ' . implode(', ', array_map(function ($fieldErrors) {
-                return implode(', ', $fieldErrors);
-            }, array_values($errors)));
-
-            Log::warning('Login validation failed', [
-                'errors' => $errors,
-                'request' => $request->all()
-            ]);
-
             $errorResponse = [
                 'success' => false,
-                'message' => $errorMessage,
+                'message' => 'Validasi gagal',
                 'errors' => $errors
             ];
 
@@ -235,23 +297,19 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Login process failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'request' => $request->all()
+                'error' => $e->getMessage()
             ]);
 
             $errorResponse = [
                 'success' => false,
-                'message' => 'Terjadi kesalahan server. Silakan coba lagi nanti.',
+                'message' => 'Terjadi kesalahan server.',
             ];
 
             if ($request->expectsJson()) {
                 return response()->json($errorResponse, 500);
             }
 
-            return back()
-                ->withErrors(['error' => 'Terjadi kesalahan sistem.'])
-                ->with('error', 'Login gagal. Silakan coba lagi nanti.');
+            return back()->withErrors(['error' => 'Login gagal.']);
         }
     }
 
@@ -271,8 +329,7 @@ class AuthController extends Controller
 
         return back()
             ->withErrors(['login' => 'Kredensial tidak valid.'])
-            ->withInput($request->only('login', 'remember'))
-            ->with('error', 'Login gagal. Periksa kembali kredensial Anda.');
+            ->withInput();
     }
 
     /**
@@ -281,7 +338,7 @@ class AuthController extends Controller
     protected function getRedirectUrlByRole($role)
     {
         $role = strtolower(trim($role));
-        
+
         $redirectMap = [
             'admin' => '/admin/dashboard',
             'administrator' => '/admin/dashboard',
@@ -289,16 +346,14 @@ class AuthController extends Controller
             'manager gudang' => '/manajergudang/dashboard',
             'staff gudang' => '/staff/dashboard',
             'staff' => '/staff/dashboard',
-            'customer' => '/customer/dashboard',
+            'customer' => '/',
             'default' => '/',
         ];
 
-        // Cek exact match
         if (isset($redirectMap[$role])) {
             return $redirectMap[$role];
         }
 
-        // Cek partial match
         foreach ($redirectMap as $key => $url) {
             if (str_contains($role, $key) || str_contains($key, $role)) {
                 return $url;
@@ -314,41 +369,32 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            $userName = 'Unknown';
+            $user = Auth::user();
             
-            if (Auth::check()) {
-                $user = Auth::user();
-                $userName = $user->name;
-                
-                Log::info('User logout', [
-                    'user_id' => $user->id,
-                    'name' => $user->name,
-                    'role' => $user->role ?? 'unknown'
-                ]);
+            // Logout API token jika ada
+            if ($request->expectsJson() && $user) {
+                $user->tokens()->delete();
             }
-
+            
+            // Logout session
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            Log::info('Session invalidated and token regenerated');
-
             $response = [
                 'success' => true,
-                'message' => 'Logout berhasil. Sampai jumpa lagi, ' . $userName,
+                'message' => 'Logout berhasil.',
             ];
 
             if ($request->expectsJson()) {
                 return response()->json($response);
             }
 
-            return redirect('/')
-                ->with('success', 'Logout berhasil. Sampai jumpa lagi!');
+            return redirect('/')->with('success', 'Logout berhasil.');
 
         } catch (\Exception $e) {
             Log::error('Logout failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'error' => $e->getMessage()
             ]);
 
             $errorResponse = [
@@ -360,8 +406,7 @@ class AuthController extends Controller
                 return response()->json($errorResponse, 500);
             }
 
-            return redirect('/')
-                ->with('error', 'Terjadi kesalahan saat logout.');
+            return redirect('/')->with('error', 'Terjadi kesalahan saat logout.');
         }
     }
 
@@ -393,23 +438,19 @@ class AuthController extends Controller
                     'phone' => $user->phone,
                     'role' => $role,
                     'status' => $user->status ?? 'active',
-                    'email_verified_at' => $user->email_verified_at,
-                    'created_at' => $user->created_at->format('Y-m-d H:i:s'),
                     'last_login' => $user->last_login_at ? $user->last_login_at->format('Y-m-d H:i:s') : null,
                 ]
             ]);
 
         } catch (\Exception $e) {
             Log::error('Auth check failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'error' => $e->getMessage()
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Error checking authentication',
-                'authenticated' => false,
-                'debug' => config('app.debug') ? $e->getMessage() : null
+                'authenticated' => false
             ], 500);
         }
     }
@@ -433,6 +474,7 @@ class AuthController extends Controller
                     'username' => $user->username,
                     'phone' => $user->phone,
                     'role' => $role,
+                    'status' => $user->status,
                 ];
             }
 
@@ -443,10 +485,6 @@ class AuthController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Check session failed', [
-                'error' => $e->getMessage()
-            ]);
-
             return response()->json([
                 'success' => false,
                 'authenticated' => false,
@@ -467,9 +505,16 @@ class AuthController extends Controller
 
             $identifier = trim($validated['identifier']);
 
-            Log::info('Forgot password request', [
-                'identifier' => $identifier
-            ]);
+            // Format identifier jika berupa nomor telepon
+            if (is_numeric($identifier) || Str::startsWith($identifier, '+') || Str::startsWith($identifier, '0')) {
+                $phone = preg_replace('/[^0-9]/', '', $identifier);
+                if (Str::startsWith($phone, '62')) {
+                    $phone = '0' . substr($phone, 2);
+                } elseif (!Str::startsWith($phone, '0')) {
+                    $phone = '0' . $phone;
+                }
+                $identifier = $phone;
+            }
 
             // Cari user
             $user = User::where('email', $identifier)
@@ -485,54 +530,26 @@ class AuthController extends Controller
                     'reset_token_expires' => now()->addHours(2)
                 ]);
 
-                Log::info('Reset token generated', [
-                    'user_id' => $user->id,
-                    'email' => $user->email,
-                ]);
-
-                $response = [
+                return response()->json([
                     'success' => true,
                     'message' => 'Instruksi reset password telah dikirim.',
-                ];
-
-                if ($request->expectsJson()) {
-                    return response()->json($response);
-                }
-
-                return back()->with('success', 'Instruksi reset password telah dikirim.');
+                ]);
             }
 
-            Log::warning('Forgot password - identifier not found', [
-                'identifier' => $identifier
-            ]);
-
-            $errorResponse = [
+            return response()->json([
                 'success' => false,
-                'message' => 'Email/nomor telepon tidak terdaftar dalam sistem.'
-            ];
-
-            if ($request->expectsJson()) {
-                return response()->json($errorResponse, 404);
-            }
-
-            return back()->withErrors(['identifier' => 'Email/nomor telepon tidak terdaftar.']);
+                'message' => 'Email/nomor telepon/username tidak terdaftar.'
+            ], 404);
 
         } catch (\Exception $e) {
             Log::error('Forgot password failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'error' => $e->getMessage()
             ]);
 
-            $errorResponse = [
+            return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan. Silakan coba lagi nanti.'
-            ];
-
-            if ($request->expectsJson()) {
-                return response()->json($errorResponse, 500);
-            }
-
-            return back()->withErrors(['error' => 'Terjadi kesalahan. Silakan coba lagi nanti.']);
+            ], 500);
         }
     }
 

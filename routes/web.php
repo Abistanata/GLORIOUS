@@ -237,13 +237,9 @@ Route::middleware(['auth', 'role:Staff Gudang'])->prefix('staff')->name('staff.'
     });
 
 // ===================================
-// CUSTOMER ROUTES (GUARD TERPISAH)
+// CUSTOMER ROUTES - REMOVED (customers stay on main page)
 // ===================================
-Route::middleware(['auth:customer'])->prefix('customer')->name('customer.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('customer.dashboard');
-    })->name('dashboard');
-});
+// Customer dashboard removed - customers use main dashboard at '/'
 
 // ===================================
 // FALLBACK ROUTE YANG LEBIH AMAN
