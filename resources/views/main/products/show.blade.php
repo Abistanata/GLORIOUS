@@ -253,14 +253,34 @@
                         @endphp
                         
                         <div class="flex flex-col sm:flex-row gap-3">
-                            <a href="https://wa.me/6282133803940?text={{ $whatsappMessage }}" 
+                            @guest
+                            <a href="{{ route('login') }}?redirect={{ urlencode(request()->url()) }}"
+                               class="flex-1 bg-primary hover:bg-primary-dark text-white py-3 px-6 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-3 hover:shadow-lg {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">
+                                <i class="fas fa-shopping-cart text-lg"></i>
+                                {{ $currentStock == 0 ? 'Stok Habis' : 'Beli (Login)' }}
+                            </a>
+                            @else
+                            @if(auth()->user()->role === 'Customer')
+                            <form action="{{ route('main.cart.add', $product->id) }}" method="POST" class="flex-1">
+                                @csrf
+                                <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-3 px-6 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-3 hover:shadow-lg {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}" {{ $currentStock == 0 ? 'disabled' : '' }}>
+                                    <i class="fas fa-shopping-cart text-lg"></i>
+                                    {{ $currentStock == 0 ? 'Stok Habis' : 'Tambah ke Keranjang' }}
+                                </button>
+                            </form>
+                            @else
+                            <a href="{{ url('/admin/dashboard') }}" class="flex-1 bg-primary hover:bg-primary-dark text-white py-3 px-6 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-3">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                            @endif
+                            @endguest
+                            <a href="https://wa.me/6282133803940?text={{ $whatsappMessage }}"
                                target="_blank"
-                               class="flex-1 bg-primary hover:bg-primary-dark text-white py-3 px-6 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-3 hover:shadow-lg {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                               class="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-3 {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
                                @if($currentStock == 0) onclick="return false;" @endif>
                                 <i class="fab fa-whatsapp text-lg"></i>
-                                {{ $currentStock == 0 ? 'Stok Habis' : 'Pesan via WhatsApp' }}
+                                Pesan via WhatsApp
                             </a>
-                            
                             <a href="{{ route('main.products.index') }}" 
                                class="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-3 border border-gray-700">
                                 <i class="fas fa-arrow-left"></i>

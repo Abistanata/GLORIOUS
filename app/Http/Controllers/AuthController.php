@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -20,233 +20,266 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle user registration
+     * Tampilkan form login (untuk redirect guest)
+     */
+    public function showLoginForm(Request $request)
+    {
+        if (Auth::check()) {
+            return $this->redirectByRole(Auth::user()->role);
+        }
+        return view('auth.login');
+    }
+
+    /**
+     * Handle registration - buat User dengan role Customer (satu tabel users, auth() saja)
      */
     public function register(Request $request)
     {
-        $rules = [
-            'name'     => 'required|string|max:100',
-            'email'    => 'required|email|unique:users',
-            'password' => 'required|string|min:6',
-        ];
-
-        // Validasi role jika dikirim
-        if ($request->has('role')) {
-            $rules['role'] = 'required|in:Admin,Staff Gudang,Manajer Gudang';
-        }
-
-        $validated = $request->validate($rules);
-
-        // Default role: Staff Gudang
-        if (!isset($validated['role'])) {
-            $validated['role'] = 'Staff Gudang';
-        }
-
         try {
-            // Buat user
-            $user = $this->auth->register($validated);
+            $validated = $request->validate([
+                'name' => 'required|string|max:100',
+                'username' => 'required|string|unique:users,username|min:3|max:50|regex:/^[a-zA-Z0-9_]+$/',
+                'phone' => 'required|string|min:10|max:15',
+                'password' => 'required|string|min:6|confirmed',
+                'email' => 'nullable|email|unique:users,email',
+                'terms' => 'accepted',
+            ], [
+                'username.regex' => 'Username hanya boleh mengandung huruf, angka, dan underscore',
+                'terms.accepted' => 'Anda harus menyetujui syarat dan ketentuan',
+            ]);
 
-            // Auto login setelah register
-            $loginData = [
-                'email'    => $validated['email'],
-                'password' => $validated['password'],
+            $phone = $this->normalizePhone($validated['phone']);
+            $email = $validated['email'] ?? null;
+            if (!$email) {
+                $email = $validated['username'] . '@customer.local';
+                if (User::where('email', $email)->exists()) {
+                    $email = $validated['username'] . '_' . time() . '@customer.local';
+                }
+            }
+
+            $user = User::create([
+                'name' => $validated['name'],
+                'username' => $validated['username'],
+                'email' => $email,
+                'phone' => $phone,
+                'whatsapp' => $phone,
+                'password' => Hash::make($validated['password']),
+                'role' => 'Customer',
+            ]);
+
+            Auth::login($user, $request->boolean('remember'));
+            $request->session()->regenerate();
+
+            Log::info('Customer registered', ['user_id' => $user->id, 'username' => $user->username]);
+
+            $response = [
+                'success' => true,
+                'message' => 'Registrasi berhasil! Selamat bergabung.',
+                'user' => $this->userResponse($user),
+                'redirect' => null,
             ];
 
-            $token = $this->auth->login($loginData);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Registrasi berhasil! Akun Anda telah dibuat.',
-                'data' => [
-                    'user' => [
-                        'id'         => $user->id,
-                        'name'       => $user->name,
-                        'email'      => $user->email,
-                        'role'       => $user->role,
-                        'created_at' => $user->created_at->format('Y-m-d H:i:s'),
-                    ],
-                    'access_token' => $token,
-                    'token_type'   => 'Bearer',
-                    'expires_in'   => config('jwt.ttl') * 60,
-                    'redirect_to'  => $this->getRedirectUrlByRole($user->role),
-                ]
-            ], 201);
-
+            if ($request->expectsJson()) {
+                return response()->json($response);
+            }
+            return redirect()->intended('/')->with('success', 'Registrasi berhasil!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Validasi gagal', 'errors' => $e->errors()], 422);
+            }
+            return back()->withErrors($e->errors())->withInput();
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Registrasi gagal. Silakan coba lagi.',
-                'error'   => 'REGISTRATION_FAILED',
-            ], 500);
+            Log::error('Registration failed', ['error' => $e->getMessage()]);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan server.'], 500);
+            }
+            return back()->withErrors(['error' => 'Registrasi gagal. Silakan coba lagi.'])->withInput();
         }
     }
 
     /**
-     * Handle user login
+     * Login - SATU CEK: User table saja. Role Customer → tetap di halaman; Admin/Staff → redirect dashboard
      */
-   public function login(Request $request)
-{
-    $validated = $request->validate([
-        'email'    => 'required|email',
-        'password' => 'required|string',
-        'remember' => 'boolean',
-    ]);
-
-    // Ambil user dari database
-    $user = User::where('email', $validated['email'])->first();
-
-    // Jika user tidak ditemukan atau password salah
-    if (!$user || !Hash::check($validated['password'], $user->password)) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Email atau password salah.',
-        ], 401);
-    }
-
-    // Login user
-    Auth::login($user, $validated['remember'] ?? false);
-
-    // Regenerate session
-    $request->session()->regenerate();
-
-    // Update last login (opsional)
-    $user->update(['last_login_at' => now()]);
-
-    // Berhasil login
-    return response()->json([
-        'success' => true,
-        'message' => 'Login berhasil! Selamat datang, ' . $user->name,
-        'data' => [
-            'user' => [
-                'id'         => $user->id,
-                'name'       => $user->name,
-                'email'      => $user->email,
-                'role'       => $user->role,
-                'last_login' => now()->format('Y-m-d H:i:s'),
-            ],
-            'redirect_to' => $this->getRedirectUrlByRole($user->role),
-        ]
-    ]);
-}
-
-
-    /**
-     * Alternative simple login method (fallback jika AuthService bermasalah)
-     */
-    public function simpleLogin(Request $request)
+    public function login(Request $request)
     {
-        $validated = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required|string',
-            'remember' => 'boolean'
-        ]);
+        try {
+            $validated = $request->validate([
+                'login' => 'required|string',
+                'password' => 'required|string',
+                'remember' => 'boolean',
+            ]);
 
-        // Manual authentication
-        $user = User::where('email', $validated['email'])->first();
+            $login = trim($validated['login']);
+            $password = $validated['password'];
+            $remember = $validated['remember'] ?? false;
 
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Login gagal! Email atau password salah.',
-                'error'   => 'INVALID_CREDENTIALS',
-            ], 401);
+            $user = User::where('email', $login)
+                ->orWhere('username', $login)
+                ->first();
+
+            if (!$user && $this->looksLikePhone($login)) {
+                $normalizedPhone = $this->normalizePhoneForLookup($login);
+                $user = User::where('phone', $normalizedPhone)
+                    ->orWhere('whatsapp', $normalizedPhone)
+                    ->first();
+            }
+
+            if (!$user || !Hash::check($password, $user->password)) {
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Username/Email/Phone atau password salah.',
+                    ], 401);
+                }
+                return back()->withErrors(['login' => 'Kredensial tidak valid.'])->withInput();
+            }
+
+            Auth::login($user, $remember);
+            $request->session()->regenerate();
+
+            $role = $user->role ?? 'Customer';
+            $redirectUrl = $this->redirectByRole($role, true);
+            $isCustomer = ($role === 'Customer');
+
+            $response = [
+                'success' => true,
+                'message' => 'Login berhasil! Selamat datang, ' . $user->name,
+                'user' => $this->userResponse($user),
+                'user_type' => $isCustomer ? 'customer' : strtolower(str_replace(' ', '_', $role)),
+                'redirect' => $isCustomer ? null : $redirectUrl,
+            ];
+
+            if ($request->expectsJson()) {
+                return response()->json($response);
+            }
+            return redirect()->intended($redirectUrl);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Validasi gagal', 'errors' => $e->errors()], 422);
+            }
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            Log::error('Login failed', ['error' => $e->getMessage()]);
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Terjadi kesalahan server.'], 500);
+            }
+            return back()->withErrors(['error' => 'Login gagal.'])->withInput();
         }
-
-        // Login user
-        Auth::login($user, $validated['remember'] ?? false);
-
-        // Update last login
-        $user->update(['last_login_at' => now()]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Login berhasil! Selamat datang, ' . $user->name,
-            'data' => [
-                'user' => [
-                    'id'         => $user->id,
-                    'name'       => $user->name,
-                    'email'      => $user->email,
-                    'role'       => $user->role,
-                    'last_login' => now()->format('Y-m-d H:i:s'),
-                ],
-                'redirect_to'  => $this->getRedirectUrlByRole($user->role),
-            ]
-        ], 200);
     }
 
     /**
-     * Get redirect path based on user role
+     * Redirect berdasarkan role: Customer tetap (null/back), Admin/Staff ke dashboard
      */
-    protected function getRedirectUrlByRole($role)
+    protected function redirectByRole($role, $returnUrl = false)
     {
-        return match ($role) {
-            'Admin'          => '/admin/dashboard',
+        $role = is_string($role) ? trim($role) : 'Customer';
+        $map = [
+            'Admin' => '/admin/dashboard',
             'Manajer Gudang' => '/manajergudang/dashboard',
-            'Staff Gudang'   => '/staff/dashboard',
-            default          => '/',
-        };
+            'Staff Gudang' => '/staff/dashboard',
+        ];
+        $url = $map[$role] ?? null;
+        if ($returnUrl) {
+            return $url ?? url()->previous('/');
+        }
+        if ($url) {
+            return redirect($url);
+        }
+        return redirect('/');
     }
 
-    /**
-     * Logout user
-     */
-
-    /**
-     * Get current authenticated user info
-     */
-    public function me(Request $request)
+    private function userResponse(User $user): array
     {
-        $user = Auth::user();
+        $base = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'role' => $user->role ?? 'Customer',
+            'email' => $user->email,
+            'username' => $user->username,
+            'phone' => $user->phone,
+            'whatsapp' => $user->whatsapp,
+        ];
+        return $base;
+    }
 
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User tidak terautentikasi',
-            ], 401);
+    private function normalizePhone(string $phone): string
+    {
+        $phone = preg_replace('/\D/', '', $phone);
+        if (Str::startsWith($phone, '62')) {
+            $phone = '0' . substr($phone, 2);
+        } elseif (!Str::startsWith($phone, '0')) {
+            $phone = '0' . $phone;
         }
+        return $phone;
+    }
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'user' => [
-                    'id'         => $user->id,
-                    'name'       => $user->name,
-                    'email'      => $user->email,
-                    'role'       => $user->role,
-                    'created_at' => $user->created_at->format('Y-m-d H:i:s'),
-                ]
-            ]
-        ]);
+    /** Normalize phone for login lookup so 62xxx / 08xxx / 8xxx all match stored 08xxx */
+    private function normalizePhoneForLookup(string $value): string
+    {
+        return $this->normalizePhone($value);
+    }
+
+    private function looksLikePhone(string $value): bool
+    {
+        $digits = preg_replace('/\D/', '', $value);
+        return strlen($digits) >= 9 && strlen($digits) <= 15;
     }
 
     public function logout(Request $request)
     {
-        // Untuk API (token-based, Sanctum/JWT)
-        if ($request->expectsJson() || $request->is('api/*')) {
-            // Sanctum: hapus token user
-            if ($request->user()) {
-                $request->user()->currentAccessToken()?->delete();
-            }
-            return response()->json([
-                'success' => true,
-                'message' => 'Logout berhasil.'
-            ]);
-        }
-
-        // Untuk web (session-based)
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login')->with('status', 'Logout berhasil.');
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Logout berhasil.']);
+        }
+        return redirect('/')->with('success', 'Logout berhasil.');
     }
 
-    /**
-     * Check if user has specific role
-     */
-    public function checkRole($role)
+    public function me(Request $request)
     {
-        $user = Auth::user();
-        return $user && $user->role === $role;
+        if (!Auth::check()) {
+            return response()->json([
+                'success' => false,
+                'authenticated' => false,
+                'message' => 'Tidak terautentikasi',
+            ], 401);
+        }
+        return response()->json([
+            'success' => true,
+            'authenticated' => true,
+            'user' => $this->userResponse(Auth::user()),
+        ]);
+    }
+
+    public function checkRole(Request $request, $role)
+    {
+        $userRole = Auth::check() ? (Auth::user()->role ?? null) : null;
+        $hasRole = strtolower($userRole ?? '') === strtolower($role);
+        return response()->json([
+            'success' => true,
+            'has_role' => $hasRole,
+            'user_role' => $userRole,
+        ]);
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['identifier' => 'required|string']);
+        // Placeholder: bisa integrasi reset token nanti
+        return response()->json([
+            'success' => true,
+            'message' => 'Instruksi reset password akan dikirim jika email/nomor terdaftar.',
+        ]);
+    }
+
+    public function ping()
+    {
+        return response()->json([
+            'success' => true,
+            'message' => 'Auth API is working',
+            'timestamp' => now()->format('Y-m-d H:i:s'),
+        ]);
     }
 }

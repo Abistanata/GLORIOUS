@@ -17,7 +17,10 @@ use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\Main\AboutController;
 use App\Http\Controllers\Main\ProductsController;
 use App\Http\Controllers\Main\DashboardsController;
-use App\Http\Controllers\Main\WishlistController; // Tambahkan ini
+use App\Http\Controllers\Main\WishlistController;
+use App\Http\Controllers\Main\CartController;
+use App\Http\Controllers\Main\CheckoutController;
+use App\Http\Controllers\Main\CustomerOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,10 +29,14 @@ use App\Http\Controllers\Main\WishlistController; // Tambahkan ini
 */
 
 // ===================================
+// AUTH (Login satu pintu, redirect by role)
+// ===================================
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// ===================================
 // HALAMAN UTAMA WEBSITE (PUBLIC)
 // ===================================
-
-// Website utama - tanpa prefix
 Route::get('/', [DashboardsController::class, 'index'])->name('main.dashboard.index');
 Route::get('/about', [AboutController::class, 'index'])->name('main.about.index');
 Route::get('/services', [ServiceController::class, 'index'])->name('main.services.index');
@@ -38,24 +45,47 @@ Route::get('/products/category/{category_id}', [ProductsController::class, 'inde
 Route::get('/products/{id}', [ProductsController::class, 'show'])->name('main.products.show');
 
 // ===================================
-// WISHLIST ROUTES (PUBLIC/LOGGED IN USERS)
+// WISHLIST (Guest: lihat saja; Add/Toggle/Remove butuh login)
 // ===================================
 Route::prefix('wishlist')->name('wishlist.')->group(function () {
     Route::get('/', [WishlistController::class, 'index'])->name('index');
-    Route::post('/add/{product}', [WishlistController::class, 'add'])->name('add');
-    Route::delete('/remove/{product}', [WishlistController::class, 'remove'])->name('remove');
-    Route::post('/toggle/{product}', [WishlistController::class, 'toggle'])->name('toggle');
     Route::get('/count', [WishlistController::class, 'count'])->name('count');
-    Route::delete('/clear', [WishlistController::class, 'clear'])->name('clear');
-    Route::post('/move-to-cart/{product}', [WishlistController::class, 'moveToCart'])->name('move-to-cart');
+    Route::middleware(['auth', 'role:Customer'])->group(function () {
+        Route::post('/add/{product}', [WishlistController::class, 'add'])->name('add');
+        Route::delete('/remove/{product}', [WishlistController::class, 'remove'])->name('remove');
+        Route::post('/toggle/{product}', [WishlistController::class, 'toggle'])->name('toggle');
+        Route::delete('/clear', [WishlistController::class, 'clear'])->name('clear');
+        Route::post('/move-to-cart/{product}', [WishlistController::class, 'moveToCart'])->name('move-to-cart');
+    });
+});
+
+// ===================================
+// CART + CHECKOUT + PESANAN SAYA (auth + role Customer)
+// ===================================
+Route::middleware(['auth', 'role:Customer'])->group(function () {
+    Route::prefix('cart')->name('main.cart.')->group(function () {
+        Route::get('/', [CartController::class, 'index'])->name('index');
+        Route::post('/add/{productId}', [CartController::class, 'add'])->name('add');
+        Route::put('/update/{productId}', [CartController::class, 'update'])->name('update');
+        Route::delete('/remove/{productId}', [CartController::class, 'remove'])->name('remove');
+        Route::get('/count', [CartController::class, 'count'])->name('count');
+    });
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('main.checkout.index');
+    Route::post('/checkout/send-wa', [CheckoutController::class, 'sendToWhatsApp'])->name('main.checkout.send-wa');
+    Route::prefix('customer/orders')->name('customer.orders.')->group(function () {
+        Route::get('/', [CustomerOrderController::class, 'index'])->name('index');
+        Route::get('/{order}', [CustomerOrderController::class, 'show'])->name('show');
+    });
 });
 // ===================================
 // APLIKASI STOCKIFY (DENGAN PREFIX)
 // ===================================
 
+// ===================================
+// APLIKASI STOCKIFY (DENGAN PREFIX)
+// ===================================
+
 Route::prefix('stockify')->group(function () {
-    
-    // Route utama stockify - redirect berdasarkan auth
     Route::get('/', function () {
         if (auth()->check()) {
             $user = auth()->user();
@@ -63,28 +93,24 @@ Route::prefix('stockify')->group(function () {
                 'Admin'          => route('admin.dashboard'),
                 'Manajer Gudang' => route('manajergudang.dashboard'),
                 'Staff Gudang'   => route('staff.dashboard'),
-                default          => route('login'),
+                default          => url('/'),
             });
         }
-        return redirect()->route('login');
-    })->name('stockify.welcome');
 
-    // GUEST ROUTES
-    Route::middleware('guest')->group(function () {
-        Route::get('/login', fn() => view('auth.login'))->name('login');
-        Route::get('/register', fn() => view('auth.register'))->name('register');
+        return view('layouts.welcome');
+    })->name('welcome');
+
     });
-
-    // Auth actions (available for all)
-    Route::post('/login', [AuthController::class, 'login'])->name('login.process');
-    Route::post('/login/simple', [AuthController::class, 'simpleLogin'])->name('login.simple');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.process');
-
-    // Auth actions (require authentication)
-    Route::middleware('auth')->group(function () {
-        Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-        Route::get('/me', [AuthController::class, 'me'])->name('auth.me');
-    });
+   
+Route::prefix('auth')->group(function () {
+    Route::get('/ping', [AuthController::class, 'ping'])->name('auth.ping');
+    Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+    Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    Route::get('/me', [AuthController::class, 'me'])->name('auth.me');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('auth.forgot-password');
+    Route::get('/check-role/{role}', [AuthController::class, 'checkRole'])->name('auth.check-role');
+});
 
     // ===================================
     // ADMIN ROUTES
@@ -264,7 +290,6 @@ Route::prefix('stockify')->group(function () {
         Route::get('/profile', [StaffDashboardController::class, 'profile'])->name('profile');
         Route::put('/profile', [StaffDashboardController::class, 'updateProfile'])->name('profile.update');
     });
-});
 
 // ===================================
 // FALLBACK

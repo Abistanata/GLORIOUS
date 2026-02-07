@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Glorious Computer - Solusi Teknologi')</title>
     
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     
@@ -100,6 +103,16 @@
             100% { transform: scale(1); }
         }
         
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
         ::-webkit-scrollbar {
             width: 10px;
         }
@@ -110,7 +123,7 @@
             background: linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%);
             border-radius: 5px;
         }
-        ::-webkit-scrollbar-thumb:hover {
+        ::-webkit.scrollbar-thumb:hover {
             background: linear-gradient(135deg, #E05D00 0%, #FF6B00 100%);
         }
         
@@ -161,6 +174,15 @@
             background-clip: text;
         }
         
+        .shimmer-text {
+            background: linear-gradient(90deg, #FF6B00 0%, #FF8C42 25%, #FF6B00 50%, #FF8C42 75%, #FF6B00 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+        
         .mobile-menu {
             max-height: 0;
             overflow: hidden;
@@ -180,11 +202,233 @@
         .products-submenu.open {
             max-height: 400px;
         }
+        
+        /* Cart Sidebar Styles */
+        .cart-sidebar {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .cart-sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .cart-item {
+            transition: all 0.3s ease;
+        }
+        
+        .cart-item:hover {
+            background: rgba(255, 107, 0, 0.05);
+        }
+        
+        .close-button {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-button:hover {
+            color: #FF6B00;
+            transform: scale(1.1);
+        }
+        
+        /* Popup overlay */
+        .popup-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 9999;
+        }
+        
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .popup-content {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .popup-overlay.active .popup-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* Compact popup styles */
+        .popup-content {
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        
+        /* Custom scrollbar untuk popup */
+        .popup-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .popup-content::-webkit-scrollbar-track {
+            background: rgba(30, 30, 30, 0.5);
+            border-radius: 3px;
+        }
+        
+        .popup-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 107, 0, 0.5);
+            border-radius: 3px;
+        }
+        
+        .popup-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 107, 0, 0.8);
+        }
+        
+        /* Responsive untuk mobile */
+        @media (max-width: 640px) {
+            .popup-content {
+                margin: 1rem;
+                padding: 1rem !important;
+                max-height: 90vh;
+            }
+        }
+        
+        /* Form input styling */
+        .form-input {
+            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #1a1a1a, #222222);
+            border: 1px solid #2d2d2d;
+        }
+        
+        .form-input:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 0, 0.2), 0 0 0 2px rgba(255, 107, 0, 0.1);
+            border-color: #FF6B00;
+        }
+        
+        .form-input:hover {
+            border-color: #FF8C42;
+        }
+        
+        /* Button animations */
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 107, 0, 0.3);
+        }
+        
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::after {
+            left: 100%;
+        }
+        
+        /* Checkbox styling */
+        .form-checkbox {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #444;
+            border-radius: 4px;
+            background: #1a1a1a;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        
+        .form-checkbox:checked {
+            background: #FF6B00;
+            border-color: #FF6B00;
+        }
+        
+        .form-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Password strength indicator */
+        .password-strength {
+            height: 4px;
+            background: #444;
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s, background-color 0.3s;
+            border-radius: 2px;
+        }
+        
+        .strength-weak { width: 25%; background: #ff4757; }
+        .strength-medium { width: 50%; background: #ffa502; }
+        .strength-strong { width: 75%; background: #2ed573; }
+        .strength-very-strong { width: 100%; background: #00b894; }
+        
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255, 107, 0, 0.2);
+            border-top-color: #FF6B00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Gradient background */
+        .gradient-bg {
+            background: linear-gradient(-45deg, #121212, #1E1E1E, #2D2D2D, #121212);
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+        }
+        
+        /* Success/Error message styles */
+        .alert-success {
+            background: linear-gradient(135deg, rgba(0, 200, 83, 0.1), rgba(0, 200, 83, 0.05));
+            border: 1px solid rgba(0, 200, 83, 0.3);
+        }
+        
+        .alert-error {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1), rgba(255, 71, 87, 0.05));
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            animation: slideDown 0.3s ease-out;
+        }
     </style>
 
     @stack('styles')
 </head>
-<body class="bg-dark text-light font-sans antialiased">
+<body class="bg-dark text-light font-sans antialiased flex flex-col min-h-screen gradient-bg">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[10000] space-y-3 max-w-sm"></div>
 
     <!-- Tombol WhatsApp -->
     <a href="https://wa.me/6282133803940" 
@@ -197,7 +441,7 @@
         </div>
     </a>
 
-    <!-- Navbar - Versi Sederhana -->
+    <!-- Navbar -->
     <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-gray-800 shadow-soft">
         <div class="max-w-7xl mx-auto px-4 lg:px-8">
             <!-- Baris Utama Navbar -->
@@ -307,11 +551,13 @@
                     <!-- Kontak -->
                     <a href="https://wa.me/6282133803940"
                        target="_blank"
-                       class="bg-gradient-primary hover:shadow-glow-primary text-white px-5 py-2.5 rounded-xl font-semibold transition-all hover:scale-105 shadow-lg flex items-center group">
+                       class="btn-primary text-white px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center group shadow-lg">
                         <i class="fab fa-whatsapp mr-2"></i>
                         Kontak
                     </a>
 
+                    @auth
+                    @if(auth()->user()->role === 'Customer')
                     <!-- Wishlist -->
                     <a href="{{ route('wishlist.index') }}" class="relative group">
                         <div class="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-dark-light transition-all">
@@ -323,11 +569,33 @@
                             @endif
                         </div>
                     </a>
+                    <!-- Cart -->
+                    <button id="cart-button" class="relative group">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-dark-light transition-all">
+                            <i class="fas fa-shopping-cart text-xl text-light group-hover:text-primary transition-colors"></i>
+                            @if(isset($cartCount) && $cartCount > 0)
+                                <span class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-glow">
+                                    {{ $cartCount }}
+                                </span>
+                            @endif
+                        </div>
+                    </button>
+                    @endif
+                    @endauth
+                    <!-- Profile / Login Button -->
+                    <div class="relative">
+                        <button type="button" 
+                                id="profile-popup-button"
+                                class="flex items-center justify-center w-10 h-10 rounded-full bg-dark-light hover:bg-primary transition-all group focus:outline-none">
+                            <i class="fas fa-user text-light group-hover:text-white"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Menu Mobile Toggle -->
                 <div class="lg:hidden flex items-center space-x-3">
-                    <!-- Wishlist Mobile -->
+                    @auth
+                    @if(auth()->user()->role === 'Customer')
                     <a href="{{ route('wishlist.index') }}" class="relative">
                         <i class="fas fa-heart text-xl text-light hover:text-primary transition-colors"></i>
                         @if(isset($wishlistCount) && $wishlistCount > 0)
@@ -336,7 +604,16 @@
                             </span>
                         @endif
                     </a>
-                    
+                    <button id="cart-button-mobile" class="relative">
+                        <i class="fas fa-shopping-cart text-xl text-light hover:text-primary transition-colors"></i>
+                        @if(isset($cartCount) && $cartCount > 0)
+                            <span class="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                {{ $cartCount }}
+                            </span>
+                        @endif
+                    </button>
+                    @endif
+                    @endauth
                     <!-- Hamburger Button -->
                     <button id="menu-toggle" 
                             class="flex flex-col justify-center items-center w-10 h-10 focus:outline-none">
@@ -400,11 +677,26 @@
                         <i class="fas fa-cogs mr-3 text-primary group-hover:text-white"></i>
                         <span class="font-medium">Layanan</span>
                     </a>
+
+                    <!-- Profile Options Mobile -->
+                    <div class="border-t border-gray-800 pt-3 mt-2">
+                        <button id="mobile-login-button" 
+                                class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                            <i class="fas fa-sign-in-alt mr-3 text-primary group-hover:text-white"></i>
+                            <span class="font-medium">Login Pelanggan</span>
+                        </button>
+                        
+                        <button id="mobile-register-button" 
+                                class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                            <i class="fas fa-user-plus mr-3 text-primary group-hover:text-white"></i>
+                            <span class="font-medium">Daftar Pelanggan</span>
+                        </button>
+                    </div>
                     
                     <!-- Kontak Mobile -->
                     <a href="https://wa.me/6282133803940" 
                        target="_blank"
-                       class="flex items-center justify-center bg-gradient-primary hover:shadow-glow-primary text-white px-4 py-3 rounded-xl font-semibold transition-all group mt-4">
+                       class="flex items-center justify-center btn-primary text-white px-4 py-3 rounded-xl font-semibold transition-all group mt-4">
                         <i class="fab fa-whatsapp mr-2"></i>
                         Hubungi via WhatsApp
                     </a>
@@ -413,72 +705,905 @@
         </div>
     </nav>
 
-    <!-- Konten Utama -->
-    <div class="pt-24">
-        <main>
-            <!-- Overlay Loading -->
-            <div id="loading-overlay" class="fixed inset-0 bg-dark/90 z-50 flex items-center justify-center hidden">
-                <div class="text-center">
-                    <div class="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-                    <p class="mt-4 text-light text-lg font-medium">Memuat...</p>
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 h-full w-full lg:w-96 bg-dark-lighter z-[70] shadow-2xl border-l border-gray-800">
+        <div class="flex flex-col h-full">
+            <!-- Cart Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-800">
+                <div class="flex items-center">
+                    <i class="fas fa-shopping-cart text-primary text-xl mr-3"></i>
+                    <h3 class="text-xl font-bold text-white font-heading">Keranjang Belanja</h3>
+                </div>
+                <button id="cart-close-button" class="close-button text-gray-400 hover:text-white text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Cart Items -->
+            <div class="flex-1 overflow-y-auto p-4" id="cart-items-container">
+                <!-- Items will be loaded here -->
+                <div class="text-center py-10">
+                    <i class="fas fa-shopping-cart text-4xl text-gray-600 mb-4"></i>
+                    <p class="text-gray-500">Keranjang belanja kosong</p>
+                    <p class="text-gray-600 text-sm mt-2">Tambahkan produk ke keranjang untuk mulai belanja</p>
                 </div>
             </div>
+            
+            <!-- Cart Footer -->
+            <div class="border-t border-gray-800 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-400">Total</span>
+                    <span class="text-2xl font-bold text-white" id="cart-total">Rp 0</span>
+                </div>
+                <div class="space-y-3">
+                    @auth
+                    @if(auth()->user()->role === 'Customer')
+                    <a href="{{ route('main.checkout.index') }}" class="block w-full btn-primary text-white py-3.5 rounded-xl font-semibold transition-all text-center">
+                        Lanjut ke Checkout
+                    </a>
+                    @else
+                    <a href="{{ url('/admin/dashboard') }}" class="block w-full btn-primary text-white py-3.5 rounded-xl font-semibold transition-all text-center">Dashboard</a>
+                    @endif
+                    @else
+                    <a href="{{ route('login') }}" class="block w-full btn-primary text-white py-3.5 rounded-xl font-semibold transition-all text-center">Login untuk Checkout</a>
+                    @endauth
+                    <button id="cart-continue-button" class="w-full bg-dark-light hover:bg-dark text-white py-3 rounded-xl font-medium transition-all">
+                        Lanjut Belanja
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Cart Overlay -->
+    <div id="cart-overlay" 
+         class="popup-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[65]">
+    </div>
+
+    <!-- Profile Popup -->
+    <div id="profile-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-sm relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-primary"></div>
+                <div class="absolute -top-20 -right-20 w-40 h-40 bg-gradient-primary rounded-full opacity-10 blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-primary/20 rounded-full opacity-5 blur-3xl"></div>
+                
+                <button id="close-profile-popup" 
+                        class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors close-button z-50">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                
+                <div class="relative z-10 p-8">
+                    <!-- Header -->
+                    <div class="text-center mb-8">
+                        <div class="relative w-20 h-20 mx-auto mb-4">
+                            <div class="absolute inset-0 bg-gradient-primary rounded-full blur-xl opacity-50"></div>
+                            <div class="relative w-full h-full bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-primary">
+                                <i class="fas fa-user-gear text-2xl text-white"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white font-heading mb-2">Glorious Computer</h3>
+                        <p class="text-gray-400">Solusi Teknologi Terpercaya</p>
+                    </div>
+                    
+                    <!-- User Status -->
+                    <div class="bg-dark-light/30 rounded-xl p-5 mb-6 text-center border border-gray-800">
+                        <p class="text-gray-400 text-sm mb-2">Status Pengguna</p>
+                        <div class="inline-flex items-center bg-dark rounded-full px-5 py-2 border border-gray-700 mb-3">
+                            <i class="fas fa-user-clock text-primary mr-2"></i>
+                            <span class="text-white font-medium" id="user-status">Tamu</span>
+                        </div>
+                        <div id="user-info" class="mt-3 hidden">
+                            <p class="text-white text-lg font-medium" id="user-name"></p>
+                            <p class="text-gray-400 text-sm mt-1" id="user-username"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Guest Buttons -->
+                    <div class="space-y-4" id="guest-buttons">
+                        <button id="profile-login-button"
+                                class="w-full btn-primary text-white py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center group">
+                            <i class="fas fa-sign-in-alt mr-3 group-hover:animate-pulse"></i>
+                            Login Pelanggan
+                        </button>
+                        
+                        <button id="profile-register-button"
+                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center group">
+                            <i class="fas fa-user-plus mr-3 group-hover:animate-bounce"></i>
+                            Daftar Pelanggan
+                        </button>
+                        
+                        <a href="https://wa.me/6282133803940" 
+                           target="_blank"
+                           class="w-full bg-gradient-to-r from-green-600/20 to-green-700/20 hover:from-green-600/30 hover:to-green-700/30 border border-green-700/30 hover:border-green-500 text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center group shadow-lg">
+                            <i class="fab fa-whatsapp mr-3 group-hover:animate-heartbeat"></i>
+                            Konsultasi via WhatsApp
+                        </a>
+                    </div>
+
+                    <!-- User Buttons -->
+                    <div class="space-y-4 hidden" id="user-buttons">
+                        <button id="user-dashboard-button"
+                                class="w-full btn-primary text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center group">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            Dashboard
+                        </button>
+                        
+                        <a href="{{ route('wishlist.index') }}"
+                           class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center group">
+                            <i class="fas fa-heart mr-3"></i>
+                            Wishlist Saya
+                        </a>
+                        
+                        <a href="{{ route('customer.orders.index') }}"
+                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center group">
+                            <i class="fas fa-shopping-bag mr-3"></i>
+                            Pesanan Saya
+                        </a>
+                        
+                        <button id="user-logout-button"
+                                class="w-full bg-gradient-to-r from-red-600/20 to-red-700/20 hover:from-red-600/30 hover:to-red-700/30 border border-red-700/30 hover:border-red-500 text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center group">
+                            <i class="fas fa-sign-out-alt mr-3"></i>
+                            Logout
+                        </button>
+                    </div>
+                    
+                    <!-- Footer Note -->
+                    <div class="mt-8 pt-6 border-t border-gray-800/50">
+                        <p class="text-gray-500 text-sm text-center">
+                            <i class="fas fa-shield-alt mr-2 text-primary"></i>
+                            Data Anda aman bersama kami sejak 2003
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Login Form Popup -->
+    <div id="customer-login-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-sm relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
+                <div class="absolute -top-32 -right-32 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-secondary/10 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10 p-8">
+                    <button id="close-login-popup" 
+                            class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors close-button">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                    
+                    <div class="text-center mb-8">
+                        <div class="relative w-20 h-20 mx-auto mb-4">
+                            <div class="absolute inset-0 bg-gradient-primary rounded-full blur-xl opacity-50"></div>
+                            <div class="relative w-full h-full bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-primary">
+                                <i class="fas fa-user-lock text-2xl text-white"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white font-heading mb-2">Masuk Akun</h3>
+                        <p class="text-gray-400">Selamat datang kembali di Glorious Computer</p>
+                    </div>
+                    
+                    <!-- Login Form - DIREVISI untuk sesuai dengan AuthController -->
+                    <form id="customer-login-form" class="space-y-6">
+                        <!-- Login identifier (username/email/phone) -->
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <i class="fas fa-user-circle text-primary mr-2"></i>
+                                <label class="text-gray-300 font-medium">Username/Email/Phone</label>
+                            </div>
+                            <input type="text" 
+                                   id="login-identifier"
+                                   name="login"
+                                   placeholder="Masukkan username, email, atau nomor telepon"
+                                   class="w-full form-input px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
+                                   required>
+                        </div>
+                        
+                        <!-- Password -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <i class="fas fa-key text-primary mr-2"></i>
+                                    <label class="text-gray-300 font-medium">Password</label>
+                                </div>
+                                <button type="button" id="forgot-password-button" class="text-primary hover:text-primary-light text-sm transition-colors">
+                                    Lupa password?
+                                </button>
+                            </div>
+                            <div class="relative">
+                                <input type="password" 
+                                       id="login-password"
+                                       name="password"
+                                       placeholder="••••••••"
+                                       class="w-full form-input px-4 py-3.5 pr-12 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
+                                       required>
+                                <button type="button" 
+                                        class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                        data-target="login-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Remember Me -->
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" 
+                                   id="remember-me" 
+                                   name="remember"
+                                   class="form-checkbox"
+                                   value="1">
+                            <label for="remember-me" class="text-gray-400 cursor-pointer select-none">
+                                Ingat saya
+                            </label>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit"
+                                class="w-full btn-primary text-white py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center">
+                            <span class="login-button-text">Masuk ke Akun</span>
+                            <div class="spinner w-5 h-5 ml-2 hidden"></div>
+                        </button>
+                    </form>
+                    
+                    <div class="relative my-8">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-800"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-dark-lighter text-gray-500">atau</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <button id="switch-to-register-button"
+                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
+                            <i class="fas fa-user-plus mr-3 group-hover:scale-110 transition-transform"></i>
+                            Buat Akun Baru
+                        </button>
+                        
+                        <button id="back-from-login-button"
+                                class="w-full bg-transparent hover:bg-dark-light/30 border border-gray-700 hover:border-gray-600 text-gray-400 hover:text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
+                            <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i>
+                            Kembali
+                        </button>
+                    </div>
+                    
+                    <div class="mt-8 pt-6 border-t border-gray-800/50">
+                        <p class="text-gray-500 text-sm text-center mb-4">Butuh bantuan cepat?</p>
+                        <a href="https://wa.me/6282133803940" 
+                           target="_blank"
+                           class="w-full bg-gradient-to-r from-green-600/20 to-green-700/20 hover:from-green-600/30 hover:to-green-700/30 border border-green-700/30 hover:border-green-500 text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group shadow-lg">
+                            <i class="fab fa-whatsapp mr-3 text-green-400 group-hover:animate-heartbeat"></i>
+                            Konsultasi via WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Registration Form Popup -->
+    <div id="customer-registration-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-4xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
+                <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-accent/10 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10">
+                    <button id="close-registration-popup" 
+                            class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors close-button z-10">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-5 min-h-[600px]">
+                        <div class="lg:col-span-2 bg-gradient-to-br from-primary/10 to-primary-dark/10 p-8 lg:p-12 flex flex-col justify-center relative overflow-hidden">
+                            <div class="absolute inset-0 opacity-5">
+                                <div class="absolute top-10 left-10 w-40 h-40 border-2 border-primary rounded-full"></div>
+                                <div class="absolute bottom-10 right-10 w-32 h-32 border-2 border-primary rounded-full"></div>
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-2 border-primary rounded-full"></div>
+                            </div>
+                            
+                            <div class="relative z-10">
+                                <div class="flex items-center space-x-4 mb-8">
+                                    <div class="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-glow">
+                                        <span class="text-white font-bold text-xl">GC</span>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-2xl font-bold text-white font-heading">Glorious Computer</h2>
+                                        <p class="gradient-text font-semibold text-sm">Solusi Teknologi Terpercaya</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-8">
+                                    <h3 class="text-3xl font-bold text-white font-heading mb-4">
+                                        Bergabung dengan <span class="gradient-text">Komunitas Kami</span>
+                                    </h3>
+                                    <p class="text-gray-300 mb-6">
+                                        Dapatkan akses eksklusif ke layanan terbaik, promo spesial, dan solusi teknologi terkini.
+                                    </p>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-check-circle text-primary mr-3"></i>
+                                            <span class="text-gray-300">Layanan Service Komputer & Laptop</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-check-circle text-primary mr-3"></i>
+                                            <span class="text-gray-300">Upgrade Hardware Terjangkau</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-check-circle text-primary mr-3"></i>
+                                            <span class="text-gray-300">Konsultasi Teknologi Gratis</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-check-circle text-primary mr-3"></i>
+                                            <span class="text-gray-300">Notifikasi Promo & Diskon</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-12">
+                                    <div class="flex items-center justify-center space-x-6">
+                                        <div class="text-center">
+                                            <div class="text-3xl font-bold text-white">20+</div>
+                                            <div class="text-gray-400 text-sm">Tahun Pengalaman</div>
+                                        </div>
+                                        <div class="h-12 w-px bg-gray-700"></div>
+                                        <div class="text-center">
+                                            <div class="text-3xl font-bold text-white">5000+</div>
+                                            <div class="text-gray-400 text-sm">Pelanggan Puas</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="lg:col-span-3 p-8 lg:p-12">
+                            <div class="mb-8">
+                                <h3 class="text-2xl lg:text-3xl font-bold text-white font-heading mb-2">Daftar Akun Baru</h3>
+                                <p class="text-gray-400">Bergabung dengan komunitas Glorious Computer</p>
+                            </div>
+                            
+                            <!-- Registration Form - DIREVISI untuk sesuai dengan AuthController -->
+                            <form id="customer-registration-form" class="space-y-6">
+                                <!-- Name & Username -->
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-user text-primary mr-2"></i>
+                                            <label class="text-gray-300 font-medium">Nama Lengkap</label>
+                                        </div>
+                                        <input type="text" 
+                                               id="register-name"
+                                               name="name"
+                                               placeholder="Masukkan nama lengkap Anda"
+                                               class="w-full form-input px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
+                                               required>
+                                    </div>
+                                    
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-at text-primary mr-2"></i>
+                                            <label class="text-gray-300 font-medium">Username</label>
+                                        </div>
+                                        <input type="text" 
+                                               id="register-username"
+                                               name="username"
+                                               placeholder="Pilih username unik"
+                                               class="w-full form-input px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
+                                               required>
+                                        <p class="text-gray-500 text-xs mt-1">Username hanya boleh mengandung huruf, angka, dan underscore</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Email & Phone -->
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-envelope text-primary mr-2"></i>
+                                            <label class="text-gray-300 font-medium">Email (Opsional)</label>
+                                        </div>
+                                        <input type="email" 
+                                               id="register-email"
+                                               name="email"
+                                               placeholder="nama@email.com"
+                                               class="w-full form-input px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all">
+                                    </div>
+                                    
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-phone text-primary mr-2"></i>
+                                            <label class="text-gray-300 font-medium">Nomor WhatsApp</label>
+                                        </div>
+                                        <div class="relative">
+                                            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                                +62
+                                            </div>
+                                            <input type="tel" 
+                                                   id="register-phone"
+                                                   name="phone"
+                                                   placeholder="812-xxxx-xxxx"
+                                                   class="w-full form-input pl-12 px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
+                                                   required>
+                                        </div>
+                                        <p class="text-gray-500 text-xs mt-1">Untuk komunikasi via WhatsApp</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Password & Confirm Password -->
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-lock text-primary mr-2"></i>
+                                            <label class="text-gray-300 font-medium">Password</label>
+                                        </div>
+                                        <div class="relative">
+                                            <input type="password" 
+                                                   id="register-password"
+                                                   name="password"
+                                                   placeholder="Buat password yang kuat"
+                                                   class="w-full form-input px-4 py-3.5 pr-12 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
+                                                   required>
+                                            <button type="button" 
+                                                    class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                                    data-target="register-password">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="password-strength">
+                                            <div id="password-strength-bar" class="password-strength-bar"></div>
+                                        </div>
+                                        <p class="text-gray-500 text-xs">Minimal 6 karakter</p>
+                                    </div>
+                                    
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-lock text-primary mr-2"></i>
+                                            <label class="text-gray-300 font-medium">Konfirmasi Password</label>
+                                        </div>
+                                        <div class="relative">
+                                            <input type="password" 
+                                                   id="register-password-confirm"
+                                                   name="password_confirmation"
+                                                   placeholder="Ketik ulang password Anda"
+                                                   class="w-full form-input px-4 py-3.5 pr-12 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
+                                                   required>
+                                            <button type="button" 
+                                                    class="password-toggle absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                                    data-target="register-password-confirm">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Terms & Conditions -->
+                                <div class="flex items-start space-x-3 bg-dark-light/30 p-4 rounded-xl border border-gray-800 mt-6">
+                                    <input type="checkbox" 
+                                           id="register-terms"
+                                           name="terms"
+                                           class="form-checkbox mt-1"
+                                           required
+                                           value="1">
+                                    <label for="register-terms" class="text-gray-400 text-sm cursor-pointer select-none">
+                                        Saya setuju dengan 
+                                        <a href="#" class="text-primary hover:text-primary-light transition-colors">Syarat & Ketentuan</a>
+                                        dan 
+                                        <a href="#" class="text-primary hover:text-primary-light transition-colors">Kebijakan Privasi</a>
+                                        Glorious Computer
+                                    </label>
+                                </div>
+                                
+                                <!-- Submit Button -->
+                                <button type="submit"
+                                        class="w-full btn-primary text-white py-4 rounded-xl font-semibold text-lg transition-all mt-6 flex items-center justify-center">
+                                    <span class="register-button-text">Daftar Sekarang</span>
+                                    <div class="spinner w-5 h-5 ml-2 hidden"></div>
+                                </button>
+                            </form>
+                            
+                            <div class="relative my-8">
+                                <div class="absolute inset-0 flex items-center">
+                                    <div class="w-full border-t border-gray-800"></div>
+                                </div>
+                                <div class="relative flex justify-center text-sm">
+                                    <span class="px-4 bg-gradient-to-br from-dark-lighter to-dark text-gray-500">sudah punya akun?</span>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <button id="switch-to-login-button"
+                                        class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
+                                    <i class="fas fa-sign-in-alt mr-3 group-hover:scale-110 transition-transform"></i>
+                                    Masuk ke Akun
+                                </button>
+                                
+                                <button id="back-from-registration-button"
+                                        class="w-full bg-transparent hover:bg-dark-light/30 border border-gray-700 hover:border-gray-600 text-gray-400 hover:text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
+                                    <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i>
+                                    Kembali
+                                </button>
+                            </div>
+                            
+                            <div class="mt-8 pt-6 border-t border-gray-800/50">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2 text-gray-500 text-sm">
+                                        <i class="fas fa-shield-alt text-primary"></i>
+                                        <span>Keamanan data terjamin sejak 2003</span>
+                                    </div>
+                                    <a href="https://wa.me/6282133803940" 
+                                       target="_blank"
+                                       class="text-primary hover:text-primary-light text-sm transition-colors">
+                                        <i class="fab fa-whatsapp mr-1"></i>
+                                        Butuh bantuan?
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Popup -->
+    <div id="forgot-password-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
+                <div class="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-secondary/10 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10 p-8">
+                    <button id="close-forgot-password-popup" 
+                            class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors close-button">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                    
+                    <div class="text-center mb-8">
+                        <div class="relative w-20 h-20 mx-auto mb-4">
+                            <div class="absolute inset-0 bg-gradient-primary rounded-full blur-xl opacity-50"></div>
+                            <div class="relative w-full h-full bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-primary">
+                                <i class="fas fa-key text-2xl text-white"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white font-heading mb-2">Lupa Password</h3>
+                        <p class="text-gray-400">Masukkan email atau nomor telepon untuk reset password</p>
+                    </div>
+                    
+                    <form id="forgot-password-form" class="space-y-6">
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <i class="fas fa-envelope text-primary mr-2"></i>
+                                <label class="text-gray-300 font-medium">Email atau Nomor Telepon</label>
+                            </div>
+                            <input type="text" 
+                                   id="forgot-password-identifier"
+                                   placeholder="Masukkan email atau nomor telepon terdaftar"
+                                   class="w-full form-input px-4 py-3.5 rounded-xl text-white placeholder-gray-500 focus:outline-none transition-all"
+                                   required>
+                        </div>
+                        
+                        <button type="submit"
+                                class="w-full btn-primary text-white py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center">
+                            <span class="forgot-password-button-text">Kirim Reset Link</span>
+                            <div class="spinner w-5 h-5 ml-2 hidden"></div>
+                        </button>
+                    </form>
+                    
+                    <div class="relative my-8">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-800"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-4 bg-dark-lighter text-gray-500">atau</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <button id="back-to-login-button"
+                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
+                            <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i>
+                            Kembali ke Login
+                        </button>
+                        
+                        <a href="https://wa.me/6282133803940" 
+                           target="_blank"
+                           class="w-full bg-gradient-to-r from-green-600/20 to-green-700/20 hover:from-green-600/30 hover:to-green-700/30 border border-green-700/30 hover:border-green-500 text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group shadow-lg">
+                            <i class="fab fa-whatsapp mr-3 text-green-400 group-hover:animate-heartbeat"></i>
+                            Hubungi Support WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Message Popup -->
+    <div id="success-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary"></div>
+                <div class="absolute -top-20 -right-20 w-40 h-40 bg-green-500/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-green-500/5 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10 p-8 text-center">
+                    <div class="relative w-24 h-24 mx-auto mb-6">
+                        <div class="absolute inset-0 bg-green-500 rounded-full blur-xl opacity-20"></div>
+                        <div class="relative w-full h-full bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-3xl text-white"></i>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold text-white font-heading mb-4" id="success-title">Sukses!</h3>
+                    <p class="text-gray-300 mb-8" id="success-message"></p>
+                    
+                    <div class="space-y-4">
+                        <button id="close-success-popup"
+                                class="w-full btn-primary text-white py-4 rounded-xl font-semibold text-lg transition-all">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            Oke, Mengerti
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Message Popup -->
+    <div id="error-popup" class="popup-overlay fixed inset-0 z-[9999] bg-black/80 backdrop-blur-xl">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="popup-content bg-gradient-to-br from-dark-lighter to-dark border border-gray-800/50 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-red-500"></div>
+                <div class="absolute -top-20 -right-20 w-40 h-40 bg-red-500/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-red-500/5 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10 p-8 text-center">
+                    <button id="close-error-popup" 
+                            class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors close-button">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                    
+                    <div class="relative w-24 h-24 mx-auto mb-6">
+                        <div class="absolute inset-0 bg-red-500 rounded-full blur-xl opacity-20"></div>
+                        <div class="relative w-full h-full bg-red-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-3xl text-white"></i>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold text-white font-heading mb-4" id="error-title">Terjadi Kesalahan</h3>
+                    <p class="text-gray-300 mb-8" id="error-message"></p>
+                    
+                    <div class="space-y-4">
+                        <button id="close-error-button"
+                                class="w-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 hover:border-red-400 text-white py-4 rounded-xl font-semibold text-lg transition-all">
+                            <i class="fas fa-times-circle mr-2"></i>
+                            Tutup
+                        </button>
+                        
+                        <a href="https://wa.me/6282133803940" 
+                           target="_blank"
+                           class="w-full bg-gradient-to-r from-green-600/20 to-green-700/20 hover:from-green-600/30 hover:to-green-700/30 border border-green-700/30 hover:border-green-500 text-white py-3.5 rounded-xl font-medium transition-all flex items-center justify-center group">
+                            <i class="fab fa-whatsapp mr-3 text-green-400"></i>
+                            Minta Bantuan Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay Loading -->
+    <div id="loading-overlay" class="popup-overlay fixed inset-0 bg-dark/95 z-50 flex items-center justify-center backdrop-blur-lg">
+        <div class="text-center">
+            <div class="relative">
+                <div class="w-28 h-28 border-4 border-primary/20 rounded-full"></div>
+                <div class="absolute top-0 left-0 w-28 h-28 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="spinner w-16 h-16"></div>
+                </div>
+            </div>
+            <p class="mt-8 text-light text-xl font-medium animate-pulse">Memproses...</p>
+            <p class="text-gray-400 text-sm mt-3">Harap tunggu sebentar</p>
+        </div>
+    </div>
+
+    <!-- Konten Utama -->
+    <div class="flex-1 pt-20">
+        <main>
             @yield('content')
         </main>
     </div>
 
-    <!-- Footer (Sederhana) -->
-    <footer class="bg-dark-lighter border-t border-gray-800 mt-12">
-        <div class="max-w-7xl mx-auto px-4 py-8">
-            <div class="text-center">
-                <div class="flex items-center justify-center space-x-3 mb-4">
-                    <div class="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
-                        <span class="text-white font-bold">GC</span>
+    <!-- Footer -->
+    <footer class="bg-dark-lighter border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                <!-- Info Perusahaan -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="relative">
+                            <div class="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-glow">
+                                <span class="text-white font-bold text-xl">GC</span>
+                            </div>
+                            <div class="absolute -inset-1 bg-gradient-primary rounded-2xl blur opacity-20"></div>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-white font-heading">Glorious Computer</h3>
+                            <p class="gradient-text font-semibold tracking-wide">Solusi Teknologi Sejak 2003</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-white">Glorious Computer</h3>
-                        <p class="gradient-text text-sm">Solusi Teknologi</p>
+                    <p class="text-gray-400 mb-8 leading-relaxed">
+                        Penyedia solusi teknologi terkemuka yang mengkhususkan diri dalam perbaikan komputer, 
+                        upgrade hardware, instalasi software, dan layanan IT komprehensif dengan keunggulan 
+                        selama lebih dari 20 tahun di Purbalingga.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-12 h-12 bg-dark-light hover:bg-primary rounded-xl flex items-center justify-center transition-all group shadow-soft">
+                            <i class="fab fa-facebook-f text-gray-400 group-hover:text-white text-lg"></i>
+                        </a>
+                        <a href="#" class="w-12 h-12 bg-dark-light hover:bg-pink-600 rounded-xl flex items-center justify-center transition-all group shadow-soft">
+                            <i class="fab fa-instagram text-gray-400 group-hover:text-white text-lg"></i>
+                        </a>
+                        <a href="#" class="w-12 h-12 bg-dark-light hover:bg-blue-500 rounded-xl flex items-center justify-center transition-all group shadow-soft">
+                            <i class="fab fa-twitter text-gray-400 group-hover:text-white text-lg"></i>
+                        </a>
+                        <a href="https://wa.me/6282133803940" 
+                           target="_blank"
+                           class="w-12 h-12 bg-dark-light hover:bg-green-600 rounded-xl flex items-center justify-center transition-all group shadow-soft">
+                            <i class="fab fa-whatsapp text-gray-400 group-hover:text-white text-lg"></i>
+                        </a>
                     </div>
                 </div>
-                <p class="text-gray-400 text-sm">
-                    &copy; {{ date('Y') }} Glorious Computer. Hak Cipta Dilindungi.
+                
+                <!-- Layanan -->
+                <div>
+                    <h4 class="text-xl font-bold text-white font-heading mb-6 pb-2 border-b border-gray-800">Layanan Kami</h4>
+                    <ul class="space-y-4">
+                        <li>
+                            <a href="{{ route('main.services.index') }}" class="flex items-center text-gray-400 hover:text-primary transition-all group">
+                                <div class="w-8 h-8 bg-dark-light rounded-lg flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
+                                    <i class="fas fa-laptop-code text-sm"></i>
+                                </div>
+                                <span>Servis PC & Laptop</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('main.services.index') }}" class="flex items-center text-gray-400 hover:text-primary transition-all group">
+                                <div class="w-8 h-8 bg-dark-light rounded-lg flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
+                                    <i class="fas fa-microchip text-sm"></i>
+                                </div>
+                                <span>Upgrade Hardware</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('main.services.index') }}" class="flex items-center text-gray-400 hover:text-primary transition-all group">
+                                <div class="w-8 h-8 bg-dark-light rounded-lg flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
+                                    <i class="fas fa-print text-sm"></i>
+                                </div>
+                                <span>Servis Printer</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('main.services.index') }}" class="flex items-center text-gray-400 hover:text-primary transition-all group">
+                                <div class="w-8 h-8 bg-dark-light rounded-lg flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
+                                    <i class="fas fa-cog text-sm"></i>
+                                </div>
+                                <span>Install Software</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Info Kontak -->
+                <div>
+                    <h4 class="text-xl font-bold text-white font-heading mb-6 pb-2 border-b border-gray-800">Info Kontak</h4>
+                    <ul class="space-y-5">
+                        <li class="flex items-start">
+                            <div class="w-10 h-10 bg-dark-light rounded-lg flex items-center justify-center mr-4 mt-1">
+                                <i class="fas fa-map-marker-alt text-primary"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-white">Lokasi</p>
+                                <p class="text-gray-400 text-sm">Jl. Argandaru No.4<br>Bukateja, Purbalingga</p>
+                            </div>
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-10 h-10 bg-dark-light rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-phone-alt text-primary"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-white">Telepon</p>
+                                <a href="tel:082133803940" class="text-gray-400 hover:text-primary transition-colors text-sm">0821-3380-3940</a>
+                            </div>
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-10 h-10 bg-dark-light rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-clock text-primary"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-white">Jam Operasional</p>
+                                <p class="text-gray-400 text-sm">Sen - Sab: 08:00 - 17:00</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Hak Cipta -->
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center">
+                <p class="text-gray-500">
+                    &copy; {{ date('Y') }} <span class="text-white font-semibold">Glorious Computer</span>. Hak Cipta Dilindungi. 
+                    <span class="gradient-text font-medium ml-2">Keunggulan dalam Solusi Teknologi</span>
+                </p>
+                <p class="text-gray-600 text-sm mt-2">
+                    Dirancang dengan <i class="fas fa-heart text-red-500 mx-1"></i> untuk masyarakat Purbalingga
                 </p>
             </div>
         </div>
     </footer>
 
-    <!-- JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle Menu Mobile
+<script>
+    // Global state management
+    const PopupManager = {
+        currentUser: null,
+        activePopup: null,
+        cartOpen: false,
+        csrfToken: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+        
+        init() {
+            this.initializeUserState();
+            this.setupEventListeners();
+            this.setupPopupCloseHandlers();
+            this.updateUserState();
+            this.initializeCart();
+            
+            // Hide all popups on initial load
+            this.hideAllPopups();
+            
+            // Check if user is logged in via session
+            this.checkSession();
+        },
+        
+        initializeUserState() {
+            const savedUser = localStorage.getItem('glorious_user');
+            if (savedUser) {
+                this.currentUser = JSON.parse(savedUser);
+            }
+        },
+        
+        setupEventListeners() {
+            // Mobile menu toggle
             const menuToggle = document.getElementById('menu-toggle');
             const mobileMenu = document.getElementById('mobile-menu');
             
             if (menuToggle && mobileMenu) {
-                menuToggle.addEventListener('click', function(e) {
+                menuToggle.addEventListener('click', (e) => {
                     e.stopPropagation();
                     mobileMenu.classList.toggle('open');
                     menuToggle.classList.toggle('hamburger-active');
                 });
             }
-
-            // Toggle Menu Produk Mobile
+            
+            // Mobile products toggle
             const mobileProductsToggle = document.getElementById('mobile-products-toggle');
             const mobileProductsMenu = document.getElementById('mobile-products-menu');
             const productsArrow = document.getElementById('products-arrow');
             
             if (mobileProductsToggle && mobileProductsMenu && productsArrow) {
-                mobileProductsToggle.addEventListener('click', function(e) {
+                mobileProductsToggle.addEventListener('click', (e) => {
                     e.stopPropagation();
                     mobileProductsMenu.classList.toggle('open');
                     productsArrow.classList.toggle('rotate-180');
                 });
             }
-
-            // Tutup menu mobile ketika mengklik link
+            
+            // Close mobile menu when clicking links
             document.querySelectorAll('#mobile-menu a').forEach(link => {
-                link.addEventListener('click', function() {
+                link.addEventListener('click', () => {
                     mobileMenu.classList.remove('open');
                     menuToggle.classList.remove('hamburger-active');
                     
@@ -488,9 +1613,254 @@
                     }
                 });
             });
-
-            // Efek scroll navbar
-            window.addEventListener('scroll', function() {
+            
+            // Profile popup button
+            const profilePopupButton = document.getElementById('profile-popup-button');
+            if (profilePopupButton) {
+                profilePopupButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showPopup('profile-popup');
+                });
+            }
+            
+            // Cart buttons
+            const cartButton = document.getElementById('cart-button');
+            const cartButtonMobile = document.getElementById('cart-button-mobile');
+            
+            if (cartButton) {
+                cartButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.toggleCart();
+                });
+            }
+            if (cartButtonMobile) {
+                cartButtonMobile.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.toggleCart();
+                });
+            }
+            
+            // Cart close buttons
+            const cartCloseButton = document.getElementById('cart-close-button');
+            const cartContinueButton = document.getElementById('cart-continue-button');
+            
+            if (cartCloseButton) {
+                cartCloseButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.toggleCart();
+                });
+            }
+            if (cartContinueButton) {
+                cartContinueButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.toggleCart();
+                });
+            }
+            
+            // Cart overlay
+            const cartOverlay = document.getElementById('cart-overlay');
+            if (cartOverlay) {
+                cartOverlay.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.toggleCart();
+                });
+            }
+            
+            // Profile popup buttons
+            const profileLoginButton = document.getElementById('profile-login-button');
+            const profileRegisterButton = document.getElementById('profile-register-button');
+            const mobileLoginButton = document.getElementById('mobile-login-button');
+            const mobileRegisterButton = document.getElementById('mobile-register-button');
+            
+            if (profileLoginButton) {
+                profileLoginButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showPopup('customer-login-popup');
+                });
+            }
+            if (profileRegisterButton) {
+                profileRegisterButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showPopup('customer-registration-popup');
+                });
+            }
+            if (mobileLoginButton) {
+                mobileLoginButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showPopup('customer-login-popup');
+                    this.hideMobileMenu();
+                });
+            }
+            if (mobileRegisterButton) {
+                mobileRegisterButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showPopup('customer-registration-popup');
+                    this.hideMobileMenu();
+                });
+            }
+            
+            // User buttons
+            const userLogoutButton = document.getElementById('user-logout-button');
+            if (userLogoutButton) {
+                userLogoutButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.handleLogout();
+                });
+            }
+            
+            // Switch between popups
+            const switchToRegisterButton = document.getElementById('switch-to-register-button');
+            const switchToLoginButton = document.getElementById('switch-to-login-button');
+            
+            if (switchToRegisterButton) {
+                switchToRegisterButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.hidePopup('customer-login-popup');
+                    setTimeout(() => this.showPopup('customer-registration-popup'), 300);
+                });
+            }
+            if (switchToLoginButton) {
+                switchToLoginButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.hidePopup('customer-registration-popup');
+                    setTimeout(() => this.showPopup('customer-login-popup'), 300);
+                });
+            }
+            
+            // Back buttons
+            const backFromLoginButton = document.getElementById('back-from-login-button');
+            const backFromRegistrationButton = document.getElementById('back-from-registration-button');
+            
+            if (backFromLoginButton) {
+                backFromLoginButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.hidePopup('customer-login-popup');
+                    setTimeout(() => this.showPopup('profile-popup'), 300);
+                });
+            }
+            if (backFromRegistrationButton) {
+                backFromRegistrationButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.hidePopup('customer-registration-popup');
+                    setTimeout(() => this.showPopup('profile-popup'), 300);
+                });
+            }
+            
+            // Forgot password
+            const forgotPasswordButton = document.getElementById('forgot-password-button');
+            const backToLoginButton = document.getElementById('back-to-login-button');
+            
+            if (forgotPasswordButton) {
+                forgotPasswordButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.hidePopup('customer-login-popup');
+                    setTimeout(() => this.showPopup('forgot-password-popup'), 300);
+                });
+            }
+            if (backToLoginButton) {
+                backToLoginButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.hidePopup('forgot-password-popup');
+                    setTimeout(() => this.showPopup('customer-login-popup'), 300);
+                });
+            }
+            
+            // Password toggle buttons
+            document.querySelectorAll('.password-toggle').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const targetId = button.getAttribute('data-target');
+                    this.togglePasswordVisibility(targetId);
+                });
+            });
+            
+            // Form submissions
+            const loginForm = document.getElementById('customer-login-form');
+            const registrationForm = document.getElementById('customer-registration-form');
+            const forgotPasswordForm = document.getElementById('forgot-password-form');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleLogin();
+                });
+            }
+            
+            if (registrationForm) {
+                registrationForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleRegistration();
+                });
+            }
+            
+            if (forgotPasswordForm) {
+                forgotPasswordForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleForgotPassword();
+                });
+            }
+            
+            // Close success/error popups
+            const closeSuccessPopupButton = document.getElementById('close-success-popup');
+            const closeErrorButton = document.getElementById('close-error-button');
+            const closeErrorPopupButton = document.getElementById('close-error-popup');
+            
+            if (closeSuccessPopupButton) {
+                closeSuccessPopupButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.hidePopup('success-popup');
+                });
+            }
+            if (closeErrorButton) {
+                closeErrorButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.hidePopup('error-popup');
+                });
+            }
+            if (closeErrorPopupButton) {
+                closeErrorPopupButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.hidePopup('error-popup');
+                });
+            }
+            
+            // Close popup when clicking outside
+            document.addEventListener('click', (e) => {
+                if (this.activePopup && e.target.classList.contains('popup-overlay')) {
+                    this.hidePopup(this.activePopup);
+                }
+            });
+            
+            // Close popup with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && this.activePopup) {
+                    this.hidePopup(this.activePopup);
+                }
+            });
+            
+            // Navbar scroll effect
+            window.addEventListener('scroll', () => {
                 const nav = document.querySelector('nav');
                 if (window.scrollY > 20) {
                     nav.classList.add('shadow-lg', 'bg-dark/95');
@@ -498,8 +1868,573 @@
                     nav.classList.remove('shadow-lg', 'bg-dark/95');
                 }
             });
-        });
-    </script>
+        },
+        
+        setupPopupCloseHandlers() {
+            // Setup close handlers for all popups
+            const popups = [
+                'profile-popup',
+                'customer-login-popup',
+                'customer-registration-popup',
+                'forgot-password-popup',
+                'success-popup',
+                'error-popup'
+            ];
+            
+            popups.forEach(popupId => {
+                const closeButton = document.getElementById(`close-${popupId}`);
+                if (closeButton) {
+                    closeButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.hidePopup(popupId);
+                    });
+                }
+            });
+        },
+        
+        showPopup(popupId) {
+            // Hide current popup if any
+            if (this.activePopup && this.activePopup !== popupId) {
+                this.hidePopup(this.activePopup);
+            }
+            
+            const popup = document.getElementById(popupId);
+            if (popup) {
+                // Reset form if needed
+                if (popupId === 'customer-login-popup') {
+                    this.resetLoginForm();
+                } else if (popupId === 'customer-registration-popup') {
+                    this.resetRegistrationForm();
+                } else if (popupId === 'forgot-password-popup') {
+                    this.resetForgotPasswordForm();
+                }
+                
+                popup.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                this.activePopup = popupId;
+            }
+        },
+        
+        hidePopup(popupId) {
+            const popup = document.getElementById(popupId);
+            if (popup) {
+                popup.classList.remove('active');
+                if (!this.activePopup || this.activePopup === popupId) {
+                    document.body.style.overflow = 'auto';
+                    this.activePopup = null;
+                }
+            }
+        },
+        
+        hideAllPopups() {
+            const popups = document.querySelectorAll('.popup-overlay');
+            popups.forEach(popup => {
+                popup.classList.remove('active');
+            });
+            document.body.style.overflow = 'auto';
+            this.activePopup = null;
+        },
+        
+        hideMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileProductsMenu = document.getElementById('mobile-products-menu');
+            const productsArrow = document.getElementById('products-arrow');
+            
+            if (mobileMenu) mobileMenu.classList.remove('open');
+            if (menuToggle) menuToggle.classList.remove('hamburger-active');
+            if (mobileProductsMenu) mobileProductsMenu.classList.remove('open');
+            if (productsArrow) productsArrow.classList.remove('rotate-180');
+        },
+        
+        toggleCart() {
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const cartOverlay = document.getElementById('cart-overlay');
+            
+            if (cartSidebar && cartOverlay) {
+                if (this.cartOpen) {
+                    cartSidebar.classList.remove('open');
+                    cartOverlay.classList.remove('active');
+                } else {
+                    cartSidebar.classList.add('open');
+                    cartOverlay.classList.add('active');
+                }
+                this.cartOpen = !this.cartOpen;
+            }
+        },
+        
+        initializeCart() {
+            // Initialize cart functionality
+            this.loadCart();
+        },
+        
+        async loadCart() {
+            try {
+                // Load cart from API
+                // This would be implemented with actual API calls
+            } catch (error) {
+                console.error('Error loading cart:', error);
+            }
+        },
+        
+        togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            if (input) {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                
+                // Update eye icon
+                const button = input.parentElement.querySelector('.password-toggle i');
+                if (button) {
+                    button.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+                }
+            }
+        },
+        
+        checkPasswordStrength(password) {
+            const strengthBar = document.getElementById('password-strength-bar');
+            if (!strengthBar) return;
+            
+            let strength = 0;
+            if (password.length >= 6) strength++;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            strengthBar.className = 'password-strength-bar';
+            if (password.length === 0) {
+                strengthBar.style.width = '0%';
+                strengthBar.style.backgroundColor = '';
+            } else if (strength <= 2) {
+                strengthBar.className += ' strength-weak';
+            } else if (strength === 3) {
+                strengthBar.className += ' strength-medium';
+            } else if (strength === 4) {
+                strengthBar.className += ' strength-strong';
+            } else {
+                strengthBar.className += ' strength-very-strong';
+            }
+        },
+        
+        resetLoginForm() {
+            const form = document.getElementById('customer-login-form');
+            if (form) form.reset();
+            
+            const spinner = form.querySelector('.spinner');
+            const buttonText = form.querySelector('.login-button-text');
+            if (spinner) spinner.classList.add('hidden');
+            if (buttonText) buttonText.textContent = 'Masuk ke Akun';
+        },
+        
+        resetRegistrationForm() {
+            const form = document.getElementById('customer-registration-form');
+            if (form) form.reset();
+            
+            const strengthBar = document.getElementById('password-strength-bar');
+            if (strengthBar) {
+                strengthBar.style.width = '0%';
+                strengthBar.style.backgroundColor = '';
+            }
+            
+            const spinner = form.querySelector('.spinner');
+            const buttonText = form.querySelector('.register-button-text');
+            if (spinner) spinner.classList.add('hidden');
+            if (buttonText) buttonText.textContent = 'Daftar Sekarang';
+        },
+        
+        resetForgotPasswordForm() {
+            const form = document.getElementById('forgot-password-form');
+            if (form) form.reset();
+            
+            const spinner = form.querySelector('.spinner');
+            const buttonText = form.querySelector('.forgot-password-button-text');
+            if (spinner) spinner.classList.add('hidden');
+            if (buttonText) buttonText.textContent = 'Kirim Reset Link';
+        },
+        
+        showLoading(show = true) {
+            const loadingOverlay = document.getElementById('loading-overlay');
+            if (loadingOverlay) {
+                if (show) {
+                    loadingOverlay.classList.add('active');
+                } else {
+                    loadingOverlay.classList.remove('active');
+                }
+            }
+        },
+        
+        showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) return;
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type === 'success' ? 'bg-green-900/30 border border-green-700/50' : 'bg-red-900/30 border border-red-700/50'} rounded-xl p-4 text-white shadow-lg backdrop-blur-sm`;
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle text-green-400' : 'fa-exclamation-circle text-red-400'} mr-3"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Remove toast after 5 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        },
+        
+        showSuccess(title, message) {
+            const successTitle = document.getElementById('success-title');
+            const successMessage = document.getElementById('success-message');
+            
+            if (successTitle) successTitle.textContent = title;
+            if (successMessage) successMessage.textContent = message;
+            
+            this.showPopup('success-popup');
+        },
+        
+        showError(title, message) {
+            const errorTitle = document.getElementById('error-title');
+            const errorMessage = document.getElementById('error-message');
+            
+            if (errorTitle) errorTitle.textContent = title;
+            if (errorMessage) errorMessage.textContent = message;
+            
+            this.showPopup('error-popup');
+        },
+        
+        async handleLogin() {
+            const identifier = document.getElementById('login-identifier')?.value;
+            const password = document.getElementById('login-password')?.value;
+            const rememberMe = document.getElementById('remember-me')?.checked;
+
+            if (!identifier || !password) {
+                this.showError('Login Gagal', 'Harap isi semua field yang diperlukan');
+                return;
+            }
+
+            const loginButton = document.querySelector('#customer-login-form button[type="submit"]');
+            const spinner = loginButton?.querySelector('.spinner');
+            const buttonText = loginButton?.querySelector('.login-button-text');
+
+            if (spinner) spinner.classList.remove('hidden');
+            if (buttonText) buttonText.textContent = 'Memproses...';
+
+            try {
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        login: identifier, // SESUAI dengan field di AuthController
+                        password: password,
+                        remember: rememberMe
+                    })
+                });
+
+                const data = await response.json();
+
+                if (spinner) spinner.classList.add('hidden');
+                if (buttonText) buttonText.textContent = 'Masuk ke Akun';
+
+                if (response.ok && data.success) {
+                    // Save user data
+                    this.currentUser = data.user;
+                    localStorage.setItem('glorious_user', JSON.stringify(data.user));
+                    
+                    // Update UI
+                    this.updateUserState();
+                    
+                    // Show success
+                    this.hidePopup('customer-login-popup');
+                    this.showSuccess('Login Berhasil', data.message || 'Selamat datang kembali!');
+                    
+                    if (data.redirect && data.user_type !== 'customer') {
+                        setTimeout(() => { window.location.href = data.redirect; }, 500);
+                    } else {
+                        window.location.reload();
+                    }
+                    
+                    // Update profile popup jika terbuka
+                    if (this.activePopup === 'profile-popup') {
+                        this.showPopup('profile-popup');
+                    }
+                } else {
+                    this.showError('Login Gagal', data.message || 'Username/Email/Phone atau password salah');
+                }
+            } catch (error) {
+                if (spinner) spinner.classList.add('hidden');
+                if (buttonText) buttonText.textContent = 'Masuk ke Akun';
+                
+                this.showError('Error Sistem', 'Terjadi kesalahan saat menghubungi server');
+                console.error('Login error:', error);
+            }
+        },
+        
+        async handleRegistration() {
+            const name = document.getElementById('register-name')?.value;
+            const username = document.getElementById('register-username')?.value;
+            const email = document.getElementById('register-email')?.value;
+            const phone = document.getElementById('register-phone')?.value;
+            const password = document.getElementById('register-password')?.value;
+            const passwordConfirm = document.getElementById('register-password-confirm')?.value;
+            const terms = document.getElementById('register-terms')?.checked;
+
+            // Validation
+            if (!name || !username || !phone || !password || !passwordConfirm) {
+                this.showError('Pendaftaran Gagal', 'Harap isi semua field yang diperlukan');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                this.showError('Pendaftaran Gagal', 'Password dan konfirmasi password tidak cocok');
+                return;
+            }
+
+            if (!terms) {
+                this.showError('Pendaftaran Gagal', 'Anda harus menyetujui syarat dan ketentuan');
+                return;
+            }
+
+            // Validasi format username sesuai dengan AuthController
+            const usernameRegex = /^[a-zA-Z0-9_]+$/;
+            if (!usernameRegex.test(username)) {
+                this.showError('Pendaftaran Gagal', 'Username hanya boleh mengandung huruf, angka, dan underscore');
+                return;
+            }
+
+            const registerButton = document.querySelector('#customer-registration-form button[type="submit"]');
+            const spinner = registerButton?.querySelector('.spinner');
+            const buttonText = registerButton?.querySelector('.register-button-text');
+
+            if (spinner) spinner.classList.remove('hidden');
+            if (buttonText) buttonText.textContent = 'Mendaftarkan...';
+
+            try {
+                const response = await fetch('/auth/register', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        username: username,
+                        email: email || null,
+                        phone: phone,
+                        password: password,
+                        password_confirmation: passwordConfirm,
+                        terms: true // Sesuai dengan validation "accepted" di AuthController
+                    })
+                });
+
+                const data = await response.json();
+
+                if (spinner) spinner.classList.add('hidden');
+                if (buttonText) buttonText.textContent = 'Daftar Sekarang';
+
+                if (response.ok && data.success) {
+                    // Save user data
+                    this.currentUser = data.user;
+                    localStorage.setItem('glorious_user', JSON.stringify(data.user));
+                    
+                    // Update UI
+                    this.updateUserState();
+                    
+                    // Show success
+                    this.hidePopup('customer-registration-popup');
+                    this.showSuccess('Pendaftaran Berhasil', data.message || 'Selamat! Akun Anda telah berhasil dibuat.');
+                } else {
+                    const errorMessage = data.errors 
+                        ? Object.values(data.errors).join(', ')
+                        : data.message || 'Terjadi kesalahan saat mendaftar';
+                    this.showError('Pendaftaran Gagal', errorMessage);
+                }
+            } catch (error) {
+                if (spinner) spinner.classList.add('hidden');
+                if (buttonText) buttonText.textContent = 'Daftar Sekarang';
+                
+                this.showError('Error Sistem', 'Terjadi kesalahan saat menghubungi server');
+                console.error('Registration error:', error);
+            }
+        },
+        
+        async handleForgotPassword() {
+            const identifier = document.getElementById('forgot-password-identifier')?.value;
+            
+            if (!identifier) {
+                this.showError('Reset Password', 'Harap masukkan email atau nomor telepon');
+                return;
+            }
+            
+            const forgotButton = document.querySelector('#forgot-password-form button[type="submit"]');
+            const spinner = forgotButton?.querySelector('.spinner');
+            const buttonText = forgotButton?.querySelector('.forgot-password-button-text');
+            
+            if (spinner) spinner.classList.remove('hidden');
+            if (buttonText) buttonText.textContent = 'Mengirim...';
+            
+            try {
+                const response = await fetch('/auth/forgot-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        identifier: identifier
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (spinner) spinner.classList.add('hidden');
+                if (buttonText) buttonText.textContent = 'Kirim Reset Link';
+                
+                if (response.ok) {
+                    this.hidePopup('forgot-password-popup');
+                    this.showSuccess('Reset Password', 'Link reset password telah dikirim. Silakan cek email atau WhatsApp Anda.');
+                } else {
+                    this.showError('Reset Password Gagal', data.message || 'Terjadi kesalahan saat mengirim reset link');
+                }
+            } catch (error) {
+                if (spinner) spinner.classList.add('hidden');
+                if (buttonText) buttonText.textContent = 'Kirim Reset Link';
+                
+                this.showError('Error Sistem', 'Terjadi kesalahan saat menghubungi server');
+                console.error('Forgot password error:', error);
+            }
+        },
+        
+        async handleLogout() {
+            try {
+                const response = await fetch('/auth/logout', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': this.csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                // Clear local storage regardless of server response
+                this.currentUser = null;
+                localStorage.removeItem('glorious_user');
+                localStorage.removeItem('glorious_token');
+                
+                // Update UI
+                this.updateUserState();
+                
+                // Hide popup
+                this.hidePopup('profile-popup');
+                
+                // Show success message
+                this.showSuccess('Logout Berhasil', 'Anda telah berhasil logout dari sistem');
+                
+            } catch (error) {
+                console.error('Logout error:', error);
+                // Still clear local storage on error
+                this.currentUser = null;
+                localStorage.removeItem('glorious_user');
+                localStorage.removeItem('glorious_token');
+                this.updateUserState();
+                this.hidePopup('profile-popup');
+            }
+        },
+        
+        updateUserState() {
+            const userStatus = document.getElementById('user-status');
+            const userInfo = document.getElementById('user-info');
+            const userName = document.getElementById('user-name');
+            const userUsername = document.getElementById('user-username');
+            const guestButtons = document.getElementById('guest-buttons');
+            const userButtons = document.getElementById('user-buttons');
+            
+            if (this.currentUser) {
+                // User is logged in
+                if (userStatus) userStatus.textContent = this.currentUser.name || 'Pengguna';
+                if (userName) userName.textContent = this.currentUser.name || 'Pengguna';
+                if (userUsername) userUsername.textContent = `@${this.currentUser.username}`;
+                
+                if (userInfo) userInfo.classList.remove('hidden');
+                if (guestButtons) guestButtons.classList.add('hidden');
+                if (userButtons) userButtons.classList.remove('hidden');
+            } else {
+                // User is guest
+                if (userStatus) userStatus.textContent = 'Tamu';
+                
+                if (userInfo) userInfo.classList.add('hidden');
+                if (guestButtons) guestButtons.classList.remove('hidden');
+                if (userButtons) userButtons.classList.add('hidden');
+            }
+        },
+        
+        async checkSession() {
+            try {
+                const response = await fetch('/auth/me', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        const user = data.user ?? data.data?.user;
+                        this.currentUser = user;
+                        if (user) localStorage.setItem('glorious_user', JSON.stringify(user));
+                        this.updateUserState();
+                    } else {
+                        // Clear invalid session
+                        localStorage.removeItem('glorious_user');
+                        localStorage.removeItem('glorious_token');
+                        this.currentUser = null;
+                        this.updateUserState();
+                    }
+                } else {
+                    // Clear invalid session
+                    localStorage.removeItem('glorious_user');
+                    localStorage.removeItem('glorious_token');
+                    this.currentUser = null;
+                    this.updateUserState();
+                }
+            } catch (error) {
+                console.error('Session check error:', error);
+                // On error, assume user is logged out
+                localStorage.removeItem('glorious_user');
+                localStorage.removeItem('glorious_token');
+                this.currentUser = null;
+                this.updateUserState();
+            }
+        }
+    };
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        PopupManager.init();
+    });
+
+    // Global function for password strength check
+    window.checkPasswordStrength = function(password) {
+        PopupManager.checkPasswordStrength(password);
+    };
+
+    // Global function for password visibility toggle
+    window.togglePasswordVisibility = function(inputId) {
+        PopupManager.togglePasswordVisibility(inputId);
+    };
+</script>
 
     @stack('scripts')
 </body>

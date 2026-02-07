@@ -83,18 +83,8 @@ class WishlistController extends Controller
      */
     public function remove(Request $request, $productId)
     {
-        if (Auth::check()) {
-            // For authenticated users - remove from database
-            Wishlist::where('user_id', Auth::id())
-                ->where('product_id', $productId)
-                ->delete();
-        } else {
-            // For guests - remove from session
-            $wishlist = session('wishlist', []);
-            $wishlist = array_diff($wishlist, [$productId]);
-            session(['wishlist' => array_values($wishlist)]);
-        }
-        
+        $this->removeItemFromWishlist($productId);
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -102,10 +92,27 @@ class WishlistController extends Controller
                 'wishlist_count' => $this->getWishlistCount()
             ]);
         }
-        
+
         return redirect()->route('wishlist.index')
             ->with('success', 'Product removed from wishlist')
             ->with('wishlist_count', $this->getWishlistCount());
+    }
+
+    /**
+     * Remove item from wishlist (DB or session) without returning a response.
+     * Used by remove() and moveToCart() so AJAX moveToCart doesn't double-return.
+     */
+    private function removeItemFromWishlist($productId): void
+    {
+        if (Auth::check()) {
+            Wishlist::where('user_id', Auth::id())
+                ->where('product_id', $productId)
+                ->delete();
+        } else {
+            $wishlist = session('wishlist', []);
+            $wishlist = array_diff($wishlist, [$productId]);
+            session(['wishlist' => array_values($wishlist)]);
+        }
     }
 
     /**
@@ -208,18 +215,15 @@ class WishlistController extends Controller
      */
     public function moveToCart(Request $request, $productId)
     {
-        // First, remove from wishlist
-        $this->remove($request, $productId);
-        
-        // Then add to cart (you'll need to implement cart logic)
-        // This is a placeholder - you need to integrate with your cart system
         $product = Product::findOrFail($productId);
-        
-        // TODO: Add to cart logic here
-        // Example: Cart::add($product, 1);
-        
-        $message = "{$product->name} moved to cart";
-        
+        $this->removeItemFromWishlist($productId);
+
+        \App\Models\Cart::firstOrCreate(
+            ['user_id' => Auth::id(), 'product_id' => $product->id],
+            ['qty' => 0]
+        )->increment('qty', 1);
+
+        $message = "{$product->name} dipindah ke keranjang.";
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -227,10 +231,7 @@ class WishlistController extends Controller
                 'wishlist_count' => $this->getWishlistCount()
             ]);
         }
-        
-        return redirect()->route('wishlist.index')
-            ->with('success', $message)
-            ->with('wishlist_count', $this->getWishlistCount());
+        return redirect()->route('main.cart.index')->with('success', $message);
     }
 
     /**
