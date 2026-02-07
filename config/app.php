@@ -28,6 +28,7 @@ return [
     */
 
     'logo' => env('APP_LOGO', null), // <-- INI BARIS YANG SAYA TAMBAHKAN
+    'wa_admin' => env('WA_ADMIN', '6282133803940'), // Nomor WhatsApp Admin untuk checkout
 
     /*
     |--------------------------------------------------------------------------

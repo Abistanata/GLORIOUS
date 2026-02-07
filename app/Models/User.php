@@ -104,7 +104,24 @@ class User extends Authenticatable
     {
         return $this->role === 'Customer';
     }
-    
+
+    // =========== RELATIONSHIPS (Customer) ===========
+
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     // =========== MUTATORS & ACCESSORS ===========
     
     /**

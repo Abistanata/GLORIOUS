@@ -38,12 +38,27 @@ Route::get('/products/category/{category_id}', [ProductsController::class, 'inde
 Route::get('/products/{id}', [ProductsController::class, 'show'])->name('main.products.show');
 
 // ===================================
-// WISHLIST ROUTES
+// WISHLIST ROUTES (index public; add/remove butuh auth + Customer)
 // ===================================
 Route::prefix('wishlist')->name('wishlist.')->group(function () {
     Route::get('/', [WishlistController::class, 'index'])->name('index');
-    Route::post('/add/{product}', [WishlistController::class, 'add'])->name('add');
-    Route::delete('/remove/{product}', [WishlistController::class, 'remove'])->name('remove');
+    Route::post('/add/{product}', [WishlistController::class, 'add'])->name('add')->middleware('auth');
+    Route::delete('/remove/{product}', [WishlistController::class, 'remove'])->name('remove')->middleware('auth');
+});
+
+// ===================================
+// CART & CHECKOUT & CUSTOMER ORDERS (auth + role Customer)
+// ===================================
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('cart')->name('cart.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Main\CartController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Main\CartController::class, 'store'])->name('store');
+        Route::put('/{cart}', [\App\Http\Controllers\Main\CartController::class, 'update'])->name('update');
+        Route::delete('/{cart}', [\App\Http\Controllers\Main\CartController::class, 'destroy'])->name('destroy');
+    });
+    Route::get('/checkout', [\App\Http\Controllers\Main\CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/send-whatsapp', [\App\Http\Controllers\Main\CheckoutController::class, 'sendToWhatsApp'])->name('checkout.send-whatsapp');
+    Route::get('/customer/orders', [\App\Http\Controllers\Main\CustomerOrderController::class, 'index'])->name('customer.orders');
 });
 
 // ===================================

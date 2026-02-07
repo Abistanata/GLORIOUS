@@ -37,15 +37,15 @@ class WishlistController extends Controller
     /**
      * Add product to wishlist.
      */
-    public function add(Request $request, $productId)
+    public function add(Request $request, $product)
     {
-        $product = Product::findOrFail($productId);
+        $product = Product::findOrFail($product);
         
         if (Auth::check()) {
             // For authenticated users - save to database
             $wishlist = Wishlist::firstOrCreate([
                 'user_id' => Auth::id(),
-                'product_id' => $productId
+                'product_id' => $product->id
             ], [
                 'added_at' => now()
             ]);
@@ -55,8 +55,8 @@ class WishlistController extends Controller
             // For guests - save to session
             $wishlist = session('wishlist', []);
             
-            if (!in_array($productId, $wishlist)) {
-                $wishlist[] = $productId;
+            if (!in_array($product->id, $wishlist)) {
+                $wishlist[] = $product->id;
                 session(['wishlist' => $wishlist]);
             }
             
@@ -81,15 +81,14 @@ class WishlistController extends Controller
     /**
      * Remove product from wishlist.
      */
-    public function remove(Request $request, $productId)
+    public function remove(Request $request, $product)
     {
+        $productId = is_object($product) ? $product->id : $product;
         if (Auth::check()) {
-            // For authenticated users - remove from database
             Wishlist::where('user_id', Auth::id())
                 ->where('product_id', $productId)
                 ->delete();
         } else {
-            // For guests - remove from session
             $wishlist = session('wishlist', []);
             $wishlist = array_diff($wishlist, [$productId]);
             session(['wishlist' => array_values($wishlist)]);
