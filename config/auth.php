@@ -41,6 +41,23 @@ return [
             'provider' => 'users',
         ],
 
+        'api' => [
+            'driver' => 'token',
+            'provider' => 'users',
+            'hash' => false,
+        ],
+
+        // Tambahkan guard untuk customer
+        'customer' => [
+            'driver' => 'session',
+            'provider' => 'customers',
+        ],
+
+        'customer_api' => [
+            'driver' => 'token',
+            'provider' => 'customers',
+            'hash' => false,
+        ],
     ],
 
     /*
@@ -70,6 +87,12 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+
+        // Tambahkan provider untuk customer
+        'customers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Customer::class,
+        ],
     ],
 
     /*
@@ -94,6 +117,14 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        // Tambahkan reset password untuk customer
+        'customers' => [
+            'provider' => 'customers',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
