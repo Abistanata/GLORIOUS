@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Main;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Cart;
+use App\Models\Wishlist;
 use App\Models\StockTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ProductsController extends Controller
@@ -155,7 +158,14 @@ class ProductsController extends Controller
             $relatedProduct->current_stock = $this->calculateProductStock($relatedProduct->id);
         }
 
-        return view('main.products.show', compact('product', 'relatedProducts'));
+        $isInCart = false;
+        $isInWishlist = false;
+        if (Auth::check() && Auth::user()->role === 'Customer') {
+            $isInCart = Cart::where('user_id', Auth::id())->where('product_id', $product->id)->exists();
+            $isInWishlist = Wishlist::where('user_id', Auth::id())->where('product_id', $product->id)->exists();
+        }
+
+        return view('main.products.show', compact('product', 'relatedProducts', 'isInCart', 'isInWishlist'));
     }
 
     /**

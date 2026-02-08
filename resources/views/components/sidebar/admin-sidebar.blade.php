@@ -27,6 +27,10 @@
         <x-sidebar.sublink :href="route('admin.suppliers.create')" :active="request()->routeIs('admin.suppliers.create')">Tambah Supplier</x-sidebar.sublink>
     </x-sidebar.dropdown>
 
+    <x-sidebar.link :href="route('admin.orders.index')" :active="request()->routeIs('admin.orders.*')" icon="fas fa-shopping-bag">
+        Pesanan
+    </x-sidebar.link>
+
     <x-sidebar.dropdown :active="request()->routeIs('admin.reports.*')" icon="fas fa-chart-pie">
         <x-slot name="trigger">Laporan</x-slot>
         <x-sidebar.sublink :href="route('admin.reports.stock')" :active="request()->routeIs('admin.reports.stock')">Laporan Stok</x-sidebar.sublink>

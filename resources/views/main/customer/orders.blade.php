@@ -4,11 +4,18 @@
 
 @section('content')
 <div class="min-h-screen bg-darker pt-24 pb-16">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">
-            <i class="fas fa-shopping-bag text-primary mr-2"></i> Pesanan Saya
-        </h1>
-        <p class="text-gray-400 mb-8">Riwayat dan status pesanan Anda.</p>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <aside class="lg:w-56 flex-shrink-0">
+                <div class="bg-gray-800/50 rounded-2xl border border-gray-700 p-4 sticky top-24">
+                    @include('partials.customer-account-sidebar')
+                </div>
+            </aside>
+            <main class="flex-1 min-w-0">
+                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">
+                    <i class="fas fa-shopping-bag text-primary mr-2"></i> Pesanan Saya
+                </h1>
+                <p class="text-gray-400 mb-8">Riwayat dan status pesanan Anda.</p>
 
         @if(session('success'))
             <x-alert type="success" title="Berhasil" class="mb-6" dismissible>{{ session('success') }}</x-alert>
@@ -59,6 +66,8 @@
                 <div class="mt-6">{{ $orders->links() }}</div>
             @endif
         @endif
+            </main>
+        </div>
     </div>
 </div>
 @endsection

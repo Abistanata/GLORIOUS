@@ -149,7 +149,43 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * Update order status (pending, confirmed, cancelled).
+     * Daftar semua pesanan (admin).
+     */
+    public function ordersIndex(Request $request)
+    {
+        $query = Order::with(['user', 'items.product'])
+            ->orderByDesc('created_at');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($qry) use ($search) {
+                $qry->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%")
+                    ->orWhere('customer_phone', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($u) use ($search) {
+                        $u->where('name', 'like', "%{$search}%")->orWhere('username', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $orders = $query->paginate(15)->withQueryString();
+        return view('pages.admin.orders.index', compact('orders'));
+    }
+
+    /**
+     * Detail pesanan (admin).
+     */
+    public function orderShow(Order $order)
+    {
+        $order->load(['user', 'items.product']);
+        return view('pages.admin.orders.show', compact('order'));
+    }
+
+    /**
+     * Update order status (pending, confirmed, processed, cancelled).
      */
     public function orderUpdateStatus(Request $request, Order $order)
     {

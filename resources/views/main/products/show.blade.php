@@ -175,27 +175,27 @@
                         @endif
                     </div>
 
-                    <!-- Quick Actions -->
-                    <div class="flex gap-3">
-                        @php
-                            $isInWishlist = false; // Will be checked via JavaScript
-                            $isInCart = false; // Will be checked via JavaScript
-                        @endphp
-
-                        <button onclick="addToCart({{ $product->id }}, '{{ $product->name }}', {{ $finalPrice }}, '{{ $product->image }}')"
-                                class="flex-1 {{ $isInCart ? 'bg-green-500 hover:bg-green-600' : 'bg-primary hover:bg-primary-dark' }} text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 border {{ $isInCart ? 'border-green-500' : 'border-primary' }}">
+                    <!-- Quick Actions: Cart & Wishlist selaras dengan backend -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button type="button" id="btn-cart-{{ $product->id }}"
+                                data-product-name="{{ e($product->name) }}"
+                                data-product-price="{{ $finalPrice }}"
+                                data-product-image="{{ e($product->image ?? '') }}"
+                                onclick="addToCart(this)"
+                                class="product-action-btn flex-1 {{ $isInCart ? 'bg-green-600 hover:bg-green-700 border-green-500' : 'bg-primary hover:bg-primary-dark border-primary' }} text-white py-3 px-4 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 border">
                             <i class="fas fa-shopping-cart"></i>
-                            {{ $isInCart ? 'Di Keranjang' : 'Tambah ke Cart' }}
+                            <span class="btn-cart-text">{{ $isInCart ? 'Di Keranjang' : 'Tambah ke Cart' }}</span>
                         </button>
 
-                        <button onclick="toggleWishlist({{ $product->id }})"
-                                class="flex-1 {{ $isInWishlist ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-800 hover:bg-gray-700' }} text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 border {{ $isInWishlist ? 'border-red-500' : 'border-gray-700' }}">
-                            <i class="{{ $isInWishlist ? 'fas' : 'far' }} fa-heart"></i>
-                            {{ $isInWishlist ? 'Di Wishlist' : 'Wishlist' }}
+                        <button type="button" id="btn-wishlist-{{ $product->id }}"
+                                onclick="toggleWishlist({{ $product->id }}, {{ $isInWishlist ? 'true' : 'false' }})"
+                                class="product-action-btn flex-1 {{ $isInWishlist ? 'bg-red-600 hover:bg-red-700 border-red-500' : 'bg-gray-800 hover:bg-gray-700 border-gray-700' }} text-white py-3 px-4 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 border">
+                            <i class="{{ $isInWishlist ? 'fas' : 'far' }} fa-heart btn-wishlist-icon"></i>
+                            <span class="btn-wishlist-text">{{ $isInWishlist ? 'Di Wishlist' : 'Wishlist' }}</span>
                         </button>
 
-                        <button onclick="shareProduct()"
-                                class="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 border border-gray-700">
+                        <button type="button" onclick="shareProduct()"
+                                class="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-3 px-4 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 border border-gray-700">
                             <i class="fas fa-share-alt"></i>
                             Bagikan
                         </button>
@@ -490,206 +490,150 @@
         document.body.classList.remove('overflow-hidden');
     }
 
-    // Add to Cart dengan localStorage
-    function addToCart(productId, productName, price, image) {
-        try {
-            // Check if user is logged in as customer
-            const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.getAttribute('content') === 'true';
+    // Add to Cart: web route POST /cart (session auth). Arg: button element atau (productId, name, price, image)
+    function addToCart(btnOrId) {
+        const btn = typeof btnOrId === 'object' && btnOrId && btnOrId.id
+            ? btnOrId
+            : document.getElementById('btn-cart-{{ $product->id }}');
+        const productId = {{ $product->id }};
+        const productName = btn?.dataset?.productName || '{{ e($product->name) }}';
+        const price = btn?.dataset?.productPrice ? parseFloat(btn.dataset.productPrice) : {{ $finalPrice }};
+        const image = btn?.dataset?.productImage || '';
 
-            if (!isAuthenticated) {
-                // For guests, use localStorage
-                let cart = JSON.parse(localStorage.getItem('glorious_cart') || '[]');
+        const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.getAttribute('content') === 'true';
 
-                // Check if product already in cart
-                const existingItem = cart.find(item => item.id === productId);
+        if (!isAuthenticated) {
+            let cart = JSON.parse(localStorage.getItem('glorious_cart') || '[]');
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) existingItem.quantity += 1;
+            else cart.push({ id: productId, name: productName, price: price, image: image || '', quantity: 1 });
+            localStorage.setItem('glorious_cart', JSON.stringify(cart));
+            updateCartCount();
+            showNotification('Produk berhasil ditambahkan ke keranjang!', 'success');
+            setCartButtonState(true);
+            return;
+        }
 
-                if (existingItem) {
-                    existingItem.quantity += 1;
-                } else {
-                    cart.push({
-                        id: productId,
-                        name: productName,
-                        price: price,
-                        image: image,
-                        quantity: 1
-                    });
-                }
+        const formData = new FormData();
+        formData.append('_token', '{{ csrf_token() }}');
+        formData.append('product_id', productId);
+        formData.append('quantity', 1);
 
-                localStorage.setItem('glorious_cart', JSON.stringify(cart));
-                updateCartCount();
-
-                // Show success message
-                showNotification('Produk berhasil ditambahkan ke keranjang!', 'success');
-
-                // Update button state
-                const button = event.target.closest('button');
-                button.innerHTML = '<i class="fas fa-check"></i> Di Keranjang';
-                button.classList.remove('bg-primary', 'hover:bg-primary-dark');
-                button.classList.add('bg-green-500', 'hover:bg-green-600');
-
-                return;
+        fetch('{{ route("cart.store") }}', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message || 'Produk berhasil ditambahkan ke keranjang!', 'success');
+                setCartButtonState(true);
+                updateCartBadge(data.cart_count);
+            } else {
+                showNotification(data.message || 'Gagal menambahkan ke keranjang', 'error');
             }
+        })
+        .catch(err => {
+            console.error(err);
+            showNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
+        });
+    }
 
-            // For authenticated users, send to backend
-            fetch('/api/cart/add', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    quantity: 1
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateCartCount();
-                    showNotification('Produk berhasil ditambahkan ke keranjang!', 'success');
-
-                    const button = event.target.closest('button');
-                    button.innerHTML = '<i class="fas fa-check"></i> Di Keranjang';
-                    button.classList.remove('bg-primary', 'hover:bg-primary-dark');
-                    button.classList.add('bg-green-500', 'hover:bg-green-600');
-                } else {
-                    showNotification('Gagal menambahkan produk ke keranjang', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Terjadi kesalahan saat menambahkan ke keranjang', 'error');
-            });
-
-        } catch (error) {
-            console.error('Cart error:', error);
-            showNotification('Terjadi kesalahan sistem', 'error');
+    function setCartButtonState(inCart) {
+        const btn = document.getElementById('btn-cart-{{ $product->id }}');
+        if (!btn) return;
+        const text = btn.querySelector('.btn-cart-text');
+        if (inCart) {
+            btn.classList.remove('bg-primary', 'hover:bg-primary-dark', 'border-primary');
+            btn.classList.add('bg-green-600', 'hover:bg-green-700', 'border-green-500');
+            if (text) text.textContent = 'Di Keranjang';
+        } else {
+            btn.classList.remove('bg-green-600', 'hover:bg-green-700', 'border-green-500');
+            btn.classList.add('bg-primary', 'hover:bg-primary-dark', 'border-primary');
+            if (text) text.textContent = 'Tambah ke Cart';
         }
     }
 
-    // Toggle Wishlist dengan AJAX
-    function toggleWishlist(productId) {
-        try {
-            const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.getAttribute('content') === 'true';
+    function updateCartBadge(count) {
+        const badges = document.querySelectorAll('.cart-count-badge');
+        badges.forEach(b => {
+            b.textContent = count > 0 ? count : '';
+            b.style.display = count > 0 ? 'flex' : 'none';
+        });
+    }
 
-            if (!isAuthenticated) {
-                // For guests, use localStorage
-                let wishlist = JSON.parse(localStorage.getItem('glorious_wishlist') || '[]');
+    // Toggle Wishlist: add atau remove via web route, state awal dari server
+    function toggleWishlist(productId, currentInWishlist) {
+        const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.getAttribute('content') === 'true';
 
-                const existingIndex = wishlist.indexOf(productId);
-
-                if (existingIndex > -1) {
-                    // Remove from wishlist
-                    wishlist.splice(existingIndex, 1);
-                    showNotification('Produk dihapus dari wishlist', 'info');
-                } else {
-                    // Add to wishlist
-                    wishlist.push(productId);
-                    showNotification('Produk ditambahkan ke wishlist!', 'success');
-                }
-
-                localStorage.setItem('glorious_wishlist', JSON.stringify(wishlist));
-                updateWishlistButton(productId, existingIndex === -1);
-                return;
-            }
-
-            // For authenticated users, use AJAX
-            if (typeof PopupManager !== 'undefined' && PopupManager && !PopupManager.isCustomerLoggedIn()) {
-                PopupManager.promptCustomerLogin({ reason: 'wishlist', redirectUrl: window.location.href });
-                return;
-            }
-        } catch (e) {
-            // ignore
+        if (!isAuthenticated) {
+            let wishlist = JSON.parse(localStorage.getItem('glorious_wishlist') || '[]');
+            const idx = wishlist.indexOf(productId);
+            if (idx > -1) { wishlist.splice(idx, 1); showNotification('Produk dihapus dari wishlist', 'info'); }
+            else { wishlist.push(productId); showNotification('Produk ditambahkan ke wishlist!', 'success'); }
+            localStorage.setItem('glorious_wishlist', JSON.stringify(wishlist));
+            setWishlistButtonState(productId, idx === -1);
+            return;
         }
 
-        const button = event.target.closest('button');
-        const icon = button.querySelector('i');
-        const text = button.querySelector('span') || button;
+        const url = currentInWishlist
+            ? '{{ url("wishlist/remove") }}/' + productId
+            : '{{ url("wishlist/add") }}/' + productId;
+        const method = currentInWishlist ? 'DELETE' : 'POST';
+        const body = new FormData();
+        body.append('_token', '{{ csrf_token() }}');
+        if (method === 'DELETE') body.append('_method', 'DELETE');
 
-        // Kirim request ke backend
-        fetch(`/wishlist/add/${productId}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
+        fetch(url, {
+            method: method,
+            body: body,
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
         })
-        .then(response => {
-            if (response.status === 401 || response.status === 419) {
-                try {
-                    if (typeof PopupManager !== 'undefined' && PopupManager) {
-                        PopupManager.promptCustomerLogin({ reason: 'wishlist', redirectUrl: window.location.href });
-                    }
-                } catch (e) {}
-                return Promise.reject('unauthorized');
-            }
-            return response.json();
-        })
+        .then(r => r.json())
         .then(data => {
             if (data.success) {
-                updateWishlistButton(productId, data.isInWishlist);
-                showNotification(data.isInWishlist ? 'Produk ditambahkan ke wishlist!' : 'Produk dihapus dari wishlist', 'success');
+                const newState = !currentInWishlist;
+                setWishlistButtonState(productId, newState);
+                showNotification(newState ? 'Produk ditambahkan ke wishlist!' : 'Produk dihapus dari wishlist', 'success');
+                if (typeof PopupManager !== 'undefined' && PopupManager.initializeCart) PopupManager.initializeCart();
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
+        .catch(err => {
+            console.error(err);
             showNotification('Terjadi kesalahan saat memproses wishlist', 'error');
         });
     }
 
-    // Update wishlist button state
-    function updateWishlistButton(productId, isInWishlist) {
-        const buttons = document.querySelectorAll(`button[onclick*="toggleWishlist(${productId})"]`);
-
-        buttons.forEach(button => {
-            const icon = button.querySelector('i');
-            const text = button.querySelector('span') || button;
-
-            if (isInWishlist) {
-                icon.classList.remove('far');
-                icon.classList.add('fas', 'text-red-500');
-                button.classList.remove('bg-gray-800', 'border-gray-700', 'hover:bg-gray-700');
-                button.classList.add('bg-red-500', 'border-red-500', 'hover:bg-red-600');
-                if (text.tagName === 'SPAN') {
-                    text.textContent = 'Di Wishlist';
-                } else {
-                    button.innerHTML = '<i class="fas fa-heart text-red-500"></i> Di Wishlist';
-                }
-            } else {
-                icon.classList.remove('fas', 'text-red-500');
-                icon.classList.add('far');
-                button.classList.remove('bg-red-500', 'border-red-500', 'hover:bg-red-600');
-                button.classList.add('bg-gray-800', 'border-gray-700', 'hover:bg-gray-700');
-                if (text.tagName === 'SPAN') {
-                    text.textContent = 'Wishlist';
-                } else {
-                    button.innerHTML = '<i class="far fa-heart"></i> Wishlist';
-                }
-            }
-        });
+    function setWishlistButtonState(productId, inWishlist) {
+        const btn = document.getElementById('btn-wishlist-' + productId);
+        if (!btn) return;
+        const icon = btn.querySelector('.btn-wishlist-icon');
+        const text = btn.querySelector('.btn-wishlist-text');
+        if (inWishlist) {
+            if (icon) { icon.classList.remove('far'); icon.classList.add('fas'); }
+            btn.classList.remove('bg-gray-800', 'border-gray-700', 'hover:bg-gray-700');
+            btn.classList.add('bg-red-600', 'hover:bg-red-700', 'border-red-500');
+            if (text) text.textContent = 'Di Wishlist';
+            btn.setAttribute('onclick', 'toggleWishlist(' + productId + ', true)');
+        } else {
+            if (icon) { icon.classList.remove('fas'); icon.classList.add('far'); }
+            btn.classList.remove('bg-red-600', 'hover:bg-red-700', 'border-red-500');
+            btn.classList.add('bg-gray-800', 'hover:bg-gray-700', 'border-gray-700');
+            if (text) text.textContent = 'Wishlist';
+            btn.setAttribute('onclick', 'toggleWishlist(' + productId + ', false)');
+        }
     }
 
-    // Update cart count
     function updateCartCount() {
         try {
             const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.getAttribute('content') === 'true';
-
             if (!isAuthenticated) {
                 const cart = JSON.parse(localStorage.getItem('glorious_cart') || '[]');
                 const count = cart.reduce((total, item) => total + item.quantity, 0);
-
-                // Update cart badge in header
-                const cartBadges = document.querySelectorAll('#cart-button .bg-primary, #cart-button-mobile .bg-primary');
-                cartBadges.forEach(badge => {
-                    badge.textContent = count > 0 ? count : '';
-                    badge.style.display = count > 0 ? 'flex' : 'none';
-                });
+                updateCartBadge(count);
             }
-        } catch (error) {
-            console.error('Error updating cart count:', error);
-        }
+        } catch (e) {}
     }
 
     // Show notification

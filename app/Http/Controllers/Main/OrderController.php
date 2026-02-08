@@ -10,19 +10,40 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
     protected function getAdminWaNumber(): string
     {
-        $num = config('app.wa_admin', '6282133803940');
-        $num = preg_replace('/[^0-9]/', '', $num);
+        $num = config('app.wa_admin') ?: env('ADMIN_WHATSAPP_NUMBER') ?: env('WA_ADMIN') ?: '6282133803940';
+        $num = (string) preg_replace('/[^0-9]/', '', (string) $num);
+        if ($num === '' || strlen($num) < 10) {
+            return '6282133803940';
+        }
         if (str_starts_with($num, '0')) {
             $num = '62' . substr($num, 1);
         } elseif (!str_starts_with($num, '62')) {
             $num = '62' . $num;
         }
         return $num;
+    }
+
+    /** Generate unique order number (GC-YYYYMMDD-HHMMSS-XXXX). */
+    protected function generateOrderNumber(): string
+    {
+        $maxAttempts = 10;
+        for ($i = 0; $i < $maxAttempts; $i++) {
+            try {
+                $num = 'GC-' . date('Ymd-His') . '-' . strtoupper(substr(str_replace('.', '', uniqid('', true)), -8));
+            } catch (\Throwable $e) {
+                $num = 'GC-' . date('YmdHis') . '-' . mt_rand(100000, 999999);
+            }
+            if (!Order::where('order_number', $num)->exists()) {
+                return $num;
+            }
+        }
+        return 'GC-' . date('YmdHis') . '-' . uniqid();
     }
 
     /**
@@ -40,6 +61,19 @@ class OrderController extends Controller
         }
 
         $user = Auth::user();
+
+        // Validasi profile lengkap (wajib untuk checkout)
+        $phone = trim($user->phone ?? '');
+        $address = trim($user->address ?? '');
+        if (strlen($phone) < 10) {
+            return redirect()->route('customer.profile.edit')
+                ->with('error', 'Lengkapi nomor WhatsApp di profil Anda terlebih dahulu untuk checkout.');
+        }
+        if (strlen($address) < 10) {
+            return redirect()->route('customer.profile.edit')
+                ->with('error', 'Lengkapi alamat di profil Anda terlebih dahulu untuk checkout.');
+        }
+
         $productId = $request->integer('product_id');
         $quantity = max(1, min(99, $request->integer('quantity', 1)));
 
@@ -48,7 +82,16 @@ class OrderController extends Controller
         }
 
         $cartIds = $request->input('cart_ids', []);
-        return $this->createCartOrderAndRedirect($user, $cartIds);
+        if (!is_array($cartIds)) {
+            $cartIds = [];
+        }
+        $cartIds = array_filter(array_map('intval', $cartIds));
+        if (empty($cartIds)) {
+            return redirect()->route('cart.index')->with('error', 'Pilih minimal satu item untuk checkout.');
+        }
+
+        $quantities = $request->input('quantities', []);
+        return $this->createCartOrderAndRedirect($user, $cartIds, $quantities);
     }
 
     protected function createSingleProductOrderAndRedirect($user, int $productId, int $quantity)
@@ -64,7 +107,7 @@ class OrderController extends Controller
         }
 
         $quantity = min($quantity, $currentStock);
-        $unitPrice = $product->final_price ?? $product->selling_price ?? 0;
+        $unitPrice = (float) ($product->final_price ?? $product->selling_price ?? 0);
         $subtotal = $unitPrice * $quantity;
         $total = $subtotal;
 
@@ -72,26 +115,27 @@ class OrderController extends Controller
         try {
             $order = Order::create([
                 'user_id' => $user->id,
-                'order_number' => 'GC-' . strtoupper(uniqid()),
+                'order_number' => $this->generateOrderNumber(),
                 'status' => 'pending',
-                'total' => $total,
-                'customer_name' => $user->name,
-                'customer_phone' => $user->phone,
+                'total' => round($total, 2),
+                'customer_name' => (string) ($user->name ?? ''),
+                'customer_phone' => (string) ($user->phone ?? ''),
                 'notes' => null,
             ]);
 
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $product->id,
-                'quantity' => $quantity,
-                'unit_price' => $unitPrice,
-                'subtotal' => $subtotal,
+                'quantity' => (int) $quantity,
+                'unit_price' => round($unitPrice, 2),
+                'subtotal' => round($subtotal, 2),
             ]);
 
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal membuat pesanan. Silakan coba lagi.');
+            Log::error('Order create single product failed: ' . $e->getMessage(), ['exception' => $e, 'user_id' => $user->id, 'product_id' => $productId]);
+            return redirect()->back()->with('error', 'Gagal membuat pesanan: ' . $e->getMessage());
         }
 
         $message = $this->buildWhatsAppMessage($user, $order);
@@ -99,7 +143,7 @@ class OrderController extends Controller
         return redirect()->away($waUrl);
     }
 
-    protected function createCartOrderAndRedirect($user, array $cartIds = [])
+    protected function createCartOrderAndRedirect($user, array $cartIds = [], array $quantities = [])
     {
         $query = Cart::where('user_id', $user->id)->with('product');
         if (!empty($cartIds)) {
@@ -117,11 +161,14 @@ class OrderController extends Controller
             if (!$item->product || ($item->product->current_stock ?? 0) < 1) {
                 continue;
             }
-            $qty = min($item->quantity, (int) ($item->product->current_stock ?? 0));
+            $requestQty = isset($quantities[$item->id]) ? max(1, min(99, (int) $quantities[$item->id])) : null;
+            $qty = $requestQty ?? $item->quantity;
+            $qty = min($qty, (int) ($item->product->current_stock ?? 0));
             if ($qty < 1) {
                 continue;
             }
-            $price = $item->product->final_price ?? $item->product->selling_price ?? 0;
+            $price = (float) ($item->product->final_price ?? $item->product->selling_price ?? 0);
+            $price = max(0, $price);
             $subtotal = $price * $qty;
             $total += $subtotal;
             $itemsData[] = [
@@ -141,11 +188,11 @@ class OrderController extends Controller
         try {
             $order = Order::create([
                 'user_id' => $user->id,
-                'order_number' => 'GC-' . strtoupper(uniqid()),
+                'order_number' => $this->generateOrderNumber(),
                 'status' => 'pending',
-                'total' => $total,
-                'customer_name' => $user->name,
-                'customer_phone' => $user->phone,
+                'total' => round((float) $total, 2),
+                'customer_name' => (string) ($user->name ?? ''),
+                'customer_phone' => (string) ($user->phone ?? ''),
                 'notes' => null,
             ]);
 
@@ -153,9 +200,9 @@ class OrderController extends Controller
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $row['product']->id,
-                    'quantity' => $row['quantity'],
-                    'unit_price' => $row['unit_price'],
-                    'subtotal' => $row['subtotal'],
+                    'quantity' => (int) $row['quantity'],
+                    'unit_price' => round((float) $row['unit_price'], 2),
+                    'subtotal' => round((float) $row['subtotal'], 2),
                 ]);
             }
 
@@ -163,7 +210,8 @@ class OrderController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('cart.index')->with('error', 'Gagal membuat pesanan.');
+            Log::error('Order create from cart failed: ' . $e->getMessage(), ['exception' => $e, 'user_id' => $user->id, 'cart_ids' => $cartIds]);
+            return redirect()->route('cart.index')->with('error', 'Gagal membuat pesanan: ' . $e->getMessage());
         }
 
         $message = $this->buildWhatsAppMessage($user, $order->load('items.product'));
@@ -187,7 +235,7 @@ class OrderController extends Controller
         }
 
         $lines[] = '';
-        $lines[] = '*Total: Rp ' . number_format($order->total, 0, ',', '.') . '*';
+        $lines[] = '*Total: Rp ' . number_format((float) $order->total, 0, ',', '.') . '*';
         $lines[] = '';
         $lines[] = 'Data saya:';
         $lines[] = '• Nama: ' . $user->name;

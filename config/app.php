@@ -29,6 +29,7 @@ return [
 
     'logo' => env('APP_LOGO', null), // <-- INI BARIS YANG SAYA TAMBAHKAN
     'wa_admin' => env('ADMIN_WHATSAPP_NUMBER', env('WA_ADMIN', '6282133803940')),
+    'consultation_email' => env('CONSULTATION_EMAIL', 'gloriouscompt@gmail.com'),
 
     /*
     |--------------------------------------------------------------------------

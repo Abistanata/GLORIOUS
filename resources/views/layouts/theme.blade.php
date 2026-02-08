@@ -617,21 +617,33 @@
                         <div class="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-dark-light transition-all">
                             <i class="fas fa-shopping-cart text-xl text-light group-hover:text-primary transition-colors"></i>
                             @if(isset($cartCount) && $cartCount > 0)
-                                <span class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-glow">
+                                <span class="cart-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-glow">
                                     {{ $cartCount }}
                                 </span>
+                            @else
+                                <span class="cart-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 items-center justify-center shadow-glow hidden" style="display: none;"></span>
                             @endif
                         </div>
                     </button>
                         @endif
                     @endauth
 
-                    <!-- Profile User Button -->
+                    <!-- Profile User Button (foto profil round circle jika sudah di-update) -->
                     <div class="relative">
                         <button type="button" 
                                 id="profile-popup-button"
-                                class="flex items-center justify-center w-10 h-10 rounded-full bg-dark-light hover:bg-primary transition-all group focus:outline-none">
-                            <i class="fas fa-user text-light group-hover:text-white"></i>
+                                class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-dark-light hover:ring-2 hover:ring-primary transition-all group focus:outline-none ring-2 ring-transparent">
+                            @auth
+                                @if(auth()->user()->profile_photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists(auth()->user()->profile_photo_path))
+                                    <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}" 
+                                         alt="Profile" 
+                                         class="w-full h-full object-cover">
+                                @else
+                                    <i class="fas fa-user text-light group-hover:text-white"></i>
+                                @endif
+                            @else
+                                <i class="fas fa-user text-light group-hover:text-white"></i>
+                            @endauth
                         </button>
                     </div>
                 </div>
@@ -654,9 +666,11 @@
                     <button id="cart-button-mobile" class="relative" type="button">
                         <i class="fas fa-shopping-cart text-xl text-light hover:text-primary transition-colors"></i>
                         @if(isset($cartCount) && $cartCount > 0)
-                            <span class="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                            <span class="cart-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                                 {{ $cartCount }}
                             </span>
+                        @else
+                            <span class="cart-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 items-center justify-center hidden" style="display: none;"></span>
                         @endif
                     </button>
                         @endif

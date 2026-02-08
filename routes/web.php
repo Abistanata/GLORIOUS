@@ -36,6 +36,7 @@ Route::get('/services', [ServiceController::class, 'index'])->name('main.service
 Route::get('/products', [ProductsController::class, 'index'])->name('main.products.index');
 Route::get('/products/category/{category_id}', [ProductsController::class, 'index'])->name('main.products.category');
 Route::get('/products/{id}', [ProductsController::class, 'show'])->name('main.products.show');
+Route::post('/consultation', [\App\Http\Controllers\Main\ConsultationController::class, 'submit'])->name('main.consultation.submit');
 
 // ===================================
 // WISHLIST ROUTES (index public; add/remove butuh auth + Customer)
@@ -104,6 +105,8 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
         Route::put('/users/{user}', [AdminDashboardController::class, 'userUpdate'])->name('users.update');
         Route::get('/users/{user}/delete', [AdminDashboardController::class, 'confirmDeleteUser'])->name('users.delete');
         Route::delete('/users/{user}', [AdminDashboardController::class, 'userDestroy'])->name('users.destroy');
+        Route::get('/orders', [AdminDashboardController::class, 'ordersIndex'])->name('orders.index');
+        Route::get('/orders/{order}', [AdminDashboardController::class, 'orderShow'])->name('orders.show');
         Route::put('/orders/{order}/status', [AdminDashboardController::class, 'orderUpdateStatus'])->name('orders.update-status');
 
         // Products Management (alternative routes)

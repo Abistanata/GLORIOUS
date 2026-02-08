@@ -454,8 +454,9 @@
 
     .services-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 35px;
+        align-items: stretch;
     }
 
     .service-card {
@@ -468,9 +469,10 @@
         box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
         position: relative;
         overflow: hidden;
-        min-height: 380px;
+        min-height: 400px;
         display: flex;
         flex-direction: column;
+        height: 100%;
     }
 
     .service-card::before {
@@ -927,7 +929,7 @@
         }
         
         .services-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr;
         }
         
         .stats-grid {
@@ -1102,7 +1104,7 @@
                     Tentang Kami
                 </h2>
                 <p class="section-subtitle">
-                    Glorious Computer berkomitmen memberikan solusi IT terpercaya untuk individu maupun bisnis dengan pengalaman lebih dari 10 tahun di industri teknologi.
+                    Komitmen kami: solusi IT terpercaya untuk individu maupun bisnis, dengan tim teknisi berpengalaman dan layanan terstandar.
                 </p>
             </div>
             
@@ -1480,40 +1482,52 @@
                     </div>
                 </div>
                 
-                <!-- Contact Form -->
+                <!-- Contact Form (data terkirim ke gloriouscompt@gmail.com) -->
                 <div class="bg-dark rounded-2xl p-8 border border-gray-800">
                     <h3 class="text-2xl font-bold text-light mb-6">Kirim Pesan</h3>
-                    <form class="space-y-6">
+                    @if(session('success'))
+                        <div class="mb-6 p-4 rounded-xl bg-green-500/20 border border-green-500/40 text-green-400 text-sm">{{ session('success') }}</div>
+                    @endif
+                    @if(session('error'))
+                        <div class="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 text-sm">{{ session('error') }}</div>
+                    @endif
+                    @if($errors->any())
+                        <div class="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 text-sm">
+                            <ul class="list-disc list-inside">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+                        </div>
+                    @endif
+                    <form action="{{ route('main.consultation.submit') }}" method="POST" class="space-y-6">
+                        @csrf
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-gray-400 mb-2">Nama Lengkap</label>
-                                <input type="text" class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="Masukkan nama Anda">
+                                <input type="text" name="name" value="{{ old('name') }}" required class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="Masukkan nama Anda">
                             </div>
                             <div>
                                 <label class="block text-gray-400 mb-2">Nomor Telepon</label>
-                                <input type="tel" class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="0821-xxx-xxxx">
+                                <input type="tel" name="phone" value="{{ old('phone') }}" required class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="0821-xxx-xxxx">
                             </div>
                         </div>
                         
                         <div>
                             <label class="block text-gray-400 mb-2">Email</label>
-                            <input type="email" class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="email@contoh.com">
+                            <input type="email" name="email" value="{{ old('email') }}" required class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="email@contoh.com">
                         </div>
                         
                         <div>
                             <label class="block text-gray-400 mb-2">Layanan yang Dibutuhkan</label>
-                            <select class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors">
+                            <select name="service" class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors">
                                 <option value="">Pilih layanan</option>
-                                <option value="pc-laptop">Servis PC & Laptop</option>
-                                <option value="upgrade">Upgrade Hardware</option>
-                                <option value="printer">Servis Printer</option>
-                                <option value="software">Install Software</option>
+                                <option value="Servis PC & Laptop" {{ old('service') === 'Servis PC & Laptop' ? 'selected' : '' }}>Servis PC & Laptop</option>
+                                <option value="Upgrade Hardware" {{ old('service') === 'Upgrade Hardware' ? 'selected' : '' }}>Upgrade Hardware</option>
+                                <option value="Servis Printer" {{ old('service') === 'Servis Printer' ? 'selected' : '' }}>Servis Printer</option>
+                                <option value="Install Software" {{ old('service') === 'Install Software' ? 'selected' : '' }}>Install Software</option>
                             </select>
                         </div>
                         
                         <div>
                             <label class="block text-gray-400 mb-2">Pesan</label>
-                            <textarea rows="4" class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="Jelaskan kebutuhan Anda secara detail"></textarea>
+                            <textarea name="message" rows="4" required class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="Jelaskan kebutuhan Anda secara detail">{{ old('message') }}</textarea>
                         </div>
                         
                         <button type="submit" class="w-full bg-gradient-primary hover:shadow-glow-primary text-white py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105">

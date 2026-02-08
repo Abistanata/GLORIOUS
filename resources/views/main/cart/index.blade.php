@@ -59,7 +59,7 @@
                                     <div class="flex items-center gap-2 flex-shrink-0">
                                         <div class="inline-flex items-center gap-1 qty-form" data-cart-id="{{ $item->id }}" data-update-url="{{ route('cart.update', $item) }}" data-csrf="{{ csrf_token() }}">
                                             <button type="button" class="w-9 h-9 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-bold flex items-center justify-center qty-minus">−</button>
-                                            <input type="number" value="{{ $item->quantity }}" min="1" max="99" class="w-14 px-2 py-1.5 rounded-lg bg-dark border border-gray-700 text-white text-center text-sm qty-input" data-unit-price="{{ $price }}">
+                                            <input type="number" name="quantities[{{ $item->id }}]" value="{{ $item->quantity }}" min="1" max="99" class="w-14 px-2 py-1.5 rounded-lg bg-dark border border-gray-700 text-white text-center text-sm qty-input" data-unit-price="{{ $price }}">
                                             <button type="button" class="w-9 h-9 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-bold flex items-center justify-center qty-plus">+</button>
                                             <button type="button" class="p-2 text-gray-400 hover:text-primary qty-sync" title="Update"><i class="fas fa-sync-alt text-sm"></i></button>
                                         </div>
