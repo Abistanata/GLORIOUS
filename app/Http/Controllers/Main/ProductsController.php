@@ -85,9 +85,17 @@ class ProductsController extends Controller
         }
 
         $products = $productsQuery->paginate(12);
+
+        // Untuk Customer: tandai produk yang ada di wishlist (selaras dengan navbar & cart)
+        $wishlistProductIds = collect();
+        if (Auth::check() && Auth::user()->role === 'Customer') {
+            $wishlistProductIds = Wishlist::where('user_id', Auth::id())
+                ->whereIn('product_id', $products->pluck('id'))
+                ->pluck('product_id');
+        }
         
-        // Generate WhatsApp message untuk setiap produk
-        $products->getCollection()->transform(function ($product) {
+        // Generate WhatsApp message dan is_in_wishlist untuk setiap produk
+        $products->getCollection()->transform(function ($product) use ($wishlistProductIds) {
             $finalPrice = $product->final_price ?? $product->selling_price ?? 0;
             $currentStock = $product->current_stock ?? 0;
             $condition = $product->getConditionLabel();
@@ -99,6 +107,7 @@ class ProductsController extends Controller
                 $condition,
                 $warranty
             );
+            $product->is_in_wishlist = $wishlistProductIds->contains($product->id);
             return $product;
         });
         

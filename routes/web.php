@@ -45,6 +45,7 @@ Route::prefix('wishlist')->name('wishlist.')->group(function () {
     Route::get('/', [WishlistController::class, 'index'])->name('index');
     Route::post('/add/{product}', [WishlistController::class, 'add'])->name('add')->middleware('auth');
     Route::delete('/remove/{product}', [WishlistController::class, 'remove'])->name('remove')->middleware('auth');
+    Route::post('/toggle/{product}', [WishlistController::class, 'toggle'])->name('toggle')->middleware('auth');
     Route::post('/move-to-cart/{product}', [WishlistController::class, 'moveToCart'])->name('move-to-cart')->middleware('auth');
 });
 

@@ -563,8 +563,8 @@
         });
     }
 
-    // Toggle Wishlist: add atau remove via web route, state awal dari server
-    function toggleWishlist(productId, currentInWishlist) {
+    // Toggle Wishlist: satu endpoint POST /wishlist/toggle/{id}, state dari response (selaras dengan navbar & product card)
+    function toggleWishlist(productId, _currentInWishlistIgnored) {
         const isAuthenticated = document.querySelector('meta[name="user-authenticated"]')?.getAttribute('content') === 'true';
 
         if (!isAuthenticated) {
@@ -577,26 +577,29 @@
             return;
         }
 
-        const url = currentInWishlist
-            ? '{{ url("wishlist/remove") }}/' + productId
-            : '{{ url("wishlist/add") }}/' + productId;
-        const method = currentInWishlist ? 'DELETE' : 'POST';
-        const body = new FormData();
-        body.append('_token', '{{ csrf_token() }}');
-        if (method === 'DELETE') body.append('_method', 'DELETE');
-
-        fetch(url, {
-            method: method,
-            body: body,
-            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        fetch(`{{ url('wishlist/toggle') }}/${productId}`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': token || '', 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            credentials: 'same-origin'
         })
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                const newState = !currentInWishlist;
-                setWishlistButtonState(productId, newState);
-                showNotification(newState ? 'Produk ditambahkan ke wishlist!' : 'Produk dihapus dari wishlist', 'success');
+                const inWishlist = !!data.is_in_wishlist;
+                setWishlistButtonState(productId, inWishlist);
+                showNotification(inWishlist ? 'Produk ditambahkan ke wishlist!' : 'Produk dihapus dari wishlist', 'success');
+                if (typeof data.wishlist_count !== 'undefined') {
+                    const badges = document.querySelectorAll('.wishlist-count-badge');
+                    badges.forEach(function(b) {
+                        b.textContent = data.wishlist_count > 0 ? data.wishlist_count : '';
+                        b.classList.toggle('hidden', data.wishlist_count < 1);
+                        b.style.display = data.wishlist_count > 0 ? 'flex' : 'none';
+                    });
+                }
                 if (typeof PopupManager !== 'undefined' && PopupManager.initializeCart) PopupManager.initializeCart();
+            } else {
+                showNotification('Gagal memperbarui wishlist', 'error');
             }
         })
         .catch(err => {

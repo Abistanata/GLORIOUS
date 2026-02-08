@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\StockTransaction;
+use App\Models\Wishlist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardsController extends Controller
 {
@@ -23,6 +25,17 @@ class DashboardsController extends Controller
             ->take(6);
 
         $products = $productsQuery->get();
+
+        // Untuk Customer: tandai produk yang ada di wishlist (selaras dengan navbar & product card)
+        $wishlistProductIds = collect();
+        if (Auth::check() && Auth::user()->role === 'Customer') {
+            $wishlistProductIds = Wishlist::where('user_id', Auth::id())
+                ->whereIn('product_id', $products->pluck('id'))
+                ->pluck('product_id');
+        }
+        $products->each(function ($product) use ($wishlistProductIds) {
+            $product->is_in_wishlist = $wishlistProductIds->contains($product->id);
+        });
 
         // Untuk statistik (opsional)
         $totalProducts = Product::count();

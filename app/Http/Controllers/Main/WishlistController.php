@@ -110,9 +110,11 @@ class WishlistController extends Controller
 
     /**
      * Toggle product in wishlist (add if not exists, remove if exists).
+     * Route: POST /wishlist/toggle/{product} (product = id).
      */
-    public function toggle(Request $request, $productId)
+    public function toggle(Request $request, $product)
     {
+        $productId = is_object($product) ? $product->id : (int) $product;
         $product = Product::findOrFail($productId);
         $isInWishlist = false;
         
@@ -148,7 +150,7 @@ class WishlistController extends Controller
             session(['wishlist' => array_values($wishlist)]);
         }
         
-        if ($request->ajax()) {
+        if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'action' => $action,

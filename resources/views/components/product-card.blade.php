@@ -25,7 +25,7 @@
     }
 @endphp
 
-<div class="group bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden transition-all hover:border-primary/30 hover:shadow-lg h-full flex flex-col">
+<div class="group bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden transition-all hover:border-primary/30 hover:shadow-lg h-full flex flex-col" data-product-id="{{ $product->id }}">
     <div class="relative h-52 bg-gray-900 overflow-hidden">
         @if($imageUrl)
             <img src="{{ $imageUrl }}" alt="{{ $product->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
@@ -97,11 +97,12 @@
                                     {{ $currentStock == 0 ? 'disabled' : '' }}>
                                 <i class="fas fa-shopping-cart text-xs"></i> Keranjang
                             </button>
+                            @php $inWishlist = $product->is_in_wishlist ?? false; @endphp
                             <button type="button"
                                     onclick="window.toggleWishlistFromCard && window.toggleWishlistFromCard({{ $product->id }})"
-                                    class="bg-gray-700 hover:bg-red-600 text-white font-medium py-2.5 px-3 rounded-lg transition-colors text-sm flex items-center justify-center"
-                                    data-product-id="{{ $product->id }}">
-                                <i class="fas fa-heart text-xs"></i>
+                                    class="bg-gray-700 hover:bg-red-600 text-white font-medium py-2.5 px-3 rounded-lg transition-colors text-sm flex items-center justify-center {{ $inWishlist ? '!bg-red-600' : '' }}"
+                                    data-product-id="{{ $product->id }}" title="{{ $inWishlist ? 'Hapus dari wishlist' : 'Tambah ke wishlist' }}">
+                                <i class="{{ $inWishlist ? 'fas' : 'far' }} fa-heart text-xs"></i>
                             </button>
                         @else
                             <a href="{{ route('main.products.show', $product->id) }}" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-medium py-2.5 px-3 rounded-lg transition-colors text-sm flex items-center justify-center gap-2">

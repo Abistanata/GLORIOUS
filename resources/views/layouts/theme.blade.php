@@ -604,11 +604,9 @@
                     <a href="{{ route('wishlist.index') }}" id="wishlist-button" class="relative group">
                         <div class="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-dark-light transition-all">
                             <i class="fas fa-heart text-xl text-light group-hover:text-red-500 transition-colors"></i>
-                            @if(isset($wishlistCount) && $wishlistCount > 0)
-                                <span class="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-glow">
-                                    {{ $wishlistCount }}
-                                </span>
-                            @endif
+                            <span class="wishlist-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-glow {{ !isset($wishlistCount) || $wishlistCount < 1 ? 'hidden' : '' }}" style="{{ !isset($wishlistCount) || $wishlistCount < 1 ? 'display: none;' : '' }}">
+                                {{ $wishlistCount ?? 0 }}
+                            </span>
                         </div>
                     </a>
 
@@ -655,11 +653,9 @@
                     <!-- Wishlist Mobile -->
                     <a href="{{ route('wishlist.index') }}" id="wishlist-button-mobile" class="relative">
                         <i class="fas fa-heart text-xl text-light hover:text-primary transition-colors"></i>
-                        @if(isset($wishlistCount) && $wishlistCount > 0)
-                            <span class="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                {{ $wishlistCount }}
-                            </span>
-                        @endif
+                        <span class="wishlist-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center {{ !isset($wishlistCount) || $wishlistCount < 1 ? 'hidden' : '' }}" style="{{ !isset($wishlistCount) || $wishlistCount < 1 ? 'display: none;' : '' }}">
+                            {{ $wishlistCount ?? 0 }}
+                        </span>
                     </a>
 
                     <!-- Cart Mobile -->
@@ -2647,20 +2643,48 @@
         .catch(() => { if (typeof PopupManager !== 'undefined') PopupManager.showToast('Gagal menambah ke keranjang', 'error'); });
     };
 
-    // Product card: toggle wishlist (customer only)
+    // Product card: toggle wishlist (customer only) - selaras dengan navbar & halaman wishlist
     window.toggleWishlistFromCard = function(productId) {
         const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        fetch(`/wishlist/add/${productId}`, {
+        fetch(`{{ url('wishlist/toggle') }}/${productId}`, {
             method: 'POST',
-            headers: { 'X-CSRF-TOKEN': token || '', 'Accept': 'application/json' },
+            headers: { 'X-CSRF-TOKEN': token || '', 'Accept': 'application/json', 'Content-Type': 'application/json' },
             credentials: 'same-origin'
         })
         .then(r => r.json())
         .then(data => {
-            if (data.success && typeof PopupManager !== 'undefined') PopupManager.showToast(data.isInWishlist ? 'Ditambah ke wishlist' : 'Dihapus dari wishlist', 'success');
-            window.location.reload();
+            if (data.success) {
+                if (typeof PopupManager !== 'undefined') PopupManager.showToast(data.is_in_wishlist ? 'Ditambah ke wishlist' : 'Dihapus dari wishlist', 'success');
+                if (typeof data.wishlist_count !== 'undefined') {
+                    const badges = document.querySelectorAll('.wishlist-count-badge');
+                    badges.forEach(function(b) {
+                        if (data.wishlist_count > 0) {
+                            b.textContent = data.wishlist_count;
+                            b.classList.remove('hidden');
+                            b.style.display = '';
+                        } else {
+                            b.classList.add('hidden');
+                            b.style.display = 'none';
+                        }
+                    });
+                }
+                var inWishlist = !!data.is_in_wishlist;
+                var btn = document.querySelector('button[data-product-id="' + productId + '"]');
+                if (btn) {
+                    var icon = btn.querySelector('i.fa-heart');
+                    if (icon) {
+                        icon.classList.toggle('fas', inWishlist);
+                        icon.classList.toggle('far', !inWishlist);
+                    }
+                    btn.classList.toggle('!bg-red-600', inWishlist);
+                    btn.classList.toggle('bg-gray-700', !inWishlist);
+                    btn.title = inWishlist ? 'Hapus dari wishlist' : 'Tambah ke wishlist';
+                } else {
+                    window.location.reload();
+                }
+            }
         })
-        .catch(() => {});
+        .catch(function() {});
     };
 </script>
 
