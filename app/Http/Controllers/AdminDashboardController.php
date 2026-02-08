@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Imports\ProductImport;
 use App\Exports\ProductsExport;
 use App\Imports\ProductsImport;
+use App\Models\Order;
 use App\Models\ProductAttribute;
 use App\Models\StockTransaction;
 use Illuminate\Support\Facades\DB;
@@ -137,7 +138,27 @@ class AdminDashboardController extends Controller
 
     public function userShow(User $user)
     {
-        return view('pages.admin.users.show', compact('user'));
+        $orders = collect();
+        if ($user->role === 'Customer') {
+            $orders = Order::where('user_id', $user->id)
+                ->with('items.product')
+                ->orderByDesc('created_at')
+                ->paginate(10);
+        }
+        return view('pages.admin.users.show', compact('user', 'orders'));
+    }
+
+    /**
+     * Update order status (pending, confirmed, cancelled).
+     */
+    public function orderUpdateStatus(Request $request, Order $order)
+    {
+        $request->validate(['status' => 'required|in:pending,confirmed,processed,cancelled']);
+        $order->update([
+            'status' => $request->status,
+            'confirmed_at' => $request->status === 'confirmed' || $request->status === 'processed' ? now() : $order->confirmed_at,
+        ]);
+        return redirect()->back()->with('success', 'Status pesanan diperbarui.');
     }
 
     public function userEdit(User $user)

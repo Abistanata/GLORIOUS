@@ -9,7 +9,7 @@
             <i class="fas fa-check-circle text-primary mr-2"></i> Checkout
         </h1>
 
-        <form action="{{ route('checkout.send-whatsapp') }}" method="POST" class="space-y-6">
+        <form action="{{ route('order.create-and-whatsapp') }}" method="POST" class="space-y-6">
             @csrf
             <div class="bg-dark-lighter rounded-xl border border-gray-800 p-6">
                 <h2 class="text-lg font-bold text-white mb-4">Data Pemesan</h2>

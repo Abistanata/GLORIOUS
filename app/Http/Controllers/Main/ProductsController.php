@@ -85,19 +85,10 @@ class ProductsController extends Controller
         
         // Generate WhatsApp message untuk setiap produk
         $products->getCollection()->transform(function ($product) {
-            // Hitung harga final (cek apakah sedang diskon)
-            $finalPrice = $product->is_on_sale && $product->discount_price > 0 
-                ? $product->discount_price 
-                : $product->selling_price;
-            
-            // Ambil current stock (sudah dihitung dari subquery)
+            $finalPrice = $product->final_price ?? $product->selling_price ?? 0;
             $currentStock = $product->current_stock ?? 0;
-            
-            // Ambil kondisi dan garansi (sesuaikan dengan field di database Anda)
-            $condition = $product->condition ?? 'Baru';
-            $warranty = $product->warranty ?? 'Garansi Toko';
-            
-            // Generate WhatsApp message
+            $condition = $product->getConditionLabel();
+            $warranty = $product->getWarrantyLabel();
             $product->whatsapp_message = $this->getWhatsAppMessage(
                 $product,
                 $finalPrice,
@@ -105,7 +96,6 @@ class ProductsController extends Controller
                 $condition,
                 $warranty
             );
-            
             return $product;
         });
         
@@ -375,32 +365,19 @@ class ProductsController extends Controller
     {
         $message = "Halo, saya tertarik dengan produk berikut:\n\n";
         $message .= "📦 *Produk:* {$product->name}\n";
-        $message .= "🏷️ *SKU:* {$product->sku}\n";
+        $message .= "🏷️ *SKU:* " . ($product->sku ?? '-') . "\n";
         $message .= "💰 *Harga:* Rp " . number_format($finalPrice, 0, ',', '.') . "\n";
         
-        // Tampilkan info diskon jika ada
-        if ($product->is_on_sale && $product->discount_price > 0 && $product->discount_price < $product->selling_price) {
-            $discount = round((($product->selling_price - $product->discount_price) / $product->selling_price) * 100);
-            $message .= "🔥 *Diskon:* {$discount}% (Hemat Rp " . number_format($product->selling_price - $product->discount_price, 0, ',', '.') . ")\n";
+        if ($product->has_discount && $product->selling_price > 0) {
+            $message .= "🔥 *Diskon:* " . round($product->discount_percentage ?? 0) . "% (Hemat Rp " . number_format($product->getDiscountAmount(), 0, ',', '.') . ")\n";
             $message .= "~~Rp " . number_format($product->selling_price, 0, ',', '.') . "~~\n";
         }
         
         $message .= "📊 *Stok:* " . ($currentStock > 0 ? $currentStock . " unit tersedia" : "Habis") . "\n";
-        
-        if (!empty($condition)) {
-            $message .= "🔧 *Kondisi:* {$condition}\n";
-        }
-        
-        if (!empty($warranty)) {
-            $message .= "✅ *Garansi:* {$warranty}\n";
-        }
-        
-        if ($product->category) {
-            $message .= "📂 *Kategori:* {$product->category->name}\n";
-        }
-        
+        if (!empty($condition)) $message .= "🔧 *Kondisi:* {$condition}\n";
+        if (!empty($warranty)) $message .= "✅ *Garansi:* {$warranty}\n";
+        if ($product->category) $message .= "📂 *Kategori:* {$product->category->name}\n";
         $message .= "\nApakah produk ini masih tersedia? Saya ingin order.";
-        
         return $message;
     }
 }

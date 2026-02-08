@@ -19,9 +19,7 @@ class CustomerOrderController extends Controller
         }
 
         $orders = Order::where('user_id', Auth::id())
-            ->confirmedOrProcessed()
             ->with('items.product')
-            ->orderByDesc('confirmed_at')
             ->orderByDesc('created_at')
             ->paginate(10);
 

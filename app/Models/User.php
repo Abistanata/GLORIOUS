@@ -13,8 +13,9 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'username',
-        'email',    // Opsional
-        'phone',    // Wajib (WhatsApp)
+        'email',
+        'phone',
+        'address',
         'password',
         'profile_photo_path',
         'role',

@@ -726,19 +726,60 @@
                         <span class="font-medium">Layanan</span>
                     </a>
 
-                    <!-- Profile Options Mobile -->
+                    <!-- Profile Options Mobile: tampil sesuai login -->
                     <div class="border-t border-gray-800 pt-3 mt-2">
-                        <button id="mobile-login-button" 
-                                class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
-                            <i class="fas fa-sign-in-alt mr-3 text-primary group-hover:text-white"></i>
-                            <span class="font-medium">Login Pelanggan</span>
-                        </button>
-                        
-                        <button id="mobile-register-button" 
-                                class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
-                            <i class="fas fa-user-plus mr-3 text-primary group-hover:text-white"></i>
-                            <span class="font-medium">Daftar Pelanggan</span>
-                        </button>
+                        @auth
+                            @if(auth()->user()->role === 'Customer')
+                                <a href="{{ route('customer.profile.edit') }}" class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                    <i class="fas fa-user-cog mr-3 text-primary group-hover:text-white"></i>
+                                    <span class="font-medium">Profile</span>
+                                </a>
+                                <a href="{{ route('wishlist.index') }}" class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                    <i class="fas fa-heart mr-3 text-primary group-hover:text-white"></i>
+                                    <span class="font-medium">Wishlist</span>
+                                </a>
+                                <a href="{{ route('cart.index') }}" class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                    <i class="fas fa-shopping-cart mr-3 text-primary group-hover:text-white"></i>
+                                    <span class="font-medium">Keranjang</span>
+                                </a>
+                                <a href="{{ route('customer.orders') }}" class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                    <i class="fas fa-shopping-bag mr-3 text-primary group-hover:text-white"></i>
+                                    <span class="font-medium">Pesanan Saya</span>
+                                </a>
+                                <button type="button" id="mobile-logout-button" class="flex items-center w-full px-4 py-3 text-light hover:bg-red-600 hover:text-white rounded-lg transition-all group">
+                                    <i class="fas fa-sign-out-alt mr-3 text-primary group-hover:text-white"></i>
+                                    <span class="font-medium">Logout</span>
+                                </button>
+                            @else
+                                @php
+                                    $dashUrl = match(auth()->user()->role ?? '') {
+                                        'Admin' => route('admin.dashboard'),
+                                        'Manajer Gudang' => route('manajergudang.dashboard'),
+                                        'Staff Gudang' => route('staff.dashboard'),
+                                        default => url('/'),
+                                    };
+                                @endphp
+                                <a href="{{ $dashUrl }}" class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                    <i class="fas fa-tachometer-alt mr-3 text-primary group-hover:text-white"></i>
+                                    <span class="font-medium">Dashboard</span>
+                                </a>
+                                <button type="button" id="mobile-logout-button" class="flex items-center w-full px-4 py-3 text-light hover:bg-red-600 hover:text-white rounded-lg transition-all group">
+                                    <i class="fas fa-sign-out-alt mr-3 text-primary group-hover:text-white"></i>
+                                    <span class="font-medium">Logout</span>
+                                </button>
+                            @endif
+                        @else
+                            <button id="mobile-login-button" 
+                                    class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                <i class="fas fa-sign-in-alt mr-3 text-primary group-hover:text-white"></i>
+                                <span class="font-medium">Login Pelanggan</span>
+                            </button>
+                            <button id="mobile-register-button" 
+                                    class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                <i class="fas fa-user-plus mr-3 text-primary group-hover:text-white"></i>
+                                <span class="font-medium">Daftar Pelanggan</span>
+                            </button>
+                        @endauth
                     </div>
                     
                     <!-- Kontak Mobile -->
@@ -772,20 +813,66 @@
             
             <!-- Cart Items -->
             <div class="flex-1 overflow-y-auto p-4" id="cart-items-container">
-                <!-- Items will be loaded here -->
-                <div class="text-center py-10">
-                    <i class="fas fa-shopping-cart text-4xl text-gray-600 mb-4"></i>
-                    <p class="text-gray-500">Keranjang belanja kosong</p>
-                    <p class="text-gray-600 text-sm mt-2">Tambahkan produk ke keranjang untuk mulai belanja</p>
-                </div>
+                @if(isset($cartItemsSidebar) && $cartItemsSidebar->count() > 0)
+                    @php $sidebarTotal = 0; @endphp
+                    <div class="space-y-3">
+                        @foreach($cartItemsSidebar as $cartItem)
+                            @if($cartItem->product)
+                                @php
+                                    $price = $cartItem->product->final_price ?? $cartItem->product->selling_price ?? 0;
+                                    $sub = $price * $cartItem->quantity;
+                                    $sidebarTotal += $sub;
+                                    $imgUrl = $cartItem->product->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($cartItem->product->image)
+                                        ? asset('storage/' . $cartItem->product->image) : null;
+                                @endphp
+                                <div class="cart-item flex gap-3 p-3 rounded-lg bg-dark/50 border border-gray-800">
+                                    @if($imgUrl)
+                                        <img src="{{ $imgUrl }}" alt="" class="w-14 h-14 rounded-lg object-cover flex-shrink-0">
+                                    @else
+                                        <div class="w-14 h-14 rounded-lg bg-gray-800 flex items-center justify-center flex-shrink-0"><i class="fas fa-laptop text-gray-600"></i></div>
+                                    @endif
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-white font-medium text-sm truncate">{{ $cartItem->product->name }}</p>
+                                        <p class="text-gray-400 text-xs">Rp {{ number_format($price, 0, ',', '.') }} × {{ $cartItem->quantity }}</p>
+                                        <p class="text-primary font-semibold text-sm">Rp {{ number_format($sub, 0, ',', '.') }}</p>
+                                    </div>
+                                    <a href="{{ route('cart.index') }}" class="self-center text-gray-400 hover:text-primary text-sm" title="Kelola">→</a>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                    <p class="text-right text-gray-400 text-sm mt-2">{{ $cartItemsSidebar->sum('quantity') }} item</p>
+                @else
+                    <div class="text-center py-10">
+                        <i class="fas fa-shopping-cart text-4xl text-gray-600 mb-4"></i>
+                        <p class="text-gray-500">Keranjang belanja kosong</p>
+                        <p class="text-gray-600 text-sm mt-2">Tambahkan produk ke keranjang untuk mulai belanja</p>
+                    </div>
+                @endif
             </div>
             
             <!-- Cart Footer -->
             <div class="border-t border-gray-800 p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-gray-400">Total</span>
-                    <span class="text-2xl font-bold text-white" id="cart-total">Rp 0</span>
-                </div>
+                @if(isset($cartItemsSidebar) && $cartItemsSidebar->count() > 0)
+                    @php
+                        $sidebarTotal = 0;
+                        foreach ($cartItemsSidebar as $ci) {
+                            if ($ci->product) {
+                                $p = $ci->product->final_price ?? $ci->product->selling_price ?? 0;
+                                $sidebarTotal += $p * $ci->quantity;
+                            }
+                        }
+                    @endphp
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-gray-400">Total</span>
+                        <span class="text-2xl font-bold text-white" id="cart-total">Rp {{ number_format($sidebarTotal, 0, ',', '.') }}</span>
+                    </div>
+                @else
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-gray-400">Total</span>
+                        <span class="text-2xl font-bold text-white" id="cart-total">Rp 0</span>
+                    </div>
+                @endif
                 <div class="space-y-3">
                     <a href="{{ route('cart.index') }}" class="w-full btn-primary text-white py-3.5 rounded-xl font-semibold transition-all flex items-center justify-center">
                         Lanjut ke Checkout
@@ -865,6 +952,11 @@
                 <div class="space-y-3 hidden" id="user-buttons">
                     @auth
                         @if(auth()->user()->role === 'Customer')
+                            <a href="{{ route('customer.profile.edit') }}"
+                               class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
+                                <i class="fas fa-user-cog mr-3"></i>
+                                Profile / Pengaturan
+                            </a>
                             <a href="{{ route('wishlist.index') }}"
                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
                                 <i class="fas fa-heart mr-3"></i>
@@ -1660,6 +1752,29 @@
                     // else: biarkan default
                 });
             }
+
+            // Require-login buttons (guest: show alert + open login popup)
+            document.addEventListener('click', (e) => {
+                const el = e.target.closest('.js-require-login-wa, .js-require-login-cart, .js-require-login-wishlist');
+                if (!el || window.isAuth === true || window.isAuth === 'true' || this.currentUser) return;
+                e.preventDefault();
+                e.stopPropagation();
+                const msg = el.getAttribute('data-message') || 'Silakan login untuk melanjutkan.';
+                this.showToast(msg, 'info');
+                this.showPopup('customer-login-popup');
+                this.hideMobileMenu();
+            });
+
+            // Block order-wa-form submit when guest (form only rendered when auth, but safety)
+            document.addEventListener('submit', (e) => {
+                const form = e.target.closest('.order-wa-form');
+                if (!form) return;
+                if (window.isAuth !== true && window.isAuth !== 'true' && !this.currentUser) {
+                    e.preventDefault();
+                    this.showToast('Silakan login untuk memesan via WhatsApp.', 'info');
+                    this.showPopup('customer-login-popup');
+                }
+            });
             
             // Cart close buttons
             const cartCloseButton = document.getElementById('cart-close-button');
@@ -1734,6 +1849,15 @@
                     e.preventDefault();
                     e.stopPropagation();
                     this.handleLogout();
+                });
+            }
+            const mobileLogoutButton = document.getElementById('mobile-logout-button');
+            if (mobileLogoutButton) {
+                mobileLogoutButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.handleLogout();
+                    this.hideMobileMenu();
                 });
             }
             
@@ -2127,11 +2251,23 @@
             const toastContainer = document.getElementById('toast-container');
             if (!toastContainer) return;
             
+            const styles = {
+                success: 'bg-green-900/30 border border-green-700/50',
+                error: 'bg-red-900/30 border border-red-700/50',
+                info: 'bg-blue-900/30 border border-blue-700/50'
+            };
+            const icons = {
+                success: 'fa-check-circle text-green-400',
+                error: 'fa-exclamation-circle text-red-400',
+                info: 'fa-info-circle text-blue-400'
+            };
+            const s = styles[type] || styles.info;
+            const i = icons[type] || icons.info;
             const toast = document.createElement('div');
-            toast.className = `toast ${type === 'success' ? 'bg-green-900/30 border border-green-700/50' : 'bg-red-900/30 border border-red-700/50'} rounded-xl p-4 text-white shadow-lg backdrop-blur-sm`;
+            toast.className = `toast ${s} rounded-xl p-4 text-white shadow-lg backdrop-blur-sm`;
             toast.innerHTML = `
                 <div class="flex items-center">
-                    <i class="fas ${type === 'success' ? 'fa-check-circle text-green-400' : 'fa-exclamation-circle text-red-400'} mr-3"></i>
+                    <i class="fas ${i} mr-3"></i>
                     <span>${message}</span>
                 </div>
             `;
@@ -2473,6 +2609,44 @@
     // Global function for password visibility toggle
     window.togglePasswordVisibility = function(inputId) {
         PopupManager.togglePasswordVisibility(inputId);
+    };
+
+    // Product card: add to cart (customer only, call from product-card component)
+    window.addToCartFromCard = function(productId, finalPrice, currentStock) {
+        if (currentStock < 1) return;
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        fetch('{{ route("cart.store") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token || '', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ product_id: productId, quantity: 1 })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                if (typeof PopupManager !== 'undefined') PopupManager.showToast(data.message || 'Ditambah ke keranjang', 'success');
+                window.location.reload();
+            } else {
+                if (typeof PopupManager !== 'undefined') PopupManager.showToast(data.message || 'Gagal menambah ke keranjang', 'error');
+            }
+        })
+        .catch(() => { if (typeof PopupManager !== 'undefined') PopupManager.showToast('Gagal menambah ke keranjang', 'error'); });
+    };
+
+    // Product card: toggle wishlist (customer only)
+    window.toggleWishlistFromCard = function(productId) {
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        fetch(`/wishlist/add/${productId}`, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': token || '', 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && typeof PopupManager !== 'undefined') PopupManager.showToast(data.isInWishlist ? 'Ditambah ke wishlist' : 'Dihapus dari wishlist', 'success');
+            window.location.reload();
+        })
+        .catch(() => {});
     };
 </script>
 

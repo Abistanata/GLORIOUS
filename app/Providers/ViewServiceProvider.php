@@ -21,15 +21,22 @@ class ViewServiceProvider extends ServiceProvider
             $view->with('categories', Category::all());
         });
 
-        // Cart & Wishlist count: hanya untuk auth + role Customer (satu guard web)
+        // Cart & Wishlist count + cart items for sidebar: hanya untuk auth + role Customer
         View::composer(['layouts.theme'], function ($view) {
             $cartCount = 0;
             $wishlistCount = 0;
+            $cartItemsSidebar = collect();
             if (Auth::check() && Auth::user()->role === 'Customer') {
                 $cartCount = Cart::where('user_id', Auth::id())->sum('quantity');
                 $wishlistCount = Wishlist::where('user_id', Auth::id())->whereHas('product')->count();
+                $cartItemsSidebar = Cart::where('user_id', Auth::id())
+                    ->with('product.category')
+                    ->orderBy('updated_at', 'desc')
+                    ->get();
             }
-            $view->with('cartCount', $cartCount)->with('wishlistCount', $wishlistCount);
+            $view->with('cartCount', $cartCount)
+                ->with('wishlistCount', $wishlistCount)
+                ->with('cartItemsSidebar', $cartItemsSidebar);
         });
     }
 }

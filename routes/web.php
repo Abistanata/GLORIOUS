@@ -44,6 +44,7 @@ Route::prefix('wishlist')->name('wishlist.')->group(function () {
     Route::get('/', [WishlistController::class, 'index'])->name('index');
     Route::post('/add/{product}', [WishlistController::class, 'add'])->name('add')->middleware('auth');
     Route::delete('/remove/{product}', [WishlistController::class, 'remove'])->name('remove')->middleware('auth');
+    Route::post('/move-to-cart/{product}', [WishlistController::class, 'moveToCart'])->name('move-to-cart')->middleware('auth');
 });
 
 // ===================================
@@ -58,7 +59,11 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::get('/checkout', [\App\Http\Controllers\Main\CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout/send-whatsapp', [\App\Http\Controllers\Main\CheckoutController::class, 'sendToWhatsApp'])->name('checkout.send-whatsapp');
+    Route::post('/order/create-and-whatsapp', [\App\Http\Controllers\Main\OrderController::class, 'createAndRedirectToWhatsApp'])->name('order.create-and-whatsapp');
     Route::get('/customer/orders', [\App\Http\Controllers\Main\CustomerOrderController::class, 'index'])->name('customer.orders');
+    Route::get('/customer/profile', [\App\Http\Controllers\Main\CustomerProfileController::class, 'edit'])->name('customer.profile.edit');
+    Route::put('/customer/profile', [\App\Http\Controllers\Main\CustomerProfileController::class, 'update'])->name('customer.profile.update');
+    Route::put('/customer/profile/password', [\App\Http\Controllers\Main\CustomerProfileController::class, 'updatePassword'])->name('customer.profile.password');
 });
 
 // ===================================
@@ -99,6 +104,7 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
         Route::put('/users/{user}', [AdminDashboardController::class, 'userUpdate'])->name('users.update');
         Route::get('/users/{user}/delete', [AdminDashboardController::class, 'confirmDeleteUser'])->name('users.delete');
         Route::delete('/users/{user}', [AdminDashboardController::class, 'userDestroy'])->name('users.destroy');
+        Route::put('/orders/{order}/status', [AdminDashboardController::class, 'orderUpdateStatus'])->name('orders.update-status');
 
         // Products Management (alternative routes)
         Route::get('/products', [AdminDashboardController::class, 'productList'])->name('products.index');

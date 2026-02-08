@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Main;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Wishlist;
+use App\Models\StockTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -203,33 +204,22 @@ class WishlistController extends Controller
     }
 
     /**
-     * Move product from wishlist to cart.
+     * Move product from wishlist to cart (add to cart then remove from wishlist).
      */
     public function moveToCart(Request $request, $productId)
     {
-        // First, remove from wishlist
-        $this->remove($request, $productId);
-        
-        // Then add to cart (you'll need to implement cart logic)
-        // This is a placeholder - you need to integrate with your cart system
-        $product = Product::findOrFail($productId);
-        
-        // TODO: Add to cart logic here
-        // Example: Cart::add($product, 1);
-        
-        $message = "{$product->name} moved to cart";
-        
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'wishlist_count' => $this->getWishlistCount()
-            ]);
+        if (!Auth::check() || Auth::user()->role !== 'Customer') {
+            return redirect()->route('wishlist.index')->with('error', 'Silakan login sebagai pelanggan.');
         }
-        
-        return redirect()->route('wishlist.index')
-            ->with('success', $message)
-            ->with('wishlist_count', $this->getWishlistCount());
+        $product = Product::findOrFail($productId);
+        $cart = \App\Models\Cart::firstOrNew([
+            'user_id' => Auth::id(),
+            'product_id' => $product->id,
+        ]);
+        $cart->quantity = ($cart->quantity ?? 0) + 1;
+        $cart->save();
+        Wishlist::where('user_id', Auth::id())->where('product_id', $productId)->delete();
+        return redirect()->route('wishlist.index')->with('success', $product->name . ' dipindah ke keranjang.');
     }
 
     /**
@@ -238,17 +228,18 @@ class WishlistController extends Controller
     private function getWishlistItems()
     {
         if (Auth::check()) {
-            // For authenticated users - get from database with product details
             $wishlistItems = Wishlist::where('user_id', Auth::id())
-                ->with(['product' => function($query) {
-                    $query->with('category');
-                    // Hapus kondisi where('is_active', true) jika kolom tidak ada
-                }])
+                ->with(['product' => fn($q) => $q->with('category')])
                 ->whereHas('product')
                 ->orderBy('added_at', 'desc')
                 ->get()
                 ->pluck('product')
-                ->filter(); // Remove null products
+                ->filter();
+            foreach ($wishlistItems as $product) {
+                $product->current_stock = StockTransaction::where('product_id', $product->id)
+                    ->selectRaw('COALESCE(SUM(CASE WHEN type = "Masuk" THEN quantity ELSE -quantity END), 0) as stock')
+                    ->value('stock') ?? 0;
+            }
         } else {
             // For guests - get from session
             $wishlistIds = session('wishlist', []);

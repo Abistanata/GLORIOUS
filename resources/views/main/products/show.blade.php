@@ -248,34 +248,35 @@
 
                     <!-- Main Action Buttons -->
                     <div class="pt-6">
-                        @php
-                            $whatsappMessage = "Halo Glorious Computer,%0A%0ASaya tertarik dengan produk:%0A*" . urlencode($product->name) . "*%0A%0A• Harga: Rp " . number_format($finalPrice, 0, ',', '.');
-                            
-                            if ($hasDiscount) {
-                                $whatsappMessage .= "%0A• Harga Normal: Rp " . number_format($sellingPrice, 0, ',', '.');
-                                $whatsappMessage .= "%0A• Diskon: " . $discountPercentage . "%";
-                                $whatsappMessage .= "%0A• Hemat: Rp " . number_format($discountAmount, 0, ',', '.');
-                            }
-                            
-                            $whatsappMessage .= "%0A• Stok: " . $currentStock . " " . $product->unit;
-                            $whatsappMessage .= "%0A• Kondisi: " . urlencode($condition);
-                            $whatsappMessage .= "%0A• Garansi: " . urlencode($warranty);
-                            $whatsappMessage .= "%0A%0AMohon info ketersediaan stok dan cara pemesanan.";
-                        @endphp
-                        
                         <div class="flex flex-col sm:flex-row gap-3">
-                            <a href="https://wa.me/6282133803940?text={{ $whatsappMessage }}" 
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               data-auth-required="customer"
-                               data-auth-reason="buy"
-                               class="flex-1 bg-primary hover:bg-primary-dark text-white py-3 px-6 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-3 hover:shadow-lg {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
-                               @if($currentStock == 0) onclick="return false;" @endif>
-                                <i class="fab fa-whatsapp text-lg"></i>
-                                {{ $currentStock == 0 ? 'Stok Habis' : 'Pesan via WhatsApp' }}
-                            </a>
-                            
-                            <a href="{{ route('main.products.index') }}" 
+                            @auth
+                                @if(auth()->user()->role === 'Customer')
+                                    <form action="{{ route('order.create-and-whatsapp') }}" method="POST" class="flex-1 order-wa-form">
+                                        @csrf
+                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit"
+                                                class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-3 {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                                {{ $currentStock == 0 ? 'disabled' : '' }}>
+                                            <i class="fab fa-whatsapp text-lg"></i>
+                                            {{ $currentStock == 0 ? 'Stok Habis' : 'Pesan via WhatsApp' }}
+                                        </button>
+                                    </form>
+                                @else
+                                    <a href="{{ route('main.products.index') }}" class="flex-1 bg-primary hover:bg-primary-dark text-white py-3 px-6 rounded-lg font-medium flex items-center justify-center gap-3">
+                                        <i class="fab fa-whatsapp"></i> Lihat Katalog
+                                    </a>
+                                @endif
+                            @else
+                                <button type="button"
+                                        class="flex-1 js-require-login-wa bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-3 {{ $currentStock == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                        data-message="Silakan login untuk memesan via WhatsApp."
+                                        {{ $currentStock == 0 ? 'disabled' : '' }}>
+                                    <i class="fab fa-whatsapp text-lg"></i>
+                                    {{ $currentStock == 0 ? 'Stok Habis' : 'Pesan via WhatsApp' }}
+                                </button>
+                            @endauth
+                            <a href="{{ route('main.products.index') }}"
                                class="flex-1 bg-gray-800 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-3 border border-gray-700">
                                 <i class="fas fa-arrow-left"></i>
                                 Kembali

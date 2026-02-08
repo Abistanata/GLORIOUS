@@ -77,9 +77,71 @@
                             </label>
                             <p class="text-lg text-gray-900 dark:text-white">#{{ $user->id }}</p>
                         </div>
+                        @if($user->phone)
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                WhatsApp / Telepon
+                            </label>
+                            <p class="text-lg text-gray-900 dark:text-white">{{ $user->formatted_phone ?? $user->phone }}</p>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
+
+            @if($user->role === 'Customer' && isset($orders) && $orders->count() > 0)
+            {{-- Pesanan Customer --}}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow mt-6">
+                <div class="p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                        <i class="fas fa-shopping-bag mr-2"></i>Pesanan
+                    </h2>
+                    @if(session('success'))
+                        <p class="text-sm text-green-600 dark:text-green-400 mb-4">{{ session('success') }}</p>
+                    @endif
+                    <div class="space-y-4">
+                        @foreach($orders as $order)
+                            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                <div class="flex flex-wrap justify-between items-center gap-2 mb-2">
+                                    <span class="font-mono text-sm text-gray-600 dark:text-gray-400">{{ $order->order_number ?? '#' . $order->id }}</span>
+                                    <span class="text-sm text-gray-500">{{ $order->created_at->format('d M Y H:i') }}</span>
+                                </div>
+                                <ul class="text-sm text-gray-700 dark:text-gray-300 space-y-1 mb-3">
+                                    @foreach($order->items as $oi)
+                                        <li>{{ $oi->product->name ?? 'Produk' }} x{{ $oi->quantity }} — Rp {{ number_format($oi->subtotal, 0, ',', '.') }}</li>
+                                    @endforeach
+                                </ul>
+                                <div class="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                                    <span class="font-semibold text-gray-900 dark:text-white">Total: Rp {{ number_format($order->total, 0, ',', '.') }}</span>
+                                    <form action="{{ route('admin.orders.update-status', $order) }}" method="POST" class="inline-flex items-center gap-2">
+                                        @csrf
+                                        @method('PUT')
+                                        <select name="status" class="text-sm rounded border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" onchange="this.form.submit()">
+                                            <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Menunggu</option>
+                                            <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Dikonfirmasi</option>
+                                            <option value="processed" {{ $order->status === 'processed' ? 'selected' : '' }}>Diproses</option>
+                                            <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    @if($orders->hasPages())
+                        <div class="mt-4">{{ $orders->links() }}</div>
+                    @endif
+                </div>
+            </div>
+            @elseif($user->role === 'Customer')
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow mt-6">
+                <div class="p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        <i class="fas fa-shopping-bag mr-2"></i>Pesanan
+                    </h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada pesanan.</p>
+                </div>
+            </div>
+            @endif
 
             {{-- Role Permissions --}}
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow mt-6">

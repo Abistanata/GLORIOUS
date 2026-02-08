@@ -468,6 +468,9 @@
         box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
         position: relative;
         overflow: hidden;
+        min-height: 380px;
+        display: flex;
+        flex-direction: column;
     }
 
     .service-card::before {
@@ -542,6 +545,7 @@
         font-size: 1.1rem;
         margin-bottom: 24px;
         font-weight: 400;
+        flex: 1;
     }
 
     .service-features {
@@ -1131,25 +1135,6 @@
                     <img src="images/background.jpg" alt="Workshop Kami">
                 </div>
             </div>
-            
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <span class="stat-number">10+</span>
-                    <span class="stat-label">Tahun Pengalaman</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">500+</span>
-                    <span class="stat-label">Klien Puas</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">1000+</span>
-                    <span class="stat-label">Produk Terjual</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">24/7</span>
-                    <span class="stat-label">Support Aktif</span>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -1314,188 +1299,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @if(isset($products) && $products->count() > 0)
                     @foreach($products as $product)
-                        @php
-                            $currentStock = $product->current_stock;
-                            $imageExists = $product->image ? Storage::disk('public')->exists($product->image) : false;
-                            $imageUrl = $product->image && $imageExists ? asset('storage/' . $product->image) : null;
-                            
-                            // Pricing logic from Product model
-                            $hasDiscount = $product->has_discount;
-                            $discountPercentage = $product->discount_percentage;
-                            $finalPrice = $product->final_price;
-                            $sellingPrice = $product->selling_price;
-                            $discountAmount = $product->getDiscountAmount();
-                            
-                            // Additional info
-                            $condition = $product->getConditionLabel();
-                            $warranty = $product->getWarrantyLabel();
-                            $shipping = $product->getShippingInfoLabel();
-                            
-                            // Stock status
-                            $stockStatus = $product->stock_status;
-                            $stockStatusLabel = $product->getStockStatusLabel();
-                            $stockStatusColor = $product->getStockStatusColor();
-                        @endphp
-                        
-                        <div class="product-card">
-                            <!-- Product Image -->
-                            <div class="product-image-container">
-                                @if($imageUrl)
-                                    <img src="{{ $imageUrl }}" 
-                                         alt="{{ $product->name }}"
-                                         class="product-image">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center">
-                                        <div class="text-center">
-                                            <i class="fas fa-laptop text-5xl text-gray-500 mb-2"></i>
-                                            <p class="text-gray-400 text-sm">No Image</p>
-                                        </div>
-                                    </div>
-                                @endif
-                                
-                                <!-- Discount Badge -->
-                                @if($hasDiscount && $discountPercentage > 0)
-                                    <div class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold z-10 shadow-lg">
-                                        -{{ $discountPercentage }}%
-                                    </div>
-                                @endif
-                                
-                                <!-- Condition Badge -->
-                                <div class="absolute top-4 right-4">
-                                    <span class="bg-primary/90 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                                        {{ $condition }}
-                                    </span>
-                                </div>
-                                
-                                <!-- Stock Badge -->
-                                <div class="absolute bottom-4 right-4">
-                                    <span class="product-badge {{ $stockStatus === 'out_of_stock' ? 'badge-out' : ($stockStatus === 'low_stock' ? 'badge-low' : 'badge-available') }}">
-                                        @if($stockStatus === 'out_of_stock')
-                                            <i class="fas fa-times mr-1"></i>Habis
-                                        @elseif($stockStatus === 'low_stock')
-                                            <i class="fas fa-exclamation mr-1"></i>Menipis
-                                        @else
-                                            <i class="fas fa-check mr-1"></i>Tersedia
-                                        @endif
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <div class="product-content">
-                                <!-- Category -->
-                                <div class="flex justify-between items-center mb-3">
-                                    <span class="product-category">
-                                        {{ $product->category->name ?? 'Uncategorized' }}
-                                    </span>
-                                    @if($warranty !== 'Tidak Ada Garansi')
-                                        <span class="text-green-400 text-xs font-bold bg-green-900/30 px-2 py-1 rounded">
-                                            <i class="fas fa-shield-alt mr-1"></i>{{ $warranty }}
-                                        </span>
-                                    @endif
-                                </div>
-                                
-                                <!-- Product Name -->
-                                <h3 class="product-title">{{ $product->name }}</h3>
-                                
-                                <!-- Stock Info Bar -->
-                                <div class="mb-4">
-                                    <div class="flex justify-between text-xs text-gray-400 mb-1">
-                                        <span>Stok: {{ $currentStock }} {{ $product->unit }}</span>
-                                        @if($product->max_stock && $product->max_stock > 0)
-                                            <span>Max: {{ $product->max_stock }}</span>
-                                        @endif
-                                    </div>
-                                    @if($product->max_stock && $product->max_stock > 0)
-                                        <div class="w-full bg-gray-700 rounded-full h-2">
-                                            <div class="bg-primary rounded-full h-2 transition-all duration-500" 
-                                                 style="width: {{ min(100, ($currentStock / $product->max_stock) * 100) }}%">
-                                            </div>
-                                        </div>
-                                    @endif
-                                </div>
-                                
-                                <!-- Specifications -->
-                                <div class="mb-4">
-                                    <h4 class="text-sm font-bold text-primary mb-2">Spesifikasi:</h4>
-                                    <div class="product-specs">
-                                        @if($product->specification && !empty(trim($product->specification)))
-                                            {!! nl2br(e(Str::limit($product->specification, 120))) !!}
-                                        @else
-                                            <span class="text-gray-500 italic">
-                                                <i class="fas fa-info-circle mr-1"></i>Spesifikasi tidak tersedia
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <!-- Additional Information -->
-                                <div class="mb-4">
-                                    <div class="flex flex-wrap gap-2">
-                                        <span class="inline-flex items-center text-xs bg-blue-900/30 text-blue-300 px-2 py-1 rounded">
-                                            <i class="fas fa-truck mr-1"></i>{{ $shipping }}
-                                        </span>
-                                        @if($product->unit !== 'pcs')
-                                            <span class="inline-flex items-center text-xs bg-purple-900/30 text-purple-300 px-2 py-1 rounded">
-                                                <i class="fas fa-box mr-1"></i>{{ $product->unit }}
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <!-- Pricing -->
-                                <div class="product-pricing">
-                                    <div class="price-display">
-                                        <div class="flex flex-col">
-                                            @if($hasDiscount)
-                                                <!-- Discount Price (Highlighted) -->
-                                                <span class="current-price text-2xl">
-                                                    Rp {{ number_format($finalPrice, 0, ',', '.') }}
-                                                </span>
-                                                <!-- Original Price (Striked) -->
-                                                <span class="original-price text-sm">
-                                                    Rp {{ number_format($sellingPrice, 0, ',', '.') }}
-                                                </span>
-                                                <!-- Discount Amount -->
-                                                <span class="text-red-400 text-xs font-bold mt-1">
-                                                    Hemat Rp {{ number_format($discountAmount, 0, ',', '.') }}
-                                                </span>
-                                            @else
-                                                <!-- Normal Price -->
-                                                <span class="current-price text-2xl">
-                                                    Rp {{ number_format($finalPrice, 0, ',', '.') }}
-                                                </span>
-                                            @endif
-                                        </div>
-                                        
-                                        <!-- Discount Badge (Large) -->
-                                        @if($hasDiscount && $discountPercentage > 0)
-                                            <div class="discount-badge-large">
-                                                {{ $discountPercentage }}% OFF
-                                            </div>
-                                        @endif
-                                    </div>
-                                    
-                                    <!-- Action Buttons -->
-                                    <div class="product-actions mt-4">
-                                        <a href="{{ route('main.products.show', $product->id) }}" 
-                                           class="btn-detail">
-                                            <i class="fas fa-eye mr-2"></i>Detail
-                                        </a>
-                                        <button onclick="handleBuyProduct({{ $product->id }}, '{{ urlencode($product->name) }}', {{ $finalPrice }}, '{{ urlencode(Str::limit($product->specification, 100)) }}', '{{ urlencode($condition) }}', '{{ urlencode($warranty) }}', {{ $currentStock }})"
-                                           data-auth-required="customer"
-                                           data-auth-reason="buy"
-                                           class="btn-buy btn-whatsapp {{ $currentStock == 0 ? 'btn-disabled' : '' }}"
-                                           @if($currentStock == 0) disabled @endif>
-                                            @if($currentStock == 0)
-                                                <i class="fas fa-times mr-2"></i>Habis
-                                            @else
-                                                <i class="fab fa-whatsapp mr-2"></i>Beli
-                                            @endif
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <x-product-card :product="$product" />
                     @endforeach
                 @else
                     <!-- Empty State -->
