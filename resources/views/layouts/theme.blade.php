@@ -2005,7 +2005,8 @@
                 googleLoginButton.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    this.showToast('Fitur login Google sedang dalam pengembangan', 'info');
+                    // Redirect ke endpoint Laravel Google OAuth (session-based)
+                    window.location.href = '/auth/google';
                 });
             }
 

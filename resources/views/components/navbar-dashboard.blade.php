@@ -78,17 +78,84 @@
                     </div>
                 </div>
 
-                {{-- Notifikasi (Placeholder) --}}
-                <div x-data="{ open: false }" class="relative hidden sm:block">
-                    <button @click="open = !open" class="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-700">
-                        <span class="sr-only">View notifications</span>
-                        <i class="fas fa-bell fa-fw"></i>
-                    </button>
-                    <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-2 w-80 bg-white dark:bg-dark-primary rounded-md shadow-lg border dark:border-slate-700 z-50">
-                        <div class="block px-4 py-2 font-medium text-center text-gray-700 bg-gray-50 dark:bg-slate-700 dark:text-gray-400">Notifikasi</div>
-                        <div class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">Tidak ada notifikasi baru.</div>
+                {{-- Notifikasi Pesanan Baru (Admin) --}}
+                @php
+                    $unreadOrderNotifications = collect();
+                    $unreadOrderCount = 0;
+                    if(auth()->check() && auth()->user()->role === 'Admin') {
+                        $unreadOrderNotifications = auth()->user()
+                            ->unreadNotifications()
+                            ->where('type', \App\Notifications\NewOrderNotification::class)
+                            ->latest()
+                            ->take(10)
+                            ->get();
+                        $unreadOrderCount = $unreadOrderNotifications->count();
+                    }
+                @endphp
+                @if(auth()->user()->role === 'Admin')
+                    <div x-data="{ open: false }" class="relative hidden sm:block">
+                        <button @click="open = !open" class="relative p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-700">
+                            <span class="sr-only">View notifications</span>
+                            <i class="fas fa-bell fa-fw"></i>
+                            @if($unreadOrderCount > 0)
+                                <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white bg-red-600 rounded-full">
+                                    {{ $unreadOrderCount }}
+                                </span>
+                            @endif
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-2 w-96 bg-white dark:bg-dark-primary rounded-md shadow-lg border dark:border-slate-700 z-50">
+                            <div class="flex items-center justify-between px-4 py-2 font-medium text-gray-700 bg-gray-50 dark:bg-slate-700 dark:text-gray-300">
+                                <span>Notifikasi Pesanan Baru</span>
+                                @if($unreadOrderCount > 0)
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ $unreadOrderCount }} belum dibaca</span>
+                                @endif
+                            </div>
+                            <div class="max-h-80 overflow-y-auto divide-y divide-gray-200 dark:divide-slate-700">
+                                @forelse($unreadOrderNotifications as $notification)
+                                    @php
+                                        $data = $notification->data;
+                                    @endphp
+                                    <a href="{{ route('admin.customers.show', $data['customer_id'] ?? 0) }}"
+                                       class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700"
+                                       onclick="event.preventDefault(); document.getElementById('notif-form-{{ $notification->id }}').submit();">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex-1">
+                                                <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                                    {{ $data['customer_name'] ?? 'Customer' }}
+                                                </p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                    {{ $data['customer_email'] ?? '-' }}
+                                                </p>
+                                                @if(!empty($data['product_summary']))
+                                                    <p class="mt-1 text-xs text-gray-700 dark:text-gray-300">
+                                                        {{ $data['product_summary'] }}
+                                                    </p>
+                                                @endif
+                                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                                    Total: Rp {{ number_format((float) ($data['order_total'] ?? 0), 0, ',', '.') }}
+                                                </p>
+                                            </div>
+                                            <div class="ml-3 text-right">
+                                                <p class="text-[10px] text-gray-500 dark:text-gray-400">
+                                                    {{ \Carbon\Carbon::parse($data['created_at'] ?? $notification->created_at)->diffForHumans() }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <form id="notif-form-{{ $notification->id }}" method="POST"
+                                          action="{{ route('admin.notifications.read', $notification->id) }}" class="hidden">
+                                        @csrf
+                                        @method('PUT')
+                                    </form>
+                                @empty
+                                    <div class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                        Tidak ada notifikasi pesanan baru.
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
                     </div>
-                </div>
+                @endif
 
                 <!-- Profile Dropdown -->
                 <div x-data="{ open: false }" class="relative">

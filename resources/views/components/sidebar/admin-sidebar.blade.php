@@ -3,10 +3,11 @@
         Dashboard
     </x-sidebar.link>
 
-    <x-sidebar.dropdown :active="request()->routeIs('admin.users.*')" icon="fas fa-users">
+    <x-sidebar.dropdown :active="request()->routeIs('admin.users.*') || request()->routeIs('admin.customers.*')" icon="fas fa-users">
         <x-slot name="trigger">Kelola User</x-slot>
         <x-sidebar.sublink :href="route('admin.users.index')" :active="request()->routeIs('admin.users.index', 'admin.users.edit', 'admin.users.show')">Daftar User</x-sidebar.sublink>
         <x-sidebar.sublink :href="route('admin.users.create')" :active="request()->routeIs('admin.users.create')">Tambah User</x-sidebar.sublink>
+        <x-sidebar.sublink :href="route('admin.customers.index')" :active="request()->routeIs('admin.customers.*')">Customer</x-sidebar.sublink>
     </x-sidebar.dropdown>
 
     <x-sidebar.dropdown :active="request()->routeIs('admin.products.*')" icon="fas fa-box-open">

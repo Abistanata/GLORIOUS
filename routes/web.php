@@ -14,6 +14,8 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\StaffDashboardController;
 use App\Http\Controllers\ManagerDashboardController;
+use App\Http\Controllers\AdminCustomerController;
+use App\Http\Controllers\AdminNotificationController;
 use App\Http\Controllers\Main\AboutController;
 use App\Http\Controllers\Main\ProductsController;
 use App\Http\Controllers\Main\DashboardsController;
@@ -79,6 +81,15 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name
 Route::get('/check-session', [AuthController::class, 'checkSession'])->name('check.session');
 
 // ===================================
+// GOOGLE LOGIN (WEB SESSION, BUKAN API TOKEN)
+// ===================================
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])
+    ->name('auth.google.redirect');
+
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])
+    ->name('auth.google.callback');
+
+// ===================================
 // ADMIN ROUTES
 // ===================================
 Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -106,6 +117,17 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
         Route::put('/users/{user}', [AdminDashboardController::class, 'userUpdate'])->name('users.update');
         Route::get('/users/{user}/delete', [AdminDashboardController::class, 'confirmDeleteUser'])->name('users.delete');
         Route::delete('/users/{user}', [AdminDashboardController::class, 'userDestroy'])->name('users.destroy');
+
+        // Customers (Customer role only)
+        Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
+        Route::get('/customers/{customer}', [AdminCustomerController::class, 'show'])->name('customers.show');
+        Route::get('/customers/{customer}/edit', [AdminCustomerController::class, 'edit'])->name('customers.edit');
+        Route::put('/customers/{customer}', [AdminCustomerController::class, 'update'])->name('customers.update');
+        Route::delete('/customers/{customer}', [AdminCustomerController::class, 'destroy'])->name('customers.destroy');
+
+        // Notifications
+        Route::put('/notifications/{notification}/read', [AdminNotificationController::class, 'markAsRead'])
+            ->name('notifications.read');
         Route::get('/orders', [AdminDashboardController::class, 'ordersIndex'])->name('orders.index');
         Route::get('/orders/{order}', [AdminDashboardController::class, 'orderShow'])->name('orders.show');
         Route::put('/orders/{order}/status', [AdminDashboardController::class, 'orderUpdateStatus'])->name('orders.update-status');

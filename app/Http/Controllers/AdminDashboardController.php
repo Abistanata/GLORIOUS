@@ -185,15 +185,38 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * Update order status (pending, confirmed, processed, cancelled).
+     * Update order status utama + status pengiriman (layer kedua).
      */
     public function orderUpdateStatus(Request $request, Order $order)
     {
-        $request->validate(['status' => 'required|in:pending,confirmed,processed,cancelled']);
-        $order->update([
-            'status' => $request->status,
-            'confirmed_at' => $request->status === 'confirmed' || $request->status === 'processed' ? now() : $order->confirmed_at,
+        $validated = $request->validate([
+            'status'           => 'required|in:pending,confirmed,processed,shipping,completed,cancelled',
+            'shipping_status'  => 'nullable|string|in:Dikirim,Diterima,Diambil di toko,Sudah diambil',
         ]);
+
+        $status = $validated['status'];
+
+        // Aturan bisnis:
+        // - Jika status != shipping → shipping_status harus null.
+        // - Jika status == shipping → shipping_status wajib valid (tidak null).
+        $shippingStatus = null;
+        if ($status === 'shipping') {
+            if (empty($validated['shipping_status'])) {
+                return back()->withErrors([
+                    'shipping_status' => 'Status pengiriman wajib diisi ketika status pesanan adalah pengiriman.',
+                ])->withInput();
+            }
+            $shippingStatus = $validated['shipping_status'];
+        }
+
+        $order->update([
+            'status'          => $status,
+            'shipping_status' => $shippingStatus,
+            'confirmed_at'    => in_array($status, ['confirmed', 'processed', 'shipping', 'completed'], true)
+                ? now()
+                : $order->confirmed_at,
+        ]);
+
         return redirect()->back()->with('success', 'Status pesanan diperbarui.');
     }
 

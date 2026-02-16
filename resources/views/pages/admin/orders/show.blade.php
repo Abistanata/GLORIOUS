@@ -91,24 +91,49 @@
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     <i class="fas fa-flag mr-2"></i>Status
                 </h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Tanggal: {{ $order->created_at->format('d M Y H:i') }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    Tanggal: {{ $order->created_at->format('d M Y H:i') }}
+                </p>
                 <form action="{{ route('admin.orders.update-status', $order) }}" method="POST">
                     @csrf
                     @method('PUT')
-                    <div class="flex flex-wrap items-center gap-3">
-                        <select name="status" class="flex-1 min-w-[140px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                            <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Menunggu</option>
-                            <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Dikonfirmasi</option>
-                            <option value="processed" {{ $order->status === 'processed' ? 'selected' : '' }}>Diproses</option>
-                            <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
-                        </select>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <div class="space-y-3">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <select name="status"
+                                    class="flex-1 min-w-[140px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Menunggu</option>
+                                <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Dikonfirmasi</option>
+                                <option value="processed" {{ $order->status === 'processed' ? 'selected' : '' }}>Diproses</option>
+                                <option value="shipping" {{ $order->status === 'shipping' ? 'selected' : '' }}>Pengiriman</option>
+                                <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Selesai</option>
+                                <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-300">
+                                Status Pengiriman <span class="text-[10px] text-gray-400">(hanya saat status = Pengiriman)</span>
+                            </label>
+                            <select name="shipping_status"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="">- Tidak ada / Belum dikirim -</option>
+                                <option value="Dikirim" {{ $order->shipping_status === 'Dikirim' ? 'selected' : '' }}>Dikirim</option>
+                                <option value="Diterima" {{ $order->shipping_status === 'Diterima' ? 'selected' : '' }}>Diterima</option>
+                                <option value="Diambil di toko" {{ $order->shipping_status === 'Diambil di toko' ? 'selected' : '' }}>Diambil di toko</option>
+                                <option value="Sudah diambil" {{ $order->shipping_status === 'Sudah diambil' ? 'selected' : '' }}>Sudah diambil</option>
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                             Update
                         </button>
                     </div>
                 </form>
                 @if($order->confirmed_at)
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">Dikonfirmasi: {{ $order->confirmed_at->format('d M Y H:i') }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        Dikonfirmasi: {{ $order->confirmed_at->format('d M Y H:i') }}
+                    </p>
                 @endif
             </div>
         </div>

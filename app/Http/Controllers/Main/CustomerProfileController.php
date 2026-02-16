@@ -33,10 +33,13 @@ class CustomerProfileController extends Controller
         }
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string|max:500',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name'    => ['required', 'string', 'max:255'],
+            // Nomor telepon wajib unik (setelah dinormalisasi di mutator User::setPhoneAttribute)
+            'phone'   => ['required', 'string', 'max:20', 'unique:users,phone,'.$user->id],
+            'address' => ['required', 'string', 'max:500'],
+            'photo'   => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+        ], [
+            'phone.unique' => 'Nomor telepon sudah digunakan oleh akun lain.',
         ]);
 
         $user->name = $request->name;

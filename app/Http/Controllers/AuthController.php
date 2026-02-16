@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Http\RedirectResponse;
 
 class AuthController extends Controller
 {
@@ -133,6 +134,22 @@ class AuthController extends Controller
                 ->withErrors(['error' => 'Terjadi kesalahan sistem.'])
                 ->with('error', 'Login gagal. Silakan coba lagi nanti.');
         }
+    }
+
+    /**
+     * Redirect ke halaman otorisasi Google (Socialite).
+     */
+    public function redirectToGoogle(Request $request): RedirectResponse
+    {
+        return redirect()->away($this->auth->getGoogleRedirectUrl());
+    }
+
+    /**
+     * Handle callback dari Google dan login via session web guard.
+     */
+    public function handleGoogleCallback(Request $request): RedirectResponse
+    {
+        return $this->auth->handleGoogleCallback();
     }
 
     // ======================== REGISTER METHOD ========================

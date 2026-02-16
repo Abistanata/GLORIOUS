@@ -25,6 +25,8 @@
                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Menunggu</option>
                         <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Dikonfirmasi</option>
                         <option value="processed" {{ request('status') === 'processed' ? 'selected' : '' }}>Diproses</option>
+                        <option value="shipping" {{ request('status') === 'shipping' ? 'selected' : '' }}>Pengiriman</option>
+                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Selesai</option>
                         <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
                     </select>
                 </div>
@@ -73,9 +75,11 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
                                     $statusConfig = [
-                                        'pending' => ['label' => 'Menunggu', 'class' => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'],
+                                        'pending'   => ['label' => 'Menunggu',   'class' => 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'],
                                         'confirmed' => ['label' => 'Dikonfirmasi', 'class' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'],
-                                        'processed' => ['label' => 'Diproses', 'class' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'],
+                                        'processed' => ['label' => 'Diproses',   'class' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'],
+                                        'shipping'  => ['label' => 'Pengiriman', 'class' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'],
+                                        'completed' => ['label' => 'Selesai',    'class' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'],
                                         'cancelled' => ['label' => 'Dibatalkan', 'class' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'],
                                     ];
                                     $cfg = $statusConfig[$order->status] ?? $statusConfig['pending'];

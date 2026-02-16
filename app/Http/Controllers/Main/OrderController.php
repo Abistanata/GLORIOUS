@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Main;
 
 use App\Http\Controllers\Controller;
+use App\Events\OrderCreated;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Cart;
@@ -132,6 +133,8 @@ class OrderController extends Controller
             ]);
 
             DB::commit();
+
+            event(new OrderCreated($order->load('items.product', 'user')));
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Order create single product failed: ' . $e->getMessage(), ['exception' => $e, 'user_id' => $user->id, 'product_id' => $productId]);
@@ -208,6 +211,9 @@ class OrderController extends Controller
 
             Cart::whereIn('id', $cartIdsToDelete)->delete();
             DB::commit();
+
+            // Trigger event setelah order berhasil dibuat
+            event(new OrderCreated($order->load('items.product', 'user')));
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Order create from cart failed: ' . $e->getMessage(), ['exception' => $e, 'user_id' => $user->id, 'cart_ids' => $cartIds]);

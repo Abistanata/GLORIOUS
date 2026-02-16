@@ -19,11 +19,13 @@ class User extends Authenticatable
         'password',
         'profile_photo_path',
         'role',
+        'google_id',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'google_id',
     ];
 
     protected $attributes = [
@@ -121,6 +123,14 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Pesanan terakhir (berdasarkan created_at).
+     */
+    public function latestOrder()
+    {
+        return $this->hasOne(Order::class)->latestOfMany();
     }
 
     // =========== MUTATORS & ACCESSORS ===========

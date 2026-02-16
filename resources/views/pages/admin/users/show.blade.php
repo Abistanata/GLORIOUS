@@ -111,18 +111,48 @@
                                         <li>{{ $oi->product->name ?? 'Produk' }} x{{ $oi->quantity }} — Rp {{ number_format($oi->subtotal, 0, ',', '.') }}</li>
                                     @endforeach
                                 </ul>
-                                <div class="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                                    <span class="font-semibold text-gray-900 dark:text-white">Total: Rp {{ number_format($order->total, 0, ',', '.') }}</span>
-                                    <form action="{{ route('admin.orders.update-status', $order) }}" method="POST" class="inline-flex items-center gap-2">
-                                        @csrf
-                                        @method('PUT')
-                                        <select name="status" class="text-sm rounded border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white" onchange="this.form.submit()">
-                                            <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Menunggu</option>
-                                            <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Dikonfirmasi</option>
-                                            <option value="processed" {{ $order->status === 'processed' ? 'selected' : '' }}>Diproses</option>
-                                            <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
-                                        </select>
-                                    </form>
+                                <div class="flex flex-col gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                                    <div class="flex flex-wrap justify-between items-center gap-2">
+                                        <span class="font-semibold text-gray-900 dark:text-white">
+                                            Total: Rp {{ number_format($order->total, 0, ',', '.') }}
+                                        </span>
+                                        <form action="{{ route('admin.orders.update-status', $order) }}" method="POST"
+                                              class="inline-flex items-center gap-2">
+                                            @csrf
+                                            @method('PUT')
+                                            <select name="status"
+                                                    class="text-sm rounded border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                                <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Menunggu</option>
+                                                <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Dikonfirmasi</option>
+                                                <option value="processed" {{ $order->status === 'processed' ? 'selected' : '' }}>Diproses</option>
+                                                <option value="shipping" {{ $order->status === 'shipping' ? 'selected' : '' }}>Pengiriman</option>
+                                                <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Selesai</option>
+                                                <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
+                                            </select>
+                                        </form>
+                                    </div>
+                                    @if($order->status === 'shipping')
+                                        <div class="flex flex-wrap justify-between items-center gap-2">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                Status Pengiriman:
+                                            </span>
+                                            <form action="{{ route('admin.orders.update-status', $order) }}" method="POST"
+                                                  class="inline-flex items-center gap-2">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="status" value="shipping">
+                                                <select name="shipping_status"
+                                                        class="text-xs rounded border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                        onchange="this.form.submit()">
+                                                    <option value="">Pilih...</option>
+                                                    <option value="Dikirim" {{ $order->shipping_status === 'Dikirim' ? 'selected' : '' }}>Dikirim</option>
+                                                    <option value="Diterima" {{ $order->shipping_status === 'Diterima' ? 'selected' : '' }}>Diterima</option>
+                                                    <option value="Diambil di toko" {{ $order->shipping_status === 'Diambil di toko' ? 'selected' : '' }}>Diambil di toko</option>
+                                                    <option value="Sudah diambil" {{ $order->shipping_status === 'Sudah diambil' ? 'selected' : '' }}>Sudah diambil</option>
+                                                </select>
+                                            </form>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
