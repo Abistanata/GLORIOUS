@@ -701,7 +701,7 @@
             </div>
             
             <div class="cta-buttons fade-in">
-                <a href="{{ route('main.services.index') }}" class="btn-primary">
+                <a href="{{ url('/') }}#services" class="btn-primary">
                     <i class="fas fa-tools mr-2"></i> Jelajahi Layanan
                 </a>
                 <!-- PERUBAHAN DI SINI: Menggunakan anchor link ke section contact di home page -->

@@ -1,1631 +1,735 @@
 @extends('layouts.theme')
 
-@section('title', 'Home - Glorious Computer')
-
-@push('styles')
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Inter', sans-serif;
-    }
-
-    html {
-        scroll-behavior: smooth;
-    }
-
-    :root {
-        --primary: #FF6B00;
-        --primary-dark: #E05D00;
-        --primary-light: #FF8C42;
-        --secondary: #2D3748;
-        --dark: #121212;
-        --darker: #0A0A0A;
-        --light: #F5F5F5;
-        --gray: #8A8A8A;
-        --gray-light: #2A2A2A;
-        --card-dark: #171717;
-        --card-light: #1E1E1E;
-        --accent: #FF8C00;
-    }
-
-    body {
-        background-color: var(--darker);
-        color: var(--light);
-        line-height: 1.7;
-        overflow-x: hidden;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
-
-    .container {
-        max-width: 1280px;
-        margin: 0 auto;
-        padding: 0 24px;
-    }
-
-    /* Modern Hero Section */
-    .hero-modern {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        position: relative;
-        background: linear-gradient(135deg, #0A0A0A 0%, #141414 50%, #0A0A0A 100%);
-        overflow: hidden;
-    }
-
-    .hero-modern::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: 
-            radial-gradient(circle at 20% 80%, rgba(255, 107, 0, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(255, 107, 0, 0.08) 0%, transparent 50%);
-    }
-
-    .hero-content-modern {
-        max-width: 1200px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 2;
-        text-align: center;
-    }
-
-    .hero-badge {
-        display: inline-block;
-        background: linear-gradient(135deg, rgba(255, 107, 0, 0.15) 0%, rgba(255, 140, 66, 0.1) 100%);
-        color: var(--primary);
-        padding: 10px 24px;
-        border-radius: 24px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        margin-bottom: 30px;
-        border: 1px solid rgba(255, 107, 0, 0.3);
-        backdrop-filter: blur(10px);
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-    }
-
-    .hero-main-title-modern {
-        font-size: 4.5rem;
-        font-weight: 900;
-        margin-bottom: 24px;
-        line-height: 1.1;
-        letter-spacing: -0.02em;
-    }
-
-    .hero-main-title-modern .gradient-text {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: 0 4px 30px rgba(255, 107, 0, 0.2);
-    }
-
-    .hero-subtitle-modern {
-        font-size: 1.75rem;
-        font-weight: 600;
-        color: #E8E8E8;
-        margin-bottom: 16px;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-    }
-
-    .hero-tagline-modern {
-        font-size: 1.25rem;
-        font-weight: 500;
-        color: #B0B0B0;
-        margin-bottom: 48px;
-        max-width: 680px;
-        margin-left: auto;
-        margin-right: auto;
-        line-height: 1.8;
-        letter-spacing: 0.02em;
-    }
-
-    .hero-description-modern {
-        font-size: 2.2rem;
-        font-weight: 800;
-        margin-bottom: 32px;
-        line-height: 1.3;
-        background: linear-gradient(135deg, #FFFFFF 0%, #E0E0E0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .hero-description-modern span {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .hero-buttons-modern {
-        display: flex;
-        gap: 24px;
-        justify-content: center;
-        margin-bottom: 80px;
-        flex-wrap: wrap;
-    }
-
-    .cta-button-modern {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: white;
-        padding: 18px 48px;
-        border-radius: 32px;
-        font-weight: 700;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        border: none;
-        box-shadow: 0 12px 40px rgba(255, 107, 0, 0.4);
-        font-size: 1.15rem;
-        position: relative;
-        overflow: hidden;
-        letter-spacing: 0.03em;
-    }
-
-    .cta-button-modern::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, 
-            transparent, 
-            rgba(255, 255, 255, 0.25), 
-            transparent);
-        transition: left 0.7s;
-    }
-
-    .cta-button-modern:hover::before {
-        left: 100%;
-    }
-
-    .cta-button-modern:hover {
-        background: linear-gradient(135deg, var(--primary-dark) 0%, #D95300 100%);
-        transform: translateY(-4px) scale(1.02);
-        box-shadow: 0 16px 50px rgba(255, 107, 0, 0.5);
-    }
-
-    .cta-button-secondary-modern {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(15px);
-        color: white;
-        padding: 18px 48px;
-        border-radius: 32px;
-        font-weight: 700;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        font-size: 1.15rem;
-        letter-spacing: 0.03em;
-    }
-
-    .cta-button-secondary-modern:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-4px);
-        box-shadow: 0 12px 35px rgba(255, 255, 255, 0.15);
-        border-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .hero-stats-modern {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 30px;
-        margin-top: 80px;
-        max-width: 1000px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .hero-stat-modern {
-        text-align: center;
-        padding: 32px 24px;
-        background: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(45, 45, 45, 0.7) 100%);
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(15px);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .hero-stat-modern:hover {
-        transform: translateY(-8px) scale(1.03);
-        border-color: rgba(255, 107, 0, 0.4);
-        box-shadow: 0 20px 50px rgba(255, 107, 0, 0.2);
-    }
-
-    .hero-stat-number-modern {
-        font-size: 3rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        display: block;
-        margin-bottom: 12px;
-        letter-spacing: -0.02em;
-    }
-
-    .hero-stat-label-modern {
-        color: #A0A0A0;
-        font-size: 1rem;
-        font-weight: 600;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-    }
-
-    /* Floating Elements */
-    .floating-elements {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 1;
-    }
-
-    .floating-element {
-        position: absolute;
-        background: linear-gradient(135deg, var(--primary) 0%, transparent 70%);
-        border-radius: 50%;
-        opacity: 0.08;
-        animation: floatElement 10s ease-in-out infinite;
-    }
-
-    /* Section Styles */
-    section {
-        padding: 120px 0;
-    }
-
-    .section-header {
-        text-align: center;
-        margin-bottom: 80px;
-    }
-
-    .section-title {
-        font-size: 3.5rem;
-        font-weight: 900;
-        margin-bottom: 24px;
-        position: relative;
-        display: inline-block;
-        background: linear-gradient(135deg, #FFFFFF 0%, #D0D0D0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -0.02em;
-    }
-
-    .section-title::after {
-        content: '';
-        position: absolute;
-        bottom: -20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100px;
-        height: 5px;
-        background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
-        border-radius: 3px;
-        box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
-    }
-
-    .section-subtitle {
-        color: #B0B0B0;
-        font-size: 1.3rem;
-        max-width: 700px;
-        margin: 32px auto 0;
-        line-height: 1.8;
-        font-weight: 500;
-        letter-spacing: 0.02em;
-    }
-
-    /* About Section */
-    .about-section {
-        background: linear-gradient(135deg, #0A0A0A 0%, #161616 50%, #0A0A0A 100%);
-        position: relative;
-    }
-
-    .about-content {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 80px;
-        align-items: center;
-    }
-
-    .about-text h2 {
-        font-size: 2.8rem;
-        margin-bottom: 32px;
-        background: linear-gradient(135deg, #FFFFFF 0%, #CCCCCC 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-    }
-
-    .about-text p {
-        margin-bottom: 24px;
-        color: #C8C8C8;
-        line-height: 1.8;
-        font-size: 1.15rem;
-        font-weight: 400;
-    }
-
-    .about-features {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        margin-top: 40px;
-    }
-
-    .about-feature {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-    }
-
-    .about-feature i {
-        color: var(--primary);
-        font-size: 1.2rem;
-        margin-top: 4px;
-    }
-
-    .about-feature span {
-        color: #C8C8C8;
-        line-height: 1.6;
-        font-weight: 500;
-    }
-
-    .about-image {
-        position: relative;
-    }
-
-    .about-image img {
-        width: 100%;
-        border-radius: 20px;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .about-image:hover img {
-        transform: scale(1.02);
-    }
-
-    /* Stats Grid */
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 30px;
-        margin-top: 60px;
-    }
-
-    .stat-item {
-        text-align: center;
-        padding: 40px 30px;
-        background: linear-gradient(135deg, #1E1E1E 0%, #2A2A2A 100%);
-        border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .stat-item:hover {
-        transform: translateY(-8px) scale(1.03);
-        border-color: rgba(255, 107, 0, 0.3);
-        box-shadow: 0 20px 60px rgba(255, 107, 0, 0.2);
-    }
-
-    .stat-number {
-        font-size: 3.5rem;
-        font-weight: 900;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        display: block;
-        margin-bottom: 12px;
-        letter-spacing: -0.03em;
-    }
-
-    .stat-label {
-        color: #A0A0A0;
-        font-size: 1.1rem;
-        font-weight: 600;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-    }
-
-    /* Services Section */
-    .services-section {
-        background: linear-gradient(135deg, #121212 0%, #1C1C1C 50%, #121212 100%);
-        position: relative;
-    }
-
-    .services-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 35px;
-        align-items: stretch;
-    }
-
-    .service-card {
-        background: linear-gradient(135deg, var(--card-dark) 0%, var(--card-light) 100%);
-        padding: 48px 35px;
-        border-radius: 20px;
-        text-align: center;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
-        position: relative;
-        overflow: hidden;
-        min-height: 400px;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    .service-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, 
-            transparent, 
-            rgba(255, 107, 0, 0.15), 
-            transparent);
-        transition: left 0.8s;
-    }
-
-    .service-card:hover::before {
-        left: 100%;
-    }
-
-    .service-card:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 25px 60px rgba(255, 107, 0, 0.2);
-        border-color: rgba(255, 107, 0, 0.4);
-    }
-
-    .service-icon {
-        width: 90px;
-        height: 90px;
-        background: linear-gradient(135deg, 
-            rgba(255, 107, 0, 0.2) 0%, 
-            rgba(255, 140, 66, 0.15) 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 32px;
-        border: 2px solid rgba(255, 107, 0, 0.3);
-        transition: all 0.4s;
-    }
-
-    .service-card:hover .service-icon {
-        background: linear-gradient(135deg, 
-            rgba(255, 107, 0, 0.25) 0%, 
-            rgba(255, 140, 66, 0.2) 100%);
-        border-color: rgba(255, 107, 0, 0.5);
-        transform: scale(1.1);
-    }
-
-    .service-icon i {
-        font-size: 2.5rem;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .service-title {
-        font-size: 1.75rem;
-        margin-bottom: 20px;
-        background: linear-gradient(135deg, #FFFFFF 0%, #E0E0E0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-weight: 800;
-        letter-spacing: -0.01em;
-    }
-
-    .service-description {
-        color: #B8B8B8;
-        line-height: 1.8;
-        font-size: 1.1rem;
-        margin-bottom: 24px;
-        font-weight: 400;
-        flex: 1;
-    }
-
-    .service-features {
-        list-style: none;
-        text-align: left;
-    }
-
-    .service-features li {
-        color: #B8B8B8;
-        margin-bottom: 12px;
-        display: flex;
-        align-items: center;
-        font-weight: 500;
-        padding-left: 8px;
-        transition: all 0.3s;
-    }
-
-    .service-features li:hover {
-        color: #E0E0E0;
-        transform: translateX(5px);
-    }
-
-    .service-features i {
-        color: var(--primary);
-        margin-right: 12px;
-        font-size: 1rem;
-        min-width: 20px;
-    }
-
-    /* Products Section Styling */
-    .product-card {
-        background: linear-gradient(135deg, var(--card-dark) 0%, var(--card-light) 100%);
-        border-radius: 20px;
-        overflow: hidden;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        position: relative;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .product-card:hover {
-        transform: translateY(-8px) scale(1.02);
-        border-color: rgba(255, 107, 0, 0.4);
-        box-shadow: 0 25px 60px rgba(255, 107, 0, 0.2);
-    }
-
-    .product-image-container {
-        height: 240px;
-        overflow: hidden;
-        position: relative;
-        background: linear-gradient(135deg, #2A2A2A 0%, #1E1E1E 100%);
-    }
-
-    .product-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .product-card:hover .product-image {
-        transform: scale(1.1);
-    }
-
-    .product-badge {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        padding: 6px 16px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-    }
-
-    .badge-available {
-        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-        color: white;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-    }
-
-    .badge-low {
-        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-        color: white;
-        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-    }
-
-    .badge-out {
-        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-        color: white;
-        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-    }
-
-    .product-content {
-        padding: 28px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .product-category {
-        color: var(--primary);
-        font-size: 0.95rem;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        margin-bottom: 12px;
-        display: inline-block;
-    }
-
-    .product-title {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: white;
-        margin-bottom: 16px;
-        line-height: 1.3;
-        letter-spacing: -0.01em;
-    }
-
-    .product-specs {
-        color: #B8B8B8;
-        font-size: 0.95rem;
-        line-height: 1.6;
-        margin-bottom: 16px;
-        flex: 1;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-    }
-
-    .product-stock {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        margin: 16px 0;
-    }
-
-    .stock-label {
-        color: #A0A0A0;
-        font-size: 0.95rem;
-        font-weight: 600;
-    }
-
-    .stock-value {
-        color: white;
-        font-size: 1.1rem;
-        font-weight: 800;
-    }
-
-    .product-pricing {
-        margin-top: auto;
-    }
-
-    .price-display {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
-    }
-
-    .current-price {
-        font-size: 1.75rem;
-        font-weight: 900;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .original-price {
-        font-size: 1.1rem;
-        color: #8A8A8A;
-        text-decoration: line-through;
-        font-weight: 500;
-    }
-
-    .discount-badge {
-        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 0.9rem;
-        font-weight: 700;
-        margin-left: auto;
-    }
-
-    .product-actions {
-        display: flex;
-        gap: 12px;
-    }
-
-    .btn-detail {
-        flex: 1;
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 14px 24px;
-        border-radius: 12px;
-        font-weight: 700;
-        transition: all 0.3s;
-        text-align: center;
-        text-decoration: none;
-    }
-
-    .btn-detail:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
-    }
-
-    .btn-buy {
-        flex: 1;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: white;
-        border: none;
-        padding: 14px 24px;
-        border-radius: 12px;
-        font-weight: 700;
-        transition: all 0.3s;
-        text-align: center;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .btn-buy:hover {
-        background: linear-gradient(135deg, var(--primary-dark) 0%, #D95300 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(255, 107, 0, 0.3);
-    }
-
-    .btn-disabled {
-        background: linear-gradient(135deg, #4B5563 0%, #374151 100%);
-        cursor: not-allowed;
-        opacity: 0.7;
-    }
-
-    .btn-disabled:hover {
-        transform: none;
-        box-shadow: none;
-    }
-
-    /* Process Section */
-    .process-step {
-        position: relative;
-        text-align: center;
-    }
-
-    .process-connector {
-        position: absolute;
-        top: 40px;
-        right: -40px;
-        width: 80px;
-        height: 2px;
-        background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
-    }
-
-    /* Testimonials Section */
-    .testimonial-card {
-        background: linear-gradient(135deg, var(--card-dark) 0%, var(--card-light) 100%);
-        border-radius: 20px;
-        padding: 40px 32px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .testimonial-card:hover {
-        transform: translateY(-8px);
-        border-color: rgba(255, 107, 0, 0.3);
-        box-shadow: 0 20px 50px rgba(255, 107, 0, 0.15);
-    }
-
-    .testimonial-quote {
-        font-size: 3.5rem;
-        color: var(--primary);
-        opacity: 0.3;
-        position: absolute;
-        top: 20px;
-        left: 20px;
-    }
-
-    /* Contact Section */
-    .contact-card {
-        background: linear-gradient(135deg, var(--card-dark) 0%, var(--card-light) 100%);
-        border-radius: 20px;
-        padding: 32px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .contact-card:hover {
-        transform: translateY(-5px);
-        border-color: rgba(255, 107, 0, 0.3);
-        box-shadow: 0 15px 40px rgba(255, 107, 0, 0.15);
-    }
-
-    /* New CSS for enhanced product cards */
-    .discount-badge-large {
-        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-        color: white;
-        padding: 6px 16px;
-        border-radius: 12px;
-        font-size: 0.95rem;
-        font-weight: 800;
-        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-    }
-
-    .condition-badge {
-        background: rgba(255, 107, 0, 0.9);
-        color: white;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-
-    .stock-progress {
-        width: 100%;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 2px;
-        overflow: hidden;
-    }
-
-    .stock-progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #10B981 0%, #34D399 100%);
-        transition: width 0.5s ease;
-    }
-
-    .info-chip {
-        display: inline-flex;
-        align-items: center;
-        background: rgba(59, 130, 246, 0.1);
-        color: #93C5FD;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 500;
-    }
-
-    .info-chip i {
-        margin-right: 4px;
-        font-size: 0.7rem;
-    }
-
-    .btn-whatsapp {
-        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        font-weight: 700;
-    }
-
-    .btn-whatsapp:hover {
-        background: linear-gradient(135deg, #128C7E 0%, #0D6E5F 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
-    }
-
-    /* Responsive Design */
-    @media (max-width: 1200px) {
-        .hero-main-title-modern {
-            font-size: 3.75rem;
-        }
-        
-        .services-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-        }
-    }
-
-    @media (max-width: 992px) {
-        .hero-main-title-modern {
-            font-size: 3.25rem;
-        }
-        
-        .hero-buttons-modern {
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .cta-button-modern,
-        .cta-button-secondary-modern {
-            width: 280px;
-            justify-content: center;
-        }
-        
-        .about-content {
-            grid-template-columns: 1fr;
-            gap: 50px;
-        }
-        
-        .section-title {
-            font-size: 3rem;
-        }
-        
-        .hero-stats-modern {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-        }
-        
-        .process-connector {
-            display: none;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .hero-main-title-modern {
-            font-size: 2.75rem;
-        }
-        
-        .hero-subtitle-modern {
-            font-size: 1.5rem;
-        }
-        
-        .hero-tagline-modern {
-            font-size: 1.1rem;
-        }
-        
-        .services-grid {
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-        
-        .section-title {
-            font-size: 2.5rem;
-        }
-        
-        .hero-stats-modern {
-            grid-template-columns: 1fr;
-            max-width: 400px;
-        }
-        
-        .stats-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        
-        .about-features {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .hero-main-title-modern {
-            font-size: 2.25rem;
-        }
-        
-        .cta-button-modern,
-        .cta-button-secondary-modern {
-            padding: 16px 36px;
-            font-size: 1.05rem;
-        }
-        
-        .section-title {
-            font-size: 2rem;
-        }
-        
-        .product-actions {
-            flex-direction: column;
-        }
-    }
-    </style>
-@endpush
+@section('title', 'Home - Glorious Computer | Solusi Teknologi Premium')
 
 @section('content')
-<div class="bg-darker text-light font-inter">
-    <!-- Modern Hero Section -->
-    <section class="hero-modern">
-        <div class="floating-elements">
-            <div class="floating-element" style="width: 120px; height: 120px; top: 20%; left: 10%; animation-delay: 0s;"></div>
-            <div class="floating-element" style="width: 80px; height: 80px; top: 60%; right: 10%; animation-delay: 2s;"></div>
-            <div class="floating-element" style="width: 60px; height: 60px; bottom: 20%; left: 20%; animation-delay: 4s;"></div>
-        </div>
-        
-        <div class="container">
-            <div class="hero-content-modern">
-                <div class="hero-badge">
-                    <i class="fas fa-star mr-2"></i> Solusi Teknologi Terpercaya
-                </div>
-                
-                <h1 class="hero-main-title-modern">
-                    <span class="gradient-text">GLORIOUS COMPUTER</span>
-                </h1>
-                
-                <p class="hero-subtitle-modern">PENJUALAN & SERVIS PROFESIONAL</p>
-                <p class="hero-tagline-modern">LAPTOP • KOMPUTER • PRINTER</p>
-                
-                <h2 class="hero-description-modern">
-                    Solusi <span>Teknologi</span> & <span>Service</span> Terbaik
-                </h2>
-                
-                <p class="hero-tagline-modern">
-                    Partner terpercaya untuk kebutuhan komputer, laptop, printer dan servis. 
-                    Kami hadir untuk mendukung bisnis & personal Anda dengan layanan profesional 
-                    dan solusi teknologi terdepan.
-                </p>
-                
-                <div class="hero-buttons-modern">
-                    <a href="#services" class="cta-button-modern">
-                        <i class="fas fa-tools mr-3"></i> Jelajahi Layanan
-                    </a>
-                    <a href="#contact" class="cta-button-secondary-modern">
-                        <i class="fas fa-phone-alt mr-3"></i> Hubungi Kami
-                    </a>
-                </div>
-                
-                <div class="hero-stats-modern">
-                    <div class="hero-stat-modern">
-                        <span class="hero-stat-number-modern">10+</span>
-                        <span class="hero-stat-label-modern">Tahun Pengalaman</span>
-                    </div>
-                    <div class="hero-stat-modern">
-                        <span class="hero-stat-number-modern">500+</span>
-                        <span class="hero-stat-label-modern">Klien Puas</span>
-                    </div>
-                    <div class="hero-stat-modern">
-                        <span class="hero-stat-number-modern">1000+</span>
-                        <span class="hero-stat-label-modern">Perangkat Diperbaiki</span>
-                    </div>
-                    <div class="hero-stat-modern">
-                        <span class="hero-stat-number-modern">24/7</span>
-                        <span class="hero-stat-label-modern">Support Aktif</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- About Section -->
-    <section id="about" class="about-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    Tentang Kami
-                </h2>
-                <p class="section-subtitle">
-                    Komitmen kami: solusi IT terpercaya untuk individu maupun bisnis, dengan tim teknisi berpengalaman dan layanan terstandar.
-                </p>
-            </div>
-            
-            <div class="about-content">
-                <div class="about-text">
-                    <h2>Mengapa Memilih Kami?</h2>
-                    <p>
-                        Dengan tim teknisi yang berpengalaman dan bersertifikat, kami memberikan solusi terbaik untuk semua kebutuhan teknologi Anda. Kami memahami bahwa setiap masalah teknologi membutuhkan pendekatan yang tepat.
+{{-- HERO --}}
+<section class="relative min-h-screen flex items-center overflow-hidden bg-dark-800 pt-20" id="hero">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 right-1/4 w-96 h-96 bg-primary-500 opacity-10 blur-3xl rounded-full"></div>
+        <div class="absolute bottom-1/4 left-1/4 w-80 h-80 bg-primary-400 opacity-5 blur-3xl rounded-full"></div>
+    </div>
+    <div class="absolute inset-0 opacity-5 pointer-events-none"
+         style="background-image: linear-gradient(rgba(255,107,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,107,0,0.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+            {{-- LEFT --}}
+            <div class="space-y-8"
+                 x-data="{ show: false }"
+                 x-init="setTimeout(() => show = true, 100)"
+                 x-show="show"
+                 x-transition:enter="transition ease-out duration-700"
+                 x-transition:enter-start="opacity-0 translate-y-8"
+                 x-transition:enter-end="opacity-1 translate-y-0">
+
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 backdrop-blur-sm">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
+                    </span>
+                    <span class="text-sm font-medium text-primary-300">Service &amp; Jual Beli Komputer Terpercaya</span>
+                </div>
+
+                <div class="space-y-4">
+                    <h1 class="font-heading font-extrabold text-white leading-tight tracking-tight">
+                        <span class="block text-5xl sm:text-6xl lg:text-7xl">Solusi Lengkap</span>
+                        <span class="block text-5xl sm:text-6xl lg:text-7xl mt-2">
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-primary-500 to-primary-600">
+                                Komputer Anda
+                            </span>
+                        </span>
+                    </h1>
+                    <p class="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-2xl">
+                        Service PC, laptop &amp; printer profesional. Jual beli laptop dan PC bekas berkualitas tinggi
+                        dengan harga terbaik dan garansi terpercaya di Purwokerto.
                     </p>
-                    <div class="about-features">
-                        <div class="about-feature">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Teknisi berpengalaman dan bersertifikat</span>
-                        </div>
-                        <div class="about-feature">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Garansi untuk setiap perbaikan dan produk</span>
-                        </div>
-                        <div class="about-feature">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Layanan cepat dan harga transparan</span>
-                        </div>
-                        <div class="about-feature">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Support 24/7 untuk kebutuhan mendesak</span>
-                        </div>
-                    </div>
                 </div>
-                <div class="about-image">
-                    <img src="images/background.jpg" alt="Workshop Kami">
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Services Section -->
-    <section id="services" class="services-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    Layanan Kami
-                </h2>
-                <p class="section-subtitle">
-                    Berbagai solusi teknologi terbaik untuk memenuhi kebutuhan perangkat komputer Anda
-                </p>
-            </div>
-            
-            <div class="services-grid">
-                <!-- Service 1 -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-laptop"></i>
-                    </div>
-                    <h3 class="service-title">Service Laptop & PC</h3>
-                    <p class="service-description">
-                        Layanan perbaikan dan perawatan lengkap untuk laptop dan komputer semua merk.
-                    </p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i>Diagnosa dan perbaikan hardware</li>
-                        <li><i class="fas fa-check"></i>Penggantian Sparepart</li>
-                        <li><i class="fas fa-check"></i>Optimasi sistem dan performa</li>
-                        <li><i class="fas fa-check"></i>Perbaikan engsel & speaker laptop</li>
-                        <li><i class="fas fa-check"></i>Perbaikan Laptop mati & Motherboard</li>
-                        <li><i class="fas fa-check"></i>Upgrade performa laptop</li>
-                    </ul>
-                </div>
-                
-                <!-- Service 2 -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-download"></i>
-                    </div>
-                    <h3 class="service-title">Install Software</h3>
-                    <p class="service-description">
-                        Instalasi software, update sistem operasi, dan konfigurasi perangkat lunak.
-                    </p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i>Instalasi Windows & Update</li>
-                        <li><i class="fas fa-check"></i>Microsoft Office & Productivity Tools</li>
-                        <li><i class="fas fa-check"></i>Browser & Software Pendukung</li>
-                        <li><i class="fas fa-check"></i>Software keamanan & antivirus</li>
-                    </ul>
-                </div>
-                
-                <!-- Service 3 -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-print"></i>
-                    </div>
-                    <h3 class="service-title">Perbaikan Printer</h3>
-                    <p class="service-description">
-                        Servis lengkap printer inkjet, laserjet, dotmatrik untuk hasil optimal.
-                    </p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i>Perbaikan hasil cetak</li>
-                        <li><i class="fas fa-check"></i>Reset Counter</li>
-                        <li><i class="fas fa-check"></i>Paper jam & kertas tidak lancar</li>
-                        <li><i class="fas fa-check"></i>Normalisasi kinerja printer</li>
-                    </ul>
-                </div>
-                
-                <!-- Service 4 -->
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-microchip"></i>
-                    </div>
-                    <h3 class="service-title">Upgrade Hardware</h3>
-                    <p class="service-description">
-                        Upgrade komponen hardware untuk meningkatkan performa perangkat Anda.
-                    </p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i>Upgrade SSD</li>
-                        <li><i class="fas fa-check"></i>Upgrade RAM</li>
-                        <li><i class="fas fa-check"></i>Pemasangan kartu grafis (VGA)</li>
-                        <li><i class="fas fa-check"></i>Optimasi performa gaming & desain</li>
-                        <li><i class="fas fa-check"></i>Custom build sesuai kebutuhan</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-     <!-- Process Section -->
-    <section class="py-20 px-4 bg-dark">
-        <div class="container mx-auto max-w-6xl">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-heading font-bold mb-4 text-light">
-                    Proses Layanan <span class="gradient-text">Terstandar</span>
-                </h2>
-                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
-                    Kami mengikuti proses yang sistematis untuk memastikan kualitas terbaik
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-                <!-- Connecting Line -->
-                <div class="hidden md:block absolute top-12 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-primary/50 to-primary/20 z-0"></div>
-                
-                <div class="relative z-10">
-                    <div class="w-24 h-24 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow">
-                        <i class="fas fa-comments text-3xl text-white"></i>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-light mb-2">Konsultasi</div>
-                        <p class="text-gray-400">Diskusikan kebutuhan dan masalah perangkat Anda</p>
-                    </div>
-                </div>
-                
-                <div class="relative z-10">
-                    <div class="w-24 h-24 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow">
-                        <i class="fas fa-search text-3xl text-white"></i>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-light mb-2">Diagnosa</div>
-                        <p class="text-gray-400">Analisa mendalam untuk identifikasi masalah</p>
-                    </div>
-                </div>
-                
-                <div class="relative z-10">
-                    <div class="w-24 h-24 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow">
-                        <i class="fas fa-tools text-3xl text-white"></i>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-light mb-2">Perbaikan</div>
-                        <p class="text-gray-400">Proses perbaikan dengan standar kualitas terbaik</p>
-                    </div>
-                </div>
-                
-                <div class="relative z-10">
-                    <div class="w-24 h-24 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-glow">
-                        <i class="fas fa-shield-alt text-3xl text-white"></i>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-light mb-2">Garansi</div>
-                        <p class="text-gray-400">Testing menyeluruh dengan garansi layanan</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Products Section -->
-    <section id="produk" class="py-20 bg-darker">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    Produk Unggulan
-                </h2>
-                <p class="section-subtitle">
-                    Tersedia Unit Second Laptop, PC, dan Printer dengan kualitas terjamin dan harga kompetitif
-                </p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @if(isset($products) && $products->count() > 0)
-                    @foreach($products as $product)
-                        <x-product-card :product="$product" />
-                    @endforeach
-                @else
-                    <!-- Empty State -->
-                    <div class="col-span-full text-center py-16">
-                        <div class="w-32 h-32 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <i class="fas fa-box-open text-4xl text-primary"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-4">Tidak Ada Produk</h3>
-                        <p class="text-gray-400 max-w-md mx-auto mb-8">
-                            Belum ada produk yang tersedia saat ini. Silakan kembali lagi nanti.
-                        </p>
-                    </div>
-                @endif
-            </div>
-
-            @if(isset($products) && $products->count() > 0)
-                <div class="text-center mt-16">
-                    <a href="{{ route('main.products.index') }}" 
-                       class="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl">
-                        Lihat Semua Produk
-                        <i class="fas fa-arrow-right ml-3 text-lg"></i>
-                    </a>
-                </div>
-            @endif
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section id="testimoni" class="py-20 bg-dark">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    Testimoni Klien
-                </h2>
-                <p class="section-subtitle">
-                    Pendapat dari pelanggan yang telah menggunakan layanan dan produk kami
-                </p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="testimonial-card">
-                    <div class="testimonial-quote">"</div>
-                    <p class="text-gray-300 mb-8 text-lg">
-                        "Pelayanan sangat memuaskan, teknisi profesional dan harga terjangkau. Recommended banget!"
-                    </p>
-                    <div class="flex items-center">
-                        <div class="w-14 h-14 bg-primary/20 rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-user text-xl text-primary"></i>
+                <div class="flex flex-wrap gap-6 text-sm">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                            <i class="fas fa-tools text-primary-400"></i>
                         </div>
                         <div>
-                            <div class="font-bold text-lg">Andi Wijaya</div>
-                            <div class="text-gray-400">Pengusaha</div>
+                            <p class="text-white font-semibold">Expert</p>
+                            <p class="text-gray-500 text-xs">Teknisi Berpengalaman</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                            <i class="fas fa-laptop text-primary-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">500+</p>
+                            <p class="text-gray-500 text-xs">Unit Terjual</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-lg bg-primary-500/10 flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-primary-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">Garansi</p>
+                            <p class="text-gray-500 text-xs">Setiap Pembelian</p>
                         </div>
                     </div>
                 </div>
-                
-                <div class="testimonial-card">
-                    <div class="testimonial-quote">"</div>
-                    <p class="text-gray-300 mb-8 text-lg">
-                        "Laptop saya rusak parah, tapi bisa diperbaiki dengan baik dan cepat. Terima kasih Glorious Computer!"
-                    </p>
-                    <div class="flex items-center">
-                        <div class="w-14 h-14 bg-primary/20 rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-user text-xl text-primary"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-lg">Budi Santoso</div>
-                            <div class="text-gray-400">Mahasiswa</div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{{ route('main.products.index') }}"
+                       class="group relative inline-flex items-center justify-center px-8 py-4 font-semibold text-white overflow-hidden rounded-xl transition-all duration-300 ease-out hover:scale-105">
+                        <span class="absolute inset-0 bg-gradient-to-r from-primary-600 via-primary-500 to-primary-600 bg-[length:200%_100%] transition-all duration-300 group-hover:bg-[length:100%_100%]"></span>
+                        <span class="relative flex items-center gap-2">
+                            <i class="fas fa-laptop"></i>
+                            Lihat Produk
+                            <i class="fas fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
+                        </span>
+                    </a>
+                    <a href="https://wa.me/6282133803940" target="_blank"
+                       class="group inline-flex items-center justify-center px-8 py-4 font-semibold text-gray-300 bg-dark-700 border border-dark-500 rounded-xl hover:border-green-500/50 hover:bg-dark-600 transition-all duration-300">
+                        <i class="fab fa-whatsapp mr-2 text-green-400 text-lg"></i>
+                        Hubungi via WhatsApp
+                        <i class="fas fa-external-link-alt ml-2 text-xs opacity-60"></i>
+                    </a>
+                </div>
+            </div>
+
+            {{-- RIGHT: service card visual --}}
+            <div class="relative"
+                 x-data="{ show: false }"
+                 x-init="setTimeout(() => show = true, 300)"
+                 x-show="show"
+                 x-transition:enter="transition ease-out duration-700 delay-200"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+                 x-transition:enter-end="opacity-1 scale-100 translate-y-0">
+
+                <div class="relative animate-float">
+                    <div class="relative bg-gradient-to-br from-dark-700 to-dark-800 rounded-3xl p-6 border border-dark-500 shadow-2xl">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-primary-600 to-primary-400 rounded-3xl blur opacity-20 transition duration-500"></div>
+                        <div class="relative space-y-4">
+
+                            {{-- Store header --}}
+                            <div class="flex items-center gap-3 pb-4 border-b border-dark-500">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                                    <i class="fas fa-store text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white font-bold text-sm">Glorious Computer</p>
+                                    <p class="text-gray-500 text-xs">Purwokerto, Jawa Tengah</p>
+                                </div>
+                                <div class="ml-auto flex items-center gap-1">
+                                    <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                                    <span class="text-green-400 text-xs font-medium">Buka</span>
+                                </div>
+                            </div>
+
+                            {{-- Service PC & Laptop --}}
+                            <div class="flex items-center gap-4 bg-dark-900/60 rounded-xl p-4 border border-dark-600 hover:border-primary-500/30 transition-colors">
+                                <div class="w-12 h-12 rounded-xl bg-primary-500/15 border border-primary-500/20 flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-laptop-medical text-primary-400 text-xl"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white font-semibold text-sm">Service PC &amp; Laptop</p>
+                                    <p class="text-gray-500 text-xs truncate">Diagnosa, ganti part, install ulang OS</p>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-600 text-xs"></i>
+                            </div>
+
+                            {{-- Service Printer --}}
+                            <div class="flex items-center gap-4 bg-dark-900/60 rounded-xl p-4 border border-dark-600 hover:border-blue-500/30 transition-colors">
+                                <div class="w-12 h-12 rounded-xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-print text-blue-400 text-xl"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white font-semibold text-sm">Service Printer</p>
+                                    <p class="text-gray-500 text-xs truncate">Servis &amp; isi ulang tinta / toner</p>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-600 text-xs"></i>
+                            </div>
+
+                            {{-- Jual Beli --}}
+                            <div class="flex items-center gap-4 bg-dark-900/60 rounded-xl p-4 border border-dark-600 hover:border-green-500/30 transition-colors">
+                                <div class="w-12 h-12 rounded-xl bg-green-500/15 border border-green-500/20 flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-exchange-alt text-green-400 text-xl"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white font-semibold text-sm">Jual Beli Laptop &amp; PC Bekas</p>
+                                    <p class="text-gray-500 text-xs truncate">Berkualitas, bergaransi, harga fair</p>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-600 text-xs"></i>
+                            </div>
+
+                            {{-- Hardware --}}
+                            <div class="flex items-center gap-4 bg-dark-900/60 rounded-xl p-4 border border-dark-600 hover:border-yellow-500/30 transition-colors">
+                                <div class="w-12 h-12 rounded-xl bg-yellow-500/15 border border-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-microchip text-yellow-400 text-xl"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white font-semibold text-sm">Jual Hardware &amp; Aksesoris</p>
+                                    <p class="text-gray-500 text-xs truncate">RAM, SSD, keyboard, mouse, dll</p>
+                                </div>
+                                <i class="fas fa-chevron-right text-gray-600 text-xs"></i>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="testimonial-quote">"</div>
-                    <p class="text-gray-300 mb-8 text-lg">
-                        "Sudah langganan service di sini, selalu puas dengan hasilnya. Support 24 jam juga sangat membantu."
-                    </p>
-                    <div class="flex items-center">
-                        <div class="w-14 h-14 bg-primary/20 rounded-full flex items-center justify-center mr-4">
-                            <i class="fas fa-user text-xl text-primary"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-lg">Citra Dewi</div>
-                            <div class="text-gray-400">Freelancer</div>
+
+                    <div class="absolute -bottom-6 -right-4 animate-float" style="animation-delay:0.5s;">
+                        <div class="bg-dark-700 border border-dark-500 rounded-xl p-3 shadow-xl backdrop-blur-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                                    <i class="fas fa-star text-yellow-400 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white text-xs font-bold">5 Tahun</p>
+                                    <p class="text-gray-500 text-xs">Berpengalaman</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Contact Section -->
-    <section id="kontak" class="py-20 px-4 bg-dark-lighter">
-        <div class="container mx-auto max-w-6xl">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-heading font-bold mb-4 text-light">
-                    Konsultasi <span class="gradient-text">Gratis</span>
-                </h2>
-                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
-                    Tim ahli kami siap membantu Anda. Hubungi kami untuk konsultasi tanpa biaya
-                </p>
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <a href="#stats" class="flex flex-col items-center gap-2 text-gray-500 hover:text-primary-400 transition-colors">
+            <span class="text-xs font-medium">Scroll untuk lanjut</span>
+            <i class="fas fa-chevron-down text-sm"></i>
+        </a>
+    </div>
+</section>
+
+{{-- STATISTICS --}}
+<section class="py-24 bg-gradient-to-b from-dark-800 via-dark-700/30 to-dark-800 relative overflow-hidden" id="stats">
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-primary-400/5 rounded-full blur-3xl"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center mb-16">
+            <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-300 text-sm font-medium mb-4">
+                <i class="fas fa-chart-line"></i> Dipercaya Ribuan Customer
+            </span>
+            <h2 class="text-4xl lg:text-5xl font-bold text-white mb-4">Angka Bicara Lebih Keras</h2>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+                Kepercayaan pelanggan adalah bukti nyata komitmen kami dalam memberikan produk dan layanan terbaik
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+
+            <div class="group"
+                 x-data="{ show:false, count:0 }"
+                 x-intersect="show=true; let t=500,d=2000,s=0,i=t/(d/16),r=setInterval(()=>{s+=i;count=Math.floor(s);if(s>=t){count=t;clearInterval(r);}},16);"
+                 x-show="show"
+                 x-transition:enter="transition ease-out duration-600 delay-100"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+                 x-transition:enter-end="opacity-1 scale-100 translate-y-0">
+                <div class="relative p-10 bg-gradient-to-br from-dark-700/60 to-dark-800/80 backdrop-blur-lg border border-primary-500/10 rounded-2xl text-center transition-all duration-300 hover:border-primary-500/30 hover:-translate-y-3">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-laptop text-4xl text-primary-400"></i>
+                    </div>
+                    <div class="text-5xl font-extrabold mb-3 gradient-text" x-text="count+'+'"></div>
+                    <div class="text-lg font-semibold text-white mb-2">Unit Terjual</div>
+                    <div class="text-sm text-gray-500">Laptop &amp; PC bekas berkualitas</div>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary-500 to-transparent opacity-0 group-hover:opacity-50 transition-opacity"></div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- Contact Info -->
-                <div class="space-y-8">
-                    <div class="bg-dark rounded-2xl p-8 border border-gray-800">
-                        <h3 class="text-2xl font-bold text-light mb-6">Informasi Kontak</h3>
-                        
-                        <div class="space-y-6">
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-phone-alt text-primary"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-lg font-semibold text-light mb-1">Telepon</h4>
-                                    <a href="tel:082133803940" class="text-gray-400 hover:text-primary transition-colors text-lg">0821-3380-3940</a>
-                                </div>
+            <div class="group"
+                 x-data="{ show:false, count:0 }"
+                 x-intersect="show=true; let t=1000,d=2000,s=0,i=t/(d/16),r=setInterval(()=>{s+=i;count=Math.floor(s);if(s>=t){count=t;clearInterval(r);}},16);"
+                 x-show="show"
+                 x-transition:enter="transition ease-out duration-600 delay-200"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+                 x-transition:enter-end="opacity-1 scale-100 translate-y-0">
+                <div class="relative p-10 bg-gradient-to-br from-dark-700/60 to-dark-800/80 backdrop-blur-lg border border-green-500/10 rounded-2xl text-center transition-all duration-300 hover:border-green-500/30 hover:-translate-y-3">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-users text-4xl text-green-400"></i>
+                    </div>
+                    <div class="text-5xl font-extrabold mb-3 bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent" x-text="count+'+'"></div>
+                    <div class="text-lg font-semibold text-white mb-2">Customer Puas</div>
+                    <div class="text-sm text-gray-500 flex items-center justify-center gap-1">
+                        <i class="fas fa-star text-yellow-400 text-xs"></i> 5 star reviews
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-500 to-transparent opacity-0 group-hover:opacity-50 transition-opacity"></div>
+                </div>
+            </div>
+
+            <div class="group"
+                 x-data="{ show:false, count:0 }"
+                 x-intersect="show=true; let t=5,d=2000,s=0,i=t/(d/16),r=setInterval(()=>{s+=i;count=Math.floor(s);if(s>=t){count=t;clearInterval(r);}},16);"
+                 x-show="show"
+                 x-transition:enter="transition ease-out duration-600 delay-300"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+                 x-transition:enter-end="opacity-1 scale-100 translate-y-0">
+                <div class="relative p-10 bg-gradient-to-br from-dark-700/60 to-dark-800/80 backdrop-blur-lg border border-blue-500/10 rounded-2xl text-center transition-all duration-300 hover:border-blue-500/30 hover:-translate-y-3">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-clock text-4xl text-blue-400"></i>
+                    </div>
+                    <div class="text-5xl font-extrabold mb-3 bg-gradient-to-r from-blue-400 to-blue-500 bg-clip-text text-transparent" x-text="count+'+'"></div>
+                    <div class="text-lg font-semibold text-white mb-2">Tahun Pengalaman</div>
+                    <div class="text-sm text-gray-500 flex items-center justify-center gap-1">
+                        <i class="fas fa-calendar text-xs"></i> Since 2019
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-0 group-hover:opacity-50 transition-opacity"></div>
+                </div>
+            </div>
+
+            <div class="group"
+                 x-data="{ show:false, count:0 }"
+                 x-intersect="show=true; let t=99,d=2000,s=0,i=t/(d/16),r=setInterval(()=>{s+=i;count=Math.floor(s);if(s>=t){count=t;clearInterval(r);}},16);"
+                 x-show="show"
+                 x-transition:enter="transition ease-out duration-600 delay-400"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-8"
+                 x-transition:enter-end="opacity-1 scale-100 translate-y-0">
+                <div class="relative p-10 bg-gradient-to-br from-dark-700/60 to-dark-800/80 backdrop-blur-lg border border-yellow-500/10 rounded-2xl text-center transition-all duration-300 hover:border-yellow-500/30 hover:-translate-y-3">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fas fa-award text-4xl text-yellow-400"></i>
+                    </div>
+                    <div class="text-5xl font-extrabold mb-3 bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent" x-text="count+'%'"></div>
+                    <div class="text-lg font-semibold text-white mb-2">Satisfaction Rate</div>
+                    <div class="text-sm text-gray-500 flex items-center justify-center gap-1">
+                        <i class="fas fa-check-circle text-xs"></i> Verified ratings
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-0 group-hover:opacity-50 transition-opacity"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-16 pt-12 border-t border-gray-700/50">
+            <div class="flex flex-wrap justify-center items-center gap-8 opacity-60 hover:opacity-100 transition-opacity duration-300">
+                <div class="flex items-center gap-2 text-gray-400">
+                    <i class="fas fa-shield-alt text-primary-400 text-xl"></i>
+                    <span class="text-sm font-medium">Garansi Toko</span>
+                </div>
+                <div class="w-px h-6 bg-gray-700"></div>
+                <div class="flex items-center gap-2 text-gray-400">
+                    <i class="fas fa-tools text-green-400 text-xl"></i>
+                    <span class="text-sm font-medium">Teknisi Berpengalaman</span>
+                </div>
+                <div class="w-px h-6 bg-gray-700"></div>
+                <div class="flex items-center gap-2 text-gray-400">
+                    <i class="fas fa-exchange-alt text-blue-400 text-xl"></i>
+                    <span class="text-sm font-medium">Beli &amp; Jual Unit Bekas</span>
+                </div>
+                <div class="w-px h-6 bg-gray-700"></div>
+                <div class="flex items-center gap-2 text-gray-400">
+                    <i class="fas fa-tags text-purple-400 text-xl"></i>
+                    <span class="text-sm font-medium">Harga Transparan</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- SERVICES --}}
+<section class="py-24 bg-dark-800" id="services">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <span class="inline-block px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-300 text-sm font-medium mb-4">
+                Layanan Kami
+            </span>
+            <h2 class="text-4xl lg:text-5xl font-bold text-white mb-4">Apa yang Kami Kerjakan</h2>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+                Spesialis service perangkat komputer dan jual beli laptop serta PC bekas berkualitas tinggi
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-8">
+
+            <div class="group hover-lift bg-gradient-to-br from-dark-700 to-dark-800 rounded-2xl p-8 border border-dark-500 transition-all duration-300">
+                <div class="w-16 h-16 rounded-xl bg-primary-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-laptop-medical text-3xl text-primary-400"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Service PC &amp; Laptop</h3>
+                <p class="text-gray-400 mb-5 leading-relaxed text-sm">
+                    Perbaikan hardware &amp; software, ganti komponen rusak, install ulang OS, upgrade RAM &amp; SSD, hingga pembersihan menyeluruh.
+                </p>
+                <a href="https://wa.me/6282133803940" target="_blank"
+                   class="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-semibold group-hover:gap-3 transition-all text-sm">
+                    Jadwalkan Service <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+
+            <div class="group hover-lift bg-gradient-to-br from-dark-700 to-dark-800 rounded-2xl p-8 border border-dark-500 transition-all duration-300">
+                <div class="w-16 h-16 rounded-xl bg-blue-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-print text-3xl text-blue-400"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Service Printer</h3>
+                <p class="text-gray-400 mb-5 leading-relaxed text-sm">
+                    Servis printer segala merek &amp; tipe, isi ulang tinta &amp; toner, perbaikan paper jam, head cleaning, penggantian spare part.
+                </p>
+                <a href="https://wa.me/6282133803940" target="_blank"
+                   class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-semibold group-hover:gap-3 transition-all text-sm">
+                    Hubungi Sekarang <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+
+            <div class="group hover-lift bg-gradient-to-br from-dark-700 to-dark-800 rounded-2xl p-8 border border-dark-500 transition-all duration-300">
+                <div class="w-16 h-16 rounded-xl bg-green-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-exchange-alt text-3xl text-green-400"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Jual Beli Laptop &amp; PC Bekas</h3>
+                <p class="text-gray-400 mb-5 leading-relaxed text-sm">
+                    Laptop dan PC bekas berkualitas yang sudah dicek menyeluruh dan bergaransi toko. Kami juga menerima pembelian unit bekas Anda.
+                </p>
+                <a href="{{ route('main.products.index') }}"
+                   class="inline-flex items-center gap-2 text-green-400 hover:text-green-300 font-semibold group-hover:gap-3 transition-all text-sm">
+                    Lihat Produk <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+
+            <div class="group hover-lift bg-gradient-to-br from-dark-700 to-dark-800 rounded-2xl p-8 border border-dark-500 transition-all duration-300">
+                <div class="w-16 h-16 rounded-xl bg-yellow-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-microchip text-3xl text-yellow-400"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-3">Hardware &amp; Aksesoris</h3>
+                <p class="text-gray-400 mb-5 leading-relaxed text-sm">
+                    Tersedia berbagai komponen &amp; aksesoris: RAM, SSD, HDD, keyboard, mouse, kabel, dan perlengkapan komputer lainnya.
+                </p>
+                <a href="{{ route('main.products.index') }}"
+                   class="inline-flex items-center gap-2 text-yellow-400 hover:text-yellow-300 font-semibold group-hover:gap-3 transition-all text-sm">
+                    Lihat Produk <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- FEATURED PRODUCTS --}}
+<section class="py-24 bg-gradient-to-b from-dark-800 to-dark-700" id="products">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <span class="inline-block px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-300 text-sm font-medium mb-4">
+                Produk Unggulan
+            </span>
+            <h2 class="text-4xl lg:text-5xl font-bold text-white mb-4">Koleksi Terbaru Kami</h2>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+                Laptop dan PC bekas pilihan, sudah melalui pengecekan menyeluruh dan bergaransi
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            @php
+                $featuredProducts = \App\Models\Product::with('category')
+                    ->where('is_active', true)
+                    ->where('current_stock', '>', 0)
+                    ->orderBy('created_at', 'desc')
+                    ->take(6)
+                    ->get();
+            @endphp
+
+            @forelse($featuredProducts as $product)
+            <div class="group hover-lift bg-dark-800 rounded-2xl overflow-hidden border border-dark-500 transition-all duration-300">
+                <div class="relative h-56 bg-dark-900 overflow-hidden">
+                    @if($product->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($product->image))
+                        <img src="{{ asset('storage/' . $product->image) }}"
+                             alt="{{ $product->name }}"
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center">
+                            <i class="fas fa-laptop text-6xl text-gray-700"></i>
+                        </div>
+                    @endif
+                    @if($product->has_discount)
+                        <div class="absolute top-3 left-3">
+                            <span class="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
+                                -{{ $product->discount_percentage }}%
+                            </span>
+                        </div>
+                    @endif
+                    <div class="absolute top-3 right-3">
+                        <span class="px-3 py-1 {{ $product->current_stock > 0 ? 'bg-green-500' : 'bg-red-500' }} text-white text-xs font-semibold rounded-full">
+                            {{ $product->current_stock > 0 ? 'Tersedia' : 'Habis' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="mb-2">
+                        <span class="text-xs text-primary-400 font-medium">{{ $product->category->name ?? 'Uncategorized' }}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2 line-clamp-2">{{ $product->name }}</h3>
+                    <div class="mb-4">
+                        @if($product->has_discount)
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-2xl font-bold text-primary-500">Rp {{ number_format($product->final_price, 0, ',', '.') }}</span>
+                                <span class="text-sm text-gray-500 line-through">Rp {{ number_format($product->selling_price, 0, ',', '.') }}</span>
                             </div>
-                            
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fab fa-whatsapp text-primary"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-lg font-semibold text-light mb-1">WhatsApp</h4>
-                                    <a href="https://wa.me/6282133803940" target="_blank" 
-                                       class="inline-flex items-center gap-2 text-gray-400 hover:text-primary transition-colors text-lg group">
-                                        Chat Sekarang
-                                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                                    </a>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-map-marker-alt text-primary"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-lg font-semibold text-light mb-1">Lokasi</h4>
-                                    <p class="text-gray-400">Jl. Argandaru No.4, Bukateja, Purbalingga</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-clock text-primary"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-lg font-semibold text-light mb-1">Jam Operasional</h4>
-                                    <p class="text-gray-400">Senin - Sabtu: 08:00 - 17:00 WIB</p>
-                                </div>
-                            </div>
+                        @else
+                            <span class="text-2xl font-bold text-primary-500">Rp {{ number_format($product->final_price ?? $product->selling_price, 0, ',', '.') }}</span>
+                        @endif
+                    </div>
+                    <a href="{{ route('main.products.show', $product->id) }}"
+                       class="block w-full py-3 text-center bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-xl font-semibold transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary-500/30">
+                        Lihat Detail
+                    </a>
+                </div>
+            </div>
+            @empty
+            <div class="col-span-full text-center py-16">
+                <i class="fas fa-box-open text-6xl text-gray-700 mb-4"></i>
+                <p class="text-gray-500 text-lg">Belum ada produk tersedia</p>
+            </div>
+            @endforelse
+        </div>
+
+        <div class="text-center">
+            <a href="{{ route('main.products.index') }}"
+               class="inline-flex items-center gap-2 px-8 py-4 bg-dark-700 hover:bg-dark-600 border border-dark-500 hover:border-primary-500/50 text-white rounded-xl font-semibold transition-all duration-300">
+                Lihat Semua Produk <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+{{-- TENTANG KAMI — id="tentang" untuk link navbar --}}
+<section class="py-24 bg-dark-800" id="tentang">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+            <div class="space-y-8">
+                <div>
+                    <span class="inline-block px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-300 text-sm font-medium mb-4">
+                        Tentang Kami
+                    </span>
+                    <h2 class="text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
+                        Kenapa Memilih
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-600">Glorious Computer?</span>
+                    </h2>
+                    <p class="text-gray-400 leading-relaxed text-lg">
+                        Kami adalah toko komputer yang berdiri sejak 2019 di Purwokerto, Jawa Tengah. Spesialisasi kami adalah service PC, laptop, dan printer serta jual beli laptop dan PC bekas berkualitas tinggi.
+                    </p>
+                    <p class="text-gray-400 leading-relaxed mt-4">
+                        Setiap unit bekas yang kami jual telah melalui pengecekan menyeluruh oleh teknisi berpengalaman, sehingga Anda mendapatkan perangkat andal dengan harga yang sepadan.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-primary-500/10 border border-primary-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-user-check text-primary-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-semibold mb-1">Teknisi Berpengalaman</h4>
+                            <p class="text-gray-500 text-sm">Lebih dari 5 tahun menangani berbagai kerusakan PC, laptop, dan printer.</p>
                         </div>
                     </div>
-                    
-                    <!-- Quick Links -->
-                    <div class="bg-dark rounded-2xl p-8 border border-gray-800">
-                        <h3 class="text-2xl font-bold text-light mb-6">Layanan Cepat</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <a href="#service-pc-laptop" class="bg-dark-light hover:bg-primary/10 rounded-xl p-4 flex items-center gap-3 group transition-all">
-                                <i class="fas fa-laptop-code text-primary group-hover:scale-110 transition-transform"></i>
-                                <span class="text-light group-hover:text-primary">PC & Laptop</span>
-                            </a>
-                            <a href="#service-upgrade-hardware" class="bg-dark-light hover:bg-primary/10 rounded-xl p-4 flex items-center gap-3 group transition-all">
-                                <i class="fas fa-microchip text-primary group-hover:scale-110 transition-transform"></i>
-                                <span class="text-light group-hover:text-primary">Upgrade Hardware</span>
-                            </a>
-                            <a href="#service-printer" class="bg-dark-light hover:bg-primary/10 rounded-xl p-4 flex items-center gap-3 group transition-all">
-                                <i class="fas fa-print text-primary group-hover:scale-110 transition-transform"></i>
-                                <span class="text-light group-hover:text-primary">Printer</span>
-                            </a>
-                            <a href="#service-software" class="bg-dark-light hover:bg-primary/10 rounded-xl p-4 flex items-center gap-3 group transition-all">
-                                <i class="fas fa-download text-primary group-hover:scale-110 transition-transform"></i>
-                                <span class="text-light group-hover:text-primary">Software</span>
-                            </a>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-shield-alt text-green-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-semibold mb-1">Semua Unit Bergaransi</h4>
+                            <p class="text-gray-500 text-sm">Setiap produk bekas disertai garansi toko untuk ketenangan pikiran Anda.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-search text-yellow-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-semibold mb-1">Pengecekan Menyeluruh</h4>
+                            <p class="text-gray-500 text-sm">Hardware, baterai, layar, dan performa setiap unit dicek sebelum dijual.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-hand-holding-usd text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-semibold mb-1">Harga Jujur &amp; Transparan</h4>
+                            <p class="text-gray-500 text-sm">Harga service dan jual beli selalu dikomunikasikan di awal tanpa biaya tersembunyi.</p>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Contact Form (data terkirim ke gloriouscompt@gmail.com) -->
-                <div class="bg-dark rounded-2xl p-8 border border-gray-800">
-                    <h3 class="text-2xl font-bold text-light mb-6">Kirim Pesan</h3>
-                    @if(session('success'))
-                        <div class="mb-6 p-4 rounded-xl bg-green-500/20 border border-green-500/40 text-green-400 text-sm">{{ session('success') }}</div>
-                    @endif
-                    @if(session('error'))
-                        <div class="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 text-sm">{{ session('error') }}</div>
-                    @endif
-                    @if($errors->any())
-                        <div class="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 text-sm">
-                            <ul class="list-disc list-inside">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
-                        </div>
-                    @endif
-                    <form action="{{ route('main.consultation.submit') }}" method="POST" class="space-y-6">
-                        @csrf
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            </div>
+
+            <div class="grid grid-cols-2 gap-5">
+                <div class="bg-gradient-to-br from-primary-500/10 to-primary-600/5 border border-primary-500/20 rounded-2xl p-7 flex flex-col items-center text-center">
+                    <i class="fas fa-laptop-medical text-primary-400 text-4xl mb-4"></i>
+                    <p class="text-4xl font-extrabold text-white mb-1">500+</p>
+                    <p class="text-gray-400 text-sm">Perangkat Diservice</p>
+                </div>
+                <div class="bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/20 rounded-2xl p-7 flex flex-col items-center text-center">
+                    <i class="fas fa-exchange-alt text-green-400 text-4xl mb-4"></i>
+                    <p class="text-4xl font-extrabold text-white mb-1">500+</p>
+                    <p class="text-gray-400 text-sm">Unit Terjual</p>
+                </div>
+                <div class="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 rounded-2xl p-7 flex flex-col items-center text-center">
+                    <i class="fas fa-print text-blue-400 text-4xl mb-4"></i>
+                    <p class="text-4xl font-extrabold text-white mb-1">200+</p>
+                    <p class="text-gray-400 text-sm">Printer Diservice</p>
+                </div>
+                <div class="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border border-yellow-500/20 rounded-2xl p-7 flex flex-col items-center text-center">
+                    <i class="fas fa-users text-yellow-400 text-4xl mb-4"></i>
+                    <p class="text-4xl font-extrabold text-white mb-1">1000+</p>
+                    <p class="text-gray-400 text-sm">Customer Puas</p>
+                </div>
+                <div class="col-span-2 bg-dark-700 border border-dark-500 rounded-2xl p-6 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-map-marker-alt text-primary-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-white font-semibold">Lokasi Kami</p>
+                        <p class="text-gray-400 text-sm">Purwokerto, Kabupaten Banyumas, Jawa Tengah</p>
+                    </div>
+                    <a href="https://wa.me/6282133803940" target="_blank"
+                       class="ml-auto flex-shrink-0 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-sm font-medium hover:bg-green-500/20 transition-colors">
+                        <i class="fab fa-whatsapp mr-1"></i> Tanya Rute
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- CTA BANNER --}}
+<section class="py-20 bg-gradient-to-r from-primary-600 via-primary-500 to-primary-600 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <h2 class="text-4xl lg:text-5xl font-bold text-white mb-6">Ada yang Perlu Diservice atau Dibeli?</h2>
+        <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+            Hubungi kami sekarang untuk info ketersediaan produk dan jadwal service perangkat Anda
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ route('main.products.index') }}"
+               class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white hover:bg-gray-100 text-primary-600 rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl">
+                <i class="fas fa-laptop"></i> Lihat Produk
+            </a>
+            <a href="https://wa.me/6282133803940" target="_blank"
+               class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent hover:bg-white/10 border-2 border-white text-white rounded-xl font-bold transition-all duration-300">
+                <i class="fab fa-whatsapp"></i> Chat via WhatsApp
+            </a>
+        </div>
+    </div>
+</section>
+
+{{-- CONTACT --}}
+<section class="py-24 bg-dark-800" id="contact">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <span class="inline-block px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-300 text-sm font-medium mb-4">
+                Hubungi Kami
+            </span>
+            <h2 class="text-4xl lg:text-5xl font-bold text-white mb-4">Kontak &amp; Lokasi</h2>
+            <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+                Kunjungi toko kami atau hubungi via WhatsApp untuk info produk dan jadwal service
+            </p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <div class="bg-dark-700 rounded-2xl p-8 border border-dark-500">
+                    <h3 class="text-xl font-bold text-white mb-6">Kirim Pesan</h3>
+                    <form class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-gray-400 mb-2">Nama Lengkap</label>
-                                <input type="text" name="name" value="{{ old('name') }}" required class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="Masukkan nama Anda">
+                                <label class="block text-gray-400 text-sm mb-2">Nama Lengkap</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg bg-dark-800 border border-dark-500 text-white focus:border-primary-500 focus:outline-none transition-colors" placeholder="John Doe">
                             </div>
                             <div>
-                                <label class="block text-gray-400 mb-2">Nomor Telepon</label>
-                                <input type="tel" name="phone" value="{{ old('phone') }}" required class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="0821-xxx-xxxx">
+                                <label class="block text-gray-400 text-sm mb-2">Nomor WhatsApp</label>
+                                <input type="text" class="w-full px-4 py-3 rounded-lg bg-dark-800 border border-dark-500 text-white focus:border-primary-500 focus:outline-none transition-colors" placeholder="08xxx">
                             </div>
                         </div>
-                        
                         <div>
-                            <label class="block text-gray-400 mb-2">Email</label>
-                            <input type="email" name="email" value="{{ old('email') }}" required class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="email@contoh.com">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-400 mb-2">Layanan yang Dibutuhkan</label>
-                            <select name="service" class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors">
-                                <option value="">Pilih layanan</option>
-                                <option value="Servis PC & Laptop" {{ old('service') === 'Servis PC & Laptop' ? 'selected' : '' }}>Servis PC & Laptop</option>
-                                <option value="Upgrade Hardware" {{ old('service') === 'Upgrade Hardware' ? 'selected' : '' }}>Upgrade Hardware</option>
-                                <option value="Servis Printer" {{ old('service') === 'Servis Printer' ? 'selected' : '' }}>Servis Printer</option>
-                                <option value="Install Software" {{ old('service') === 'Install Software' ? 'selected' : '' }}>Install Software</option>
+                            <label class="block text-gray-400 text-sm mb-2">Keperluan</label>
+                            <select class="w-full px-4 py-3 rounded-lg bg-dark-800 border border-dark-500 text-white focus:border-primary-500 focus:outline-none transition-colors">
+                                <option value="">Pilih keperluan...</option>
+                                <option>Service PC / Laptop</option>
+                                <option>Service Printer</option>
+                                <option>Beli Laptop / PC Bekas</option>
+                                <option>Jual Laptop / PC Bekas Saya</option>
+                                <option>Beli Hardware / Aksesoris</option>
+                                <option>Lainnya</option>
                             </select>
                         </div>
-                        
                         <div>
-                            <label class="block text-gray-400 mb-2">Pesan</label>
-                            <textarea name="message" rows="4" required class="w-full bg-dark-light border border-gray-800 rounded-xl px-4 py-3 text-light focus:outline-none focus:border-primary transition-colors" placeholder="Jelaskan kebutuhan Anda secara detail">{{ old('message') }}</textarea>
+                            <label class="block text-gray-400 text-sm mb-2">Pesan</label>
+                            <textarea rows="4" class="w-full px-4 py-3 rounded-lg bg-dark-800 border border-dark-500 text-white focus:border-primary-500 focus:outline-none transition-colors resize-none" placeholder="Deskripsikan kebutuhan atau kerusakan perangkat Anda..."></textarea>
                         </div>
-                        
-                        <button type="submit" class="w-full bg-gradient-primary hover:shadow-glow-primary text-white py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105">
-                            Kirim Pesan  
+                        <button type="submit"
+                                class="w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 text-white rounded-xl font-bold transition-all duration-300 shadow-lg hover:shadow-orange-500/30 hover:-translate-y-0.5 active:translate-y-0">
+                            <i class="fas fa-paper-plane mr-2"></i> Kirim Pesan
                         </button>
                     </form>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- CTA Section -->
-    <section class="py-24 bg-gradient-to-r from-primary to-accent relative overflow-hidden">
-        <div class="container relative z-10">
-            <div class="text-center max-w-3xl mx-auto">
-                <h2 class="text-4xl md:text-5xl font-black mb-6 text-white">Siap Membantu Kebutuhan Teknologi Anda</h2>
-                <p class="text-white/95 text-xl mb-12 leading-relaxed">
-                    Dapatkan solusi terbaik untuk komputer, laptop, dan perangkat elektronik Anda dengan layanan profesional dari tim ahli kami.
-                </p>
-                <div class="flex flex-wrap justify-center gap-6">
-                    <a href="https://wa.me/6282133803940" target="_blank" class="bg-white text-primary hover:bg-gray-100 font-black py-4 px-10 rounded-full transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl flex items-center text-lg">
-                        <i class="fab fa-whatsapp mr-4 text-xl"></i> Hubungi via WhatsApp
-                    </a>
-                    <a href="tel:082133803940" class="bg-transparent border-3 border-white text-white hover:bg-white/15 font-bold py-4 px-10 rounded-full transition-all duration-300 transform hover:-translate-y-2 hover:shadow-xl flex items-center text-lg">
-                        <i class="fas fa-phone-alt mr-4 text-xl"></i> Telepon Sekarang
-                    </a>
+            <div class="space-y-6">
+                <div class="bg-dark-700 rounded-2xl p-6 border border-dark-500">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-primary-500/10 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-map-marker-alt text-primary-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-white mb-1">Alamat Toko</h4>
+                            <p class="text-gray-400 text-sm">Purwokerto, Kabupaten Banyumas, Jawa Tengah</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-dark-700 rounded-2xl p-6 border border-dark-500">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                            <i class="fab fa-whatsapp text-green-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-white mb-1">WhatsApp</h4>
+                            <a href="https://wa.me/6282133803940" target="_blank" class="text-green-400 hover:text-green-300 text-sm font-medium transition-colors">+62 821-3380-3940</a>
+                            <p class="text-gray-500 text-xs mt-1">Respon cepat via chat</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-dark-700 rounded-2xl p-6 border border-dark-500">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-envelope text-blue-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-white mb-1">Email</h4>
+                            <a href="mailto:info@gloriouscomputer.com" class="text-blue-400 hover:text-blue-300 text-sm transition-colors">info@gloriouscomputer.com</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-br from-primary-500/10 to-primary-600/5 rounded-2xl p-6 border border-primary-500/20">
+                    <h4 class="font-bold text-white mb-3">
+                        <i class="fas fa-clock text-primary-400 mr-2"></i> Jam Operasional
+                    </h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Senin – Jumat</span>
+                            <span class="text-white font-medium">09:00 – 17:00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Sabtu</span>
+                            <span class="text-white font-medium">09:00 – 15:00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Minggu</span>
+                            <span class="text-red-400 font-medium">Tutup</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
-
     </div>
+</section>
+
 @endsection
 
-@push('scripts')
-<script>
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-        
-        // Animation on scroll
-        function animateOnScroll() {
-            const elements = document.querySelectorAll('.service-card, .stat-item, .product-card, .testimonial-card, .contact-card');
-            
-            elements.forEach(element => {
-                const elementPosition = element.getBoundingClientRect().top;
-                const screenPosition = window.innerHeight / 1.1;
-                
-                if (elementPosition < screenPosition) {
-                    element.style.opacity = 1;
-                    element.style.transform = 'translateY(0) scale(1)';
-                }
-            });
-        }
-        
-        // Initialize elements for animation
-        document.querySelectorAll('.service-card, .stat-item, .product-card, .testimonial-card, .contact-card').forEach(element => {
-            element.style.opacity = 0;
-            element.style.transform = 'translateY(30px) scale(0.95)';
-            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        });
-        
-        // Listen for scroll events
-        window.addEventListener('scroll', animateOnScroll);
-        // Initial check on page load
-        window.addEventListener('load', () => {
-            animateOnScroll();
-            // Add animation class to hero elements
-            document.querySelectorAll('.hero-badge, .hero-main-title-modern, .hero-subtitle-modern, .hero-tagline-modern, .hero-description-modern, .hero-buttons-modern, .hero-stats-modern').forEach((el, index) => {
-                el.style.animationDelay = `${index * 0.1}s`;
-                el.classList.add('animate-fade-in-up');
-            });
-        });
-
-        // Parallax effect for floating elements
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const parallaxElements = document.querySelectorAll('.floating-element');
-            
-            parallaxElements.forEach((element, index) => {
-                const speed = 0.2 + (index * 0.05);
-                const yPos = -(scrolled * speed);
-                element.style.transform = `translateY(${yPos}px)`;
-            });
-        });
-    </script>
+@push('styles')
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
 @endpush

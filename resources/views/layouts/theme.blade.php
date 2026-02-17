@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Glorious Computer - Solusi Teknologi')</title>
+    <title>@yield('title', 'Glorious Computer - Solusi Teknologi Premium')</title>
     
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -20,16 +20,25 @@
                 extend: {
                     colors: {
                         primary: {
-                            DEFAULT: '#FF6B00',
-                            dark: '#E05D00',
-                            light: '#FF8C42',
+                            50:  '#FFF7ED',
+                            100: '#FFEDD5',
+                            200: '#FED7AA',
+                            300: '#FDBA74',
+                            400: '#FF8C42',
+                            500: '#FF6B00',  // Main brand orange
+                            600: '#E05D00',
+                            700: '#C44D00',
+                            800: '#9C3D00',
+                            900: '#7C3100',
                         },
                         secondary: '#00A8FF',
                         accent: '#9C27B0',
                         dark: {
-                            DEFAULT: '#121212',
-                            lighter: '#1E1E1E',
-                            light: '#2D2D2D'
+                            900: '#0A0A0A',
+                            800: '#121212',
+                            700: '#1A1A1A',
+                            600: '#242424',
+                            500: '#2D2D2D',
                         },
                         light: {
                             DEFAULT: '#F8FAFC',
@@ -37,51 +46,66 @@
                         }
                     },
                     fontFamily: {
-                        'sans': ['Inter', 'Segoe UI', 'Roboto', 'system-ui', '-apple-system', 'sans-serif'],
-                        'heading': ['Poppins', 'Inter', 'sans-serif']
+                        'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        'heading': ['Plus Jakarta Sans', 'Inter', 'sans-serif']
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'fade-in': 'fadeIn 0.6s ease-out',
                         'slide-down': 'slideDown 0.3s ease-out',
                         'pulse-slow': 'pulse 2s infinite',
-                        'float': 'float 3s ease-in-out infinite',
-                        'heartbeat': 'heartbeat 1.5s ease-in-out infinite'
+                        'float': 'float 6s ease-in-out infinite',
+                        'heartbeat': 'heartbeat 1.5s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite'
                     },
                     boxShadow: {
                         'soft': '0 4px 20px rgba(0, 0, 0, 0.08)',
-                        'glow': '0 0 20px rgba(255, 107, 0, 0.3)',
-                        'glow-primary': '0 0 15px rgba(255, 107, 0, 0.5)'
+                        'glow-sm': '0 0 10px rgba(255, 107, 0, 0.2)',
+                        'glow-md': '0 0 20px rgba(255, 107, 0, 0.3)',
+                        'glow-lg': '0 0 30px rgba(255, 107, 0, 0.4)',
+                        'glow-xl': '0 0 40px rgba(255, 107, 0, 0.5)',
+                        'elevated': '0 10px 30px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 107, 0, 0.15)',
                     },
                     backgroundImage: {
                         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-                        'gradient-primary': 'linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%)'
+                        'gradient-primary': 'linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%)',
+                        'gradient-primary-hover': 'linear-gradient(135deg, #E05D00 0%, #FF6B00 100%)',
+                    },
+                    borderRadius: {
+                        '4xl': '2rem',
                     }
                 }
             }
         }
     </script>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Inter + Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- AlpineJS -->
     <script src="//unpkg.com/alpinejs" defer></script>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
     <style>
+        /* ===========================
+           CSS VARIABLES
+           =========================== */
         :root {
             --primary: #FF6B00;
             --primary-dark: #E05D00;
             --primary-light: #FF8C42;
+            --dark-900: #0A0A0A;
+            --dark-800: #121212;
+            --dark-700: #1A1A1A;
         }
         
+        /* ===========================
+           KEYFRAME ANIMATIONS
+           =========================== */
+        
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
@@ -92,7 +116,7 @@
         
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-20px); }
         }
         
         @keyframes heartbeat {
@@ -101,6 +125,11 @@
             50% { transform: scale(1); }
             75% { transform: scale(1.05); }
             100% { transform: scale(1); }
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 107, 0, 0.6); }
         }
         
         @keyframes shimmer {
@@ -113,18 +142,109 @@
             50% { background-position: 100% 50%; }
         }
         
+        /* ===========================
+           SCROLLBAR STYLING
+           =========================== */
         ::-webkit-scrollbar {
             width: 10px;
         }
         ::-webkit-scrollbar-track {
-            background: #1E1E1E;
+            background: var(--dark-700);
         }
         ::-webkit-scrollbar-thumb {
             background: linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%);
             border-radius: 5px;
         }
-        ::-webkit.scrollbar-thumb:hover {
+        ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(135deg, #E05D00 0%, #FF6B00 100%);
+        }
+        
+        /* ===========================
+           NAVBAR SHRINK EFFECT
+           =========================== */
+        nav.navbar-shrink {
+            padding-top: 0.5rem !important;
+            padding-bottom: 0.5rem !important;
+        }
+
+        nav.navbar-shrink .logo-container {
+            transform: scale(0.9);
+        }
+        
+        /* ===========================
+           UTILITY CLASSES
+           =========================== */
+        
+        .glass {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 107, 0, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .shimmer-text {
+            background: linear-gradient(90deg, #FF6B00 0%, #FF8C42 25%, #FF6B00 50%, #FF8C42 75%, #FF6B00 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s linear infinite;
+        }
+        
+        /* Hover Lift Effect */
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                        0 0 30px rgba(255, 107, 0, 0.15);
+        }
+        
+        /* Hover Scale */
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Smooth Transitions */
+        .transition-smooth {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ===========================
+           MOBILE MENU
+           =========================== */
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        
+        .mobile-menu.open {
+            max-height: 600px;
+        }
+        
+        .products-submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .products-submenu.open {
+            max-height: 400px;
         }
         
         .hamburger-line {
@@ -152,58 +272,9 @@
             background-color: var(--primary);
         }
         
-        .glass {
-            background: rgba(18, 18, 18, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .fab-button {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 40;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .shimmer-text {
-            background: linear-gradient(90deg, #FF6B00 0%, #FF8C42 25%, #FF6B00 50%, #FF8C42 75%, #FF6B00 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: shimmer 3s linear infinite;
-        }
-        
-        .mobile-menu {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-out;
-        }
-        
-        .mobile-menu.open {
-            max-height: 600px;
-        }
-        
-        .products-submenu {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        
-        .products-submenu.open {
-            max-height: 400px;
-        }
-        
-        /* Cart Sidebar Styles */
+        /* ===========================
+           CART SIDEBAR
+           =========================== */
         .cart-sidebar {
             transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
@@ -231,7 +302,9 @@
             transform: scale(1.1);
         }
         
-        /* FIXED: Popup overlay yang benar */
+        /* ===========================
+           POPUP SYSTEM
+           =========================== */
         .popup-overlay {
             position: fixed;
             inset: 0;
@@ -253,7 +326,6 @@
             visibility: visible;
         }
         
-        /* FIXED: Popup content dengan overflow auto */
         .popup-content {
             background: linear-gradient(145deg, #1E1E1E, #121212);
             border: 1px solid rgba(255, 107, 0, 0.2);
@@ -274,12 +346,10 @@
             opacity: 1;
         }
         
-        /* Popup content khusus untuk registration yang lebih besar */
         .popup-content.large {
             max-width: 900px;
         }
         
-        /* Custom scrollbar untuk popup */
         .popup-content::-webkit-scrollbar {
             width: 6px;
         }
@@ -298,7 +368,6 @@
             background: rgba(255, 107, 0, 0.8);
         }
         
-        /* Responsive untuk mobile */
         @media (max-width: 640px) {
             .popup-overlay {
                 padding: 10px;
@@ -314,7 +383,13 @@
             }
         }
         
-        /* Form input styling */
+        body.popup-open {
+            overflow: hidden;
+        }
+        
+        /* ===========================
+           FORM STYLING
+           =========================== */
         .form-input {
             transition: all 0.3s ease;
             background: linear-gradient(145deg, #1a1a1a, #222222);
@@ -331,7 +406,9 @@
             border-color: #FF8C42;
         }
         
-        /* Button animations */
+        /* ===========================
+           BUTTON ANIMATIONS
+           =========================== */
         .btn-primary {
             background: linear-gradient(135deg, #FF6B00 0%, #FF8C42 100%);
             position: relative;
@@ -358,7 +435,88 @@
             left: 100%;
         }
         
-        /* Checkbox styling */
+        /* ===========================
+           TOAST NOTIFICATIONS
+           =========================== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        /* ===========================
+           LOADING SPINNER
+           =========================== */
+        .spinner {
+            border: 3px solid rgba(255, 107, 0, 0.2);
+            border-top-color: #FF6B00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ===========================
+           GRADIENT BACKGROUND
+           =========================== */
+        .gradient-bg {
+            background: linear-gradient(-45deg, #0A0A0A, #121212, #1A1A1A, #0A0A0A);
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+        }
+        
+        /* ===========================
+           ALERT MESSAGES
+           =========================== */
+        .alert-success {
+            background: linear-gradient(135deg, rgba(0, 200, 83, 0.1), rgba(0, 200, 83, 0.05));
+            border: 1px solid rgba(0, 200, 83, 0.3);
+        }
+        
+        .alert-error {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1), rgba(255, 71, 87, 0.05));
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+        
+        /* ===========================
+           FAB BUTTON (WhatsApp)
+           =========================== */
+        .fab-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 40;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* ===========================
+           PASSWORD STRENGTH
+           =========================== */
+        .password-strength {
+            height: 4px;
+            background: #444;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .strength-weak { width: 25%; background: #ff4757; }
+        .strength-medium { width: 50%; background: #ffa502; }
+        .strength-strong { width: 75%; background: #2ed573; }
+        .strength-very-strong { width: 100%; background: #00b894; }
+        
+        /* ===========================
+           CHECKBOX STYLING
+           =========================== */
         .form-checkbox {
             appearance: none;
             width: 18px;
@@ -387,67 +545,9 @@
             transform: translate(-50%, -50%);
         }
         
-        /* Password strength indicator */
-        .password-strength {
-            height: 4px;
-            background: #444;
-            border-radius: 2px;
-            margin-top: 4px;
-            overflow: hidden;
-        }
-        
-        .password-strength-bar {
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s, background-color 0.3s;
-            border-radius: 2px;
-        }
-        
-        .strength-weak { width: 25%; background: #ff4757; }
-        .strength-medium { width: 50%; background: #ffa502; }
-        .strength-strong { width: 75%; background: #2ed573; }
-        .strength-very-strong { width: 100%; background: #00b894; }
-        
-        /* Loading spinner */
-        .spinner {
-            border: 3px solid rgba(255, 107, 0, 0.2);
-            border-top-color: #FF6B00;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Gradient background */
-        .gradient-bg {
-            background: linear-gradient(-45deg, #121212, #1E1E1E, #2D2D2D, #121212);
-            background-size: 400% 400%;
-            animation: gradient-shift 15s ease infinite;
-        }
-        
-        /* Success/Error message styles */
-        .alert-success {
-            background: linear-gradient(135deg, rgba(0, 200, 83, 0.1), rgba(0, 200, 83, 0.05));
-            border: 1px solid rgba(0, 200, 83, 0.3);
-        }
-        
-        .alert-error {
-            background: linear-gradient(135deg, rgba(255, 71, 87, 0.1), rgba(255, 71, 87, 0.05));
-            border: 1px solid rgba(255, 71, 87, 0.3);
-        }
-        
-        /* Toast notification */
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
-            animation: slideDown 0.3s ease-out;
-        }
-        
-        /* FIXED: Untuk popup registration yang lebih kompleks */
+        /* ===========================
+           REGISTRATION CONTAINER
+           =========================== */
         .registration-container {
             display: flex;
             flex-direction: column;
@@ -459,220 +559,276 @@
             }
         }
         
-        /* FIXED: Menghilangkan overflow hidden yang menyebabkan terpotong */
-        body.popup-open {
-            overflow: hidden;
+        /* ===========================
+           RESPONSIVE UTILITIES
+           =========================== */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 
     @stack('styles')
+    @yield('head')
 </head>
-<body class="bg-dark text-light font-sans antialiased flex flex-col min-h-screen gradient-bg">
+<body class="bg-dark-800 text-light font-sans antialiased flex flex-col min-h-screen gradient-bg">
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-[10000] space-y-3 max-w-sm"></div>
 
-    <!-- Tombol WhatsApp -->
+    <!-- Tombol WhatsApp Floating -->
     <a href="https://wa.me/6282133803940" 
        target="_blank"
-       class="fab-button w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center shadow-glow hover:shadow-glow-primary transition-all hover:scale-110 group"
+       class="fab-button w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-lg hover:shadow-glow-xl transition-all hover:scale-110 group"
        title="Chat via WhatsApp">
         <i class="fab fa-whatsapp text-2xl text-white group-hover:animate-pulse"></i>
         <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
-            <span class="text-xs text-white">!</span>
+            <span class="text-xs text-white font-bold">!</span>
         </div>
     </a>
 
-    <!-- Navbar -->
-    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-gray-800 shadow-soft">
-        <div class="max-w-7xl mx-auto px-4 lg:px-8">
-            <!-- Baris Utama Navbar -->
-            <div class="flex items-center justify-between h-20">
-                <!-- Logo -->
-                <div class="flex-shrink-0">
-                    <a href="{{ url('/') }}" class="flex items-center space-x-3 group">
+    <!-- NAVBAR PREMIUM REDESIGNED -->
+    <nav id="main-navbar" 
+         class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass border-b border-gray-800"
+         x-data="{ 
+             scrolled: false, 
+             mobileOpen: false,
+             productDropdownOpen: false
+         }"
+         x-init="
+             window.addEventListener('scroll', () => {
+                 scrolled = window.pageYOffset > 50;
+                 if (scrolled) {
+                     $el.classList.add('navbar-shrink');
+                 } else {
+                     $el.classList.remove('navbar-shrink');
+                 }
+             });
+         "
+         :class="scrolled ? 'bg-dark-900/95 backdrop-blur-lg border-b border-gray-800 shadow-xl py-3' : 'bg-dark-900/85 backdrop-blur-md border-b border-gray-800/50 py-4'">
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                
+                <!-- LOGO -->
+                <div class="flex-shrink-0 logo-container transition-all duration-300">
+                    <a href="{{ url('/') }}" class="flex items-center gap-3 group">
                         <div class="relative">
-                            <div class="w-12 h-12 lg:w-14 lg:h-14 bg-gradient-primary rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-transform duration-500 shadow-glow">
-                                <span class="text-white font-bold text-lg lg:text-xl">GC</span>
+                            <div class="bg-gradient-to-br from-primary-600 to-primary-500 rounded-xl flex items-center justify-center group-hover:scale-105 transition-all duration-300 shadow-lg"
+                                 :class="scrolled ? 'w-10 h-10' : 'w-12 h-12'">
+                                <span class="text-white font-bold" :class="scrolled ? 'text-base' : 'text-lg'">GC</span>
                             </div>
-                            <div class="absolute -inset-1 bg-gradient-primary rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                            <div class="absolute -inset-1 bg-gradient-to-br from-primary-600 to-primary-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
                         </div>
+                        
                         <div class="flex flex-col">
-                            <span class="text-white font-heading font-bold text-xl lg:text-2xl leading-6 tracking-tight">GLORIOUS</span>
-                            <span class="gradient-text font-semibold text-xs lg:text-sm tracking-wider">SOLUSI TEKNOLOGI</span>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- Menu Desktop Tengah -->
-                <div class="hidden lg:flex items-center space-x-1">
-                    <div class="flex items-center space-x-8">
-                        <!-- Beranda -->
-                        <a href="{{ url('/') }}" class="relative group px-4 py-2">
-                            <div class="flex items-center">
-                                <i class="fas fa-home mr-2 text-primary opacity-80 group-hover:opacity-100 transition-all"></i>
-                                <span class="text-light font-medium group-hover:text-primary transition-colors">Beranda</span>
-                            </div>
-                            <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-primary group-hover:w-full transition-all duration-300 rounded-full"></div>
-                        </a>
-
-                        <!-- Tentang -->
-                        <a href="{{ route('main.about.index') }}" class="relative group px-4 py-2">
-                            <div class="flex items-center">
-                                <i class="fas fa-info-circle mr-2 text-primary opacity-80 group-hover:opacity-100 transition-all"></i>
-                                <span class="text-light font-medium group-hover:text-primary transition-colors">Tentang</span>
-                            </div>
-                            <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-primary group-hover:w-full transition-all duration-300 rounded-full"></div>
-                        </a>
-
-                        <!-- Produk Dropdown -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button type="button"
-                                @mouseenter="open = true"
-                                @mouseleave="open = false"
-                                class="relative group px-4 py-2 flex items-center">
-                                <i class="fas fa-boxes mr-2 text-primary opacity-80 group-hover:opacity-100 transition-all"></i>
-                                <span class="text-light font-medium group-hover:text-primary transition-colors">Produk</span>
-                                <i class="fas fa-chevron-down text-xs ml-1 transition-transform duration-300"
-                                   :class="{ 'rotate-180': open }"></i>
-                            </button>
-
-                            <!-- Dropdown Menu -->
-                            <div x-show="open"
-                                 x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0 -translate-y-2"
-                                 x-transition:enter-end="opacity-100 translate-y-0"
-                                 @mouseenter="open = true"
-                                 @mouseleave="open = false"
-                                 class="absolute left-0 mt-2 w-64 bg-dark-lighter border border-gray-800 rounded-xl shadow-2xl py-3 z-50">
-                                <div class="px-4 py-2 border-b border-gray-800">
-                                    <h3 class="text-white font-semibold text-sm flex items-center">
-                                        <i class="fas fa-layer-group mr-2 text-primary"></i>
-                                        Kategori Produk
-                                    </h3>
-                                </div>
-                                
-                                <a href="{{ route('main.products.index') }}"
-                                   class="flex items-center px-4 py-3 text-sm text-light hover:bg-primary hover:text-white transition-all mx-2 mt-1 rounded-lg">
-                                    <i class="fas fa-th-large mr-3"></i>
-                                    Semua Produk
-                                </a>
-                                
-                                <div class="px-2 pt-2">
-                                    <div class="px-3 py-2 text-xs font-semibold text-gray-400">
-                                        Kategori
-                                    </div>
-                                    <div class="space-y-1 max-h-56 overflow-y-auto">
-                                        @if(isset($categories) && $categories->count() > 0)
-                                            @foreach($categories->take(6) as $category)
-                                                <a href="{{ route('main.products.index', ['category_id' => $category->id]) }}"
-                                                   class="flex items-center px-4 py-2.5 text-sm text-gray-300 hover:text-white hover:bg-dark-light transition-all rounded-lg">
-                                                    <i class="fas fa-folder mr-3 text-primary text-xs"></i>
-                                                    <span class="truncate">{{ $category->name }}</span>
-                                                </a>
-                                            @endforeach
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Layanan -->
-                        <a href="{{ route('main.services.index') }}" class="relative group px-4 py-2">
-                            <div class="flex items-center">
-                                <i class="fas fa-cogs mr-2 text-primary opacity-80 group-hover:opacity-100 transition-all"></i>
-                                <span class="text-light font-medium group-hover:text-primary transition-colors">Layanan</span>
-                            </div>
-                            <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-primary group-hover:w-full transition-all duration-300 rounded-full"></div>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Menu Kanan Desktop -->
-                <div class="hidden lg:flex items-center space-x-4">
-                    <!-- Kontak -->
-                    <a href="https://wa.me/6282133803940"
-                       target="_blank"
-                       class="btn-primary text-white px-5 py-2.5 rounded-xl font-semibold transition-all flex items-center group shadow-lg">
-                        <i class="fab fa-whatsapp mr-2"></i>
-                        Kontak
-                    </a>
-
-                    @auth
-                        @if(auth()->user()->role === 'Customer')
-                    <!-- Wishlist (hanya Customer) -->
-                    <a href="{{ route('wishlist.index') }}" id="wishlist-button" class="relative group">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-dark-light transition-all">
-                            <i class="fas fa-heart text-xl text-light group-hover:text-red-500 transition-colors"></i>
-                            <span class="wishlist-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-glow {{ !isset($wishlistCount) || $wishlistCount < 1 ? 'hidden' : '' }}" style="{{ !isset($wishlistCount) || $wishlistCount < 1 ? 'display: none;' : '' }}">
-                                {{ $wishlistCount ?? 0 }}
+                            <span class="text-white font-bold tracking-tight leading-none"
+                                  :class="scrolled ? 'text-lg' : 'text-xl'">
+                                GLORIOUS
+                            </span>
+                            <span class="text-primary-400 font-semibold tracking-wider"
+                                  :class="scrolled ? 'text-[10px]' : 'text-xs'">
+                                SOLUSI TEKNOLOGI
                             </span>
                         </div>
                     </a>
+                </div>
 
-                    <!-- Cart (hanya Customer) -->
-                    <button id="cart-button" class="relative group" type="button">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-dark-light transition-all">
-                            <i class="fas fa-shopping-cart text-xl text-light group-hover:text-primary transition-colors"></i>
-                            @if(isset($cartCount) && $cartCount > 0)
-                                <span class="cart-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-glow">
-                                    {{ $cartCount }}
-                                </span>
-                            @else
-                                <span class="cart-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 items-center justify-center shadow-glow hidden" style="display: none;"></span>
-                            @endif
+                <!-- DESKTOP MENU -->
+                <div class="hidden lg:flex items-center space-x-1">
+                    <!-- Beranda -->
+                    <a href="{{ url('/') }}" 
+                       class="group relative px-4 py-2 rounded-lg transition-all duration-200 hover:bg-dark-700/50">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-home text-sm text-primary-400 opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                            <span class="text-gray-300 font-medium group-hover:text-white transition-colors">Beranda</span>
                         </div>
-                    </button>
+                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-500 group-hover:w-2/3 transition-all duration-300 rounded-full"></div>
+                    </a>
+
+                    <!-- Tentang -->
+                    <a href="{{ url('/') }}#about" 
+                       class="group relative px-4 py-2 rounded-lg transition-all duration-200 hover:bg-dark-700/50">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-info-circle text-sm text-primary-400 opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                            <span class="text-gray-300 font-medium group-hover:text-white transition-colors">Tentang</span>
+                        </div>
+                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-500 group-hover:w-2/3 transition-all duration-300 rounded-full"></div>
+                    </a>
+
+                    <!-- Produk Dropdown -->
+                    <div class="relative" 
+                         @mouseenter="productDropdownOpen = true"
+                         @mouseleave="productDropdownOpen = false">
+                        
+                        <div class="flex items-center">
+                            <a href="{{ route('main.products.index') }}" 
+                               class="group relative px-4 py-2 rounded-lg transition-all duration-200 hover:bg-dark-700/50">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-boxes text-sm text-primary-400 opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                                    <span class="text-gray-300 font-medium group-hover:text-white transition-colors">Produk</span>
+                                </div>
+                                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-500 group-hover:w-2/3 transition-all duration-300 rounded-full"></div>
+                            </a>
+                            
+                            <button type="button" class="p-2 hover:bg-dark-700/50 rounded-lg transition-colors">
+                                <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-300"
+                                   :class="productDropdownOpen ? 'rotate-180' : ''"></i>
+                            </button>
+                        </div>
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="productDropdownOpen"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute left-0 mt-2 w-64 bg-dark-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden"
+                             style="display: none;">
+                            
+                            <div class="px-4 py-3 border-b border-gray-700 bg-dark-700/30">
+                                <h3 class="text-white font-semibold text-sm flex items-center gap-2">
+                                    <i class="fas fa-layer-group text-primary-400"></i>
+                                    Kategori Produk
+                                </h3>
+                            </div>
+                            
+                            <a href="{{ route('main.products.index') }}"
+                               class="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-primary-500/10 hover:text-white transition-all border-b border-gray-700/50 group">
+                                <i class="fas fa-th-large text-primary-400 group-hover:scale-110 transition-transform"></i>
+                                <span class="font-medium">Semua Produk</span>
+                                <i class="fas fa-arrow-right text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            </a>
+                            
+                            <div class="px-2 py-2">
+                                <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    Kategori
+                                </div>
+                                <div class="space-y-1 max-h-64 overflow-y-auto">
+                                    @if(isset($categories) && $categories->count() > 0)
+                                        @foreach($categories->take(8) as $category)
+                                            <a href="{{ route('main.products.index', ['category_id' => $category->id]) }}"
+                                               class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-400 hover:text-white hover:bg-dark-700 rounded-lg transition-all group">
+                                                <i class="fas fa-folder text-primary-400 text-xs group-hover:scale-110 transition-transform"></i>
+                                                <span class="truncate">{{ $category->name }}</span>
+                                                <i class="fas fa-chevron-right text-xs ml-auto opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                            </a>
+                                        @endforeach
+                                    @else
+                                        <div class="px-3 py-6 text-center text-gray-500 text-sm">
+                                            <i class="fas fa-inbox text-2xl mb-2 opacity-50"></i>
+                                            <p>Belum ada kategori</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Layanan -->
+                    <a href="#services" 
+                       class="group relative px-4 py-2 rounded-lg transition-all duration-200 hover:bg-dark-700/50">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-cogs text-sm text-primary-400 opacity-80 group-hover:opacity-100 transition-opacity"></i>
+                            <span class="text-gray-300 font-medium group-hover:text-white transition-colors">Layanan</span>
+                        </div>
+                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-500 group-hover:w-2/3 transition-all duration-300 rounded-full"></div>
+                    </a>
+                </div>
+
+                <!-- RIGHT SIDE ACTIONS -->
+                <div class="hidden lg:flex items-center gap-3">
+                    @auth
+                        @if(auth()->user()->role === 'Customer')
+                            <!-- Wishlist -->
+                            <a href="{{ route('wishlist.index') }}" 
+                               id="wishlist-button"
+                               class="relative p-2.5 rounded-xl hover:bg-dark-700/50 transition-all group">
+                                <i class="fas fa-heart text-lg text-gray-400 group-hover:text-red-400 transition-colors"></i>
+                                @if(isset($wishlistCount) && $wishlistCount > 0)
+                                    <span class="wishlist-count-badge absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-primary-600 to-primary-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
+                                        {{ $wishlistCount }}
+                                    </span>
+                                @else
+                                    <span class="wishlist-count-badge absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-primary-600 to-primary-500 text-white text-xs font-bold rounded-full items-center justify-center shadow-lg hidden"></span>
+                                @endif
+                            </a>
+
+                            <!-- Cart -->
+                            <button id="cart-button" type="button"
+                                    class="relative p-2.5 rounded-xl hover:bg-dark-700/50 transition-all group">
+                                <i class="fas fa-shopping-cart text-lg text-gray-400 group-hover:text-primary-400 transition-colors"></i>
+                                @if(isset($cartCount) && $cartCount > 0)
+                                    <span class="cart-count-badge absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-primary-600 to-primary-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
+                                        {{ $cartCount }}
+                                    </span>
+                                @else
+                                    <span class="cart-count-badge absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-primary-600 to-primary-500 text-white text-xs font-bold rounded-full items-center justify-center shadow-lg hidden"></span>
+                                @endif
+                            </button>
                         @endif
                     @endauth
 
-                    <!-- Profile User Button (foto profil round circle jika sudah di-update) -->
-                    <div class="relative">
-                        <button type="button" 
-                                id="profile-popup-button"
-                                class="flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-dark-light hover:ring-2 hover:ring-primary transition-all group focus:outline-none ring-2 ring-transparent">
-                            @auth
-                                @if(auth()->user()->profile_photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists(auth()->user()->profile_photo_path))
-                                    <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}" 
-                                         alt="Profile" 
-                                         class="w-full h-full object-cover">
-                                @else
-                                    <i class="fas fa-user text-light group-hover:text-white"></i>
-                                @endif
-                            @else
-                                <i class="fas fa-user text-light group-hover:text-white"></i>
-                            @endauth
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Menu Mobile Toggle -->
-                <div class="lg:hidden flex items-center space-x-3">
-                    @auth
-                        @if(auth()->user()->role === 'Customer')
-                    <!-- Wishlist Mobile -->
-                    <a href="{{ route('wishlist.index') }}" id="wishlist-button-mobile" class="relative">
-                        <i class="fas fa-heart text-xl text-light hover:text-primary transition-colors"></i>
-                        <span class="wishlist-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center {{ !isset($wishlistCount) || $wishlistCount < 1 ? 'hidden' : '' }}" style="{{ !isset($wishlistCount) || $wishlistCount < 1 ? 'display: none;' : '' }}">
-                            {{ $wishlistCount ?? 0 }}
-                        </span>
+                    <!-- WhatsApp CTA -->
+                    <a href="https://wa.me/6282133803940" 
+                       target="_blank"
+                       class="group relative inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-primary-500/30 overflow-hidden">
+                        <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
+                        <i class="fab fa-whatsapp relative z-10"></i>
+                        <span class="relative z-10">Hubungi</span>
                     </a>
 
-                    <!-- Cart Mobile -->
-                    <button id="cart-button-mobile" class="relative" type="button">
-                        <i class="fas fa-shopping-cart text-xl text-light hover:text-primary transition-colors"></i>
-                        @if(isset($cartCount) && $cartCount > 0)
-                            <span class="cart-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                                {{ $cartCount }}
-                            </span>
+                    <!-- Profile Button -->
+                    <button type="button" 
+                            id="profile-popup-button"
+                            class="relative w-10 h-10 rounded-full overflow-hidden bg-dark-700 hover:ring-2 hover:ring-primary-500 transition-all group focus:outline-none">
+                        @auth
+                            @if(auth()->user()->profile_photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists(auth()->user()->profile_photo_path))
+                                <img src="{{ asset('storage/' . auth()->user()->profile_photo_path) }}" 
+                                     alt="Profile" 
+                                     class="w-full h-full object-cover">
+                            @else
+                                <i class="fas fa-user text-gray-400 group-hover:text-white transition-colors"></i>
+                            @endif
                         @else
-                            <span class="cart-count-badge absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 items-center justify-center hidden" style="display: none;"></span>
-                        @endif
+                            <i class="fas fa-user text-gray-400 group-hover:text-white transition-colors"></i>
+                        @endauth
                     </button>
+                </div>
+
+                <!-- MOBILE MENU TOGGLE -->
+                <div class="lg:hidden flex items-center gap-3">
+                    @auth
+                        @if(auth()->user()->role === 'Customer')
+                            <a href="{{ route('wishlist.index') }}" id="wishlist-button-mobile" class="relative p-2">
+                                <i class="fas fa-heart text-lg text-gray-400"></i>
+                                @if(isset($wishlistCount) && $wishlistCount > 0)
+                                    <span class="wishlist-count-badge absolute -top-1 -right-1 w-5 h-5 bg-primary-500 text-white text-xs rounded-full flex items-center justify-center">
+                                        {{ $wishlistCount }}
+                                    </span>
+                                @endif
+                            </a>
+
+                            <button id="cart-button-mobile" type="button" class="relative p-2">
+                                <i class="fas fa-shopping-cart text-lg text-gray-400"></i>
+                                @if(isset($cartCount) && $cartCount > 0)
+                                    <span class="cart-count-badge absolute -top-1 -right-1 w-5 h-5 bg-primary-500 text-white text-xs rounded-full flex items-center justify-center">
+                                        {{ $cartCount }}
+                                    </span>
+                                @else
+                                    <span class="cart-count-badge absolute -top-1 -right-1 w-5 h-5 bg-primary-500 text-white text-xs rounded-full items-center justify-center hidden"></span>
+                                @endif
+                            </button>
                         @endif
                     @endauth
                     
-                    <!-- Hamburger Button -->
                     <button id="menu-toggle" 
                             class="flex flex-col justify-center items-center w-10 h-10 focus:outline-none">
                         <span class="hamburger-line"></span>
@@ -682,27 +838,24 @@
                 </div>
             </div>
 
-            <!-- Menu Mobile -->
-            <div id="mobile-menu" class="lg:hidden mobile-menu bg-dark-lighter border-t border-gray-800">
+            <!-- MOBILE MENU -->
+            <div id="mobile-menu" class="lg:hidden mobile-menu bg-dark-700/50 border-t border-gray-700 rounded-b-2xl">
                 <div class="px-4 py-4 space-y-1">
-                    <!-- Beranda Mobile -->
                     <a href="{{ url('/') }}" 
-                       class="flex items-center px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
-                        <i class="fas fa-home mr-3 text-primary group-hover:text-white"></i>
+                       class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-primary hover:text-white rounded-lg transition-all group">
+                        <i class="fas fa-home text-primary group-hover:text-white"></i>
                         <span class="font-medium">Beranda</span>
                     </a>
                     
-                    <!-- Tentang Mobile -->
-                    <a href="{{ route('main.about.index') }}" 
-                       class="flex items-center px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
-                        <i class="fas fa-info-circle mr-3 text-primary group-hover:text-white"></i>
-                        <span class="font-medium">Tentang Kami</span>
+                    <a href="{{ url('/') }}#about" 
+                       class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-primary hover:text-white rounded-lg transition-all group">
+                        <i class="fas fa-info-circle text-primary group-hover:text-white"></i>
+                        <span class="font-medium">Tentang</span>
                     </a>
-
-                    <!-- Produk Mobile -->
+                    
                     <div class="px-4 py-2">
                         <button id="mobile-products-toggle" 
-                                class="flex items-center justify-between w-full text-light hover:text-primary transition-all p-2 focus:outline-none">
+                                class="flex items-center justify-between w-full text-gray-300 hover:text-primary transition-all p-2 focus:outline-none">
                             <div class="flex items-center">
                                 <i class="fas fa-boxes mr-3 text-primary"></i>
                                 <span class="font-medium">Produk</span>
@@ -712,7 +865,7 @@
                         
                         <div id="mobile-products-menu" class="products-submenu pl-8 space-y-1 mt-1">
                             <a href="{{ route('main.products.index') }}" 
-                               class="flex items-center px-4 py-2 text-sm text-light hover:bg-primary hover:text-white rounded-lg transition-all">
+                               class="flex items-center px-4 py-2 text-sm text-gray-400 hover:bg-primary hover:text-white rounded-lg transition-all">
                                 <i class="fas fa-th-large mr-3 w-4 text-center"></i>
                                 Semua Produk
                             </a>
@@ -720,7 +873,7 @@
                             @isset($categories)
                                 @foreach($categories->take(5) as $category)
                                     <a href="{{ route('main.products.index', ['category_id' => $category->id]) }}" 
-                                       class="flex items-center px-4 py-2 text-sm text-light hover:bg-primary hover:text-white rounded-lg transition-all">
+                                       class="flex items-center px-4 py-2 text-sm text-gray-400 hover:bg-primary hover:text-white rounded-lg transition-all">
                                         <i class="fas fa-folder mr-3 w-4 text-center"></i>
                                         <span>{{ $category->name }}</span>
                                     </a>
@@ -728,35 +881,35 @@
                             @endisset
                         </div>
                     </div>
-
-                    <!-- Layanan Mobile -->
-                    <a href="{{ route('main.services.index') }}" 
-                       class="flex items-center px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
-                        <i class="fas fa-cogs mr-3 text-primary group-hover:text-white"></i>
+                    
+                    <a href="#services" 
+                       class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-primary hover:text-white rounded-lg transition-all group">
+                        <i class="fas fa-cogs text-primary group-hover:text-white"></i>
                         <span class="font-medium">Layanan</span>
                     </a>
+                    
+                    <a href="#contact" 
+                       class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-primary hover:text-white rounded-lg transition-all group">
+                        <i class="fas fa-envelope text-primary group-hover:text-white"></i>
+                        <span class="font-medium">Kontak</span>
+                    </a>
 
-                    <!-- Profile Options Mobile: tampil sesuai login -->
-                    <div class="border-t border-gray-800 pt-3 mt-2">
+                    <div class="border-t border-gray-700 pt-3 mt-2">
                         @auth
                             @if(auth()->user()->role === 'Customer')
-                                <a href="{{ route('customer.profile.edit') }}" class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                <a href="{{ route('customer.profile.edit') }}" class="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-primary hover:text-white rounded-lg transition-all group">
                                     <i class="fas fa-user-cog mr-3 text-primary group-hover:text-white"></i>
                                     <span class="font-medium">Profile</span>
                                 </a>
-                                <a href="{{ route('wishlist.index') }}" class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                <a href="{{ route('wishlist.index') }}" class="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-primary hover:text-white rounded-lg transition-all group">
                                     <i class="fas fa-heart mr-3 text-primary group-hover:text-white"></i>
                                     <span class="font-medium">Wishlist</span>
                                 </a>
-                                <a href="{{ route('cart.index') }}" class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                <a href="{{ route('cart.index') }}" class="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-primary hover:text-white rounded-lg transition-all group">
                                     <i class="fas fa-shopping-cart mr-3 text-primary group-hover:text-white"></i>
                                     <span class="font-medium">Keranjang</span>
                                 </a>
-                                <a href="{{ route('customer.orders') }}" class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
-                                    <i class="fas fa-shopping-bag mr-3 text-primary group-hover:text-white"></i>
-                                    <span class="font-medium">Pesanan Saya</span>
-                                </a>
-                                <button type="button" id="mobile-logout-button" class="flex items-center w-full px-4 py-3 text-light hover:bg-red-600 hover:text-white rounded-lg transition-all group">
+                                <button type="button" id="mobile-logout-button" class="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition-all group">
                                     <i class="fas fa-sign-out-alt mr-3 text-primary group-hover:text-white"></i>
                                     <span class="font-medium">Logout</span>
                                 </button>
@@ -769,30 +922,29 @@
                                         default => url('/'),
                                     };
                                 @endphp
-                                <a href="{{ $dashUrl }}" class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                <a href="{{ $dashUrl }}" class="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-primary hover:text-white rounded-lg transition-all group">
                                     <i class="fas fa-tachometer-alt mr-3 text-primary group-hover:text-white"></i>
                                     <span class="font-medium">Dashboard</span>
                                 </a>
-                                <button type="button" id="mobile-logout-button" class="flex items-center w-full px-4 py-3 text-light hover:bg-red-600 hover:text-white rounded-lg transition-all group">
+                                <button type="button" id="mobile-logout-button" class="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-red-600 hover:text-white rounded-lg transition-all group">
                                     <i class="fas fa-sign-out-alt mr-3 text-primary group-hover:text-white"></i>
                                     <span class="font-medium">Logout</span>
                                 </button>
                             @endif
                         @else
                             <button id="mobile-login-button" 
-                                    class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                    class="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-primary hover:text-white rounded-lg transition-all group">
                                 <i class="fas fa-sign-in-alt mr-3 text-primary group-hover:text-white"></i>
                                 <span class="font-medium">Login Pelanggan</span>
                             </button>
                             <button id="mobile-register-button" 
-                                    class="flex items-center w-full px-4 py-3 text-light hover:bg-primary hover:text-white rounded-lg transition-all group">
+                                    class="flex items-center w-full px-4 py-3 text-gray-300 hover:bg-primary hover:text-white rounded-lg transition-all group">
                                 <i class="fas fa-user-plus mr-3 text-primary group-hover:text-white"></i>
                                 <span class="font-medium">Daftar Pelanggan</span>
                             </button>
                         @endauth
                     </div>
-                    
-                    <!-- Kontak Mobile -->
+
                     <a href="https://wa.me/6282133803940" 
                        target="_blank"
                        class="flex items-center justify-center btn-primary text-white px-4 py-3 rounded-xl font-semibold transition-all group mt-4">
@@ -803,15 +955,16 @@
             </div>
         </div>
     </nav>
+    <!-- END NAVBAR -->
 
     <!-- Debug: tampilkan AUTH status (sembunyikan di production) -->
     <div id="auth-debug" style="display:none;" aria-hidden="true">AUTH: {{ auth()->check() ? 'YES' : 'NO' }}</div>
 
     <!-- Cart Sidebar -->
-    <div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 h-full w-full lg:w-96 bg-dark-lighter z-[70] shadow-2xl border-l border-gray-800">
+    <div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 h-full w-full lg:w-96 bg-dark-800 z-[70] shadow-2xl border-l border-gray-700">
         <div class="flex flex-col h-full">
             <!-- Cart Header -->
-            <div class="flex items-center justify-between p-6 border-b border-gray-800">
+            <div class="flex items-center justify-between p-6 border-b border-gray-700">
                 <div class="flex items-center">
                     <i class="fas fa-shopping-cart text-primary text-xl mr-3"></i>
                     <h3 class="text-xl font-bold text-white font-heading">Keranjang Belanja</h3>
@@ -835,7 +988,7 @@
                                     $imgUrl = $cartItem->product->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($cartItem->product->image)
                                         ? asset('storage/' . $cartItem->product->image) : null;
                                 @endphp
-                                <div class="cart-item flex gap-3 p-3 rounded-lg bg-dark/50 border border-gray-800">
+                                <div class="cart-item flex gap-3 p-3 rounded-lg bg-dark-700/50 border border-gray-700">
                                     @if($imgUrl)
                                         <img src="{{ $imgUrl }}" alt="" class="w-14 h-14 rounded-lg object-cover flex-shrink-0">
                                     @else
@@ -862,7 +1015,7 @@
             </div>
             
             <!-- Cart Footer -->
-            <div class="border-t border-gray-800 p-6">
+            <div class="border-t border-gray-700 p-6">
                 @if(isset($cartItemsSidebar) && $cartItemsSidebar->count() > 0)
                     @php
                         $sidebarTotal = 0;
@@ -887,7 +1040,7 @@
                     <a href="{{ route('cart.index') }}" class="w-full btn-primary text-white py-3.5 rounded-xl font-semibold transition-all flex items-center justify-center">
                         Lanjut ke Checkout
                     </a>
-                    <button id="cart-continue-button" class="w-full bg-dark-light hover:bg-dark text-white py-3 rounded-xl font-medium transition-all">
+                    <button id="cart-continue-button" class="w-full bg-dark-700 hover:bg-dark-600 text-white py-3 rounded-xl font-medium transition-all">
                         Lanjut Belanja
                     </button>
                 </div>
@@ -924,9 +1077,9 @@
                 </div>
                 
                 <!-- User Status -->
-                <div class="bg-dark-light/30 rounded-xl p-4 mb-4 text-center border border-gray-800">
+                <div class="bg-dark-700/30 rounded-xl p-4 mb-4 text-center border border-gray-700">
                     <p class="text-gray-400 text-sm mb-2">Status Pengguna</p>
-                    <div class="inline-flex items-center bg-dark rounded-full px-4 py-2 border border-gray-700 mb-2">
+                    <div class="inline-flex items-center bg-dark-800 rounded-full px-4 py-2 border border-gray-700 mb-2">
                         <i class="fas fa-user-clock text-primary mr-2"></i>
                         <span class="text-white font-medium text-sm" id="user-status">Tamu</span>
                     </div>
@@ -945,7 +1098,7 @@
                     </button>
                     
                     <button id="profile-register-button"
-                            class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-center group">
+                            class="w-full bg-dark-700/50 hover:bg-dark-700 border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold text-sm transition-all flex items-center justify-center group">
                         <i class="fas fa-user-plus mr-3 group-hover:animate-bounce"></i>
                         Daftar Pelanggan
                     </button>
@@ -963,22 +1116,22 @@
                     @auth
                         @if(auth()->user()->role === 'Customer')
                             <a href="{{ route('customer.profile.edit') }}"
-                               class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
+                               class="w-full bg-dark-700/50 hover:bg-dark-700 border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
                                 <i class="fas fa-user-cog mr-3"></i>
                                 Profile / Pengaturan
                             </a>
                             <a href="{{ route('wishlist.index') }}"
-                               class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
+                               class="w-full bg-dark-700/50 hover:bg-dark-700 border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
                                 <i class="fas fa-heart mr-3"></i>
                                 Wishlist Saya
                             </a>
                             <a href="{{ route('cart.index') }}"
-                               class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
+                               class="w-full bg-dark-700/50 hover:bg-dark-700 border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
                                 <i class="fas fa-shopping-cart mr-3"></i>
                                 Keranjang
                             </a>
                             <a href="{{ route('customer.orders') }}" id="user-orders-button"
-                               class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
+                               class="w-full bg-dark-700/50 hover:bg-dark-700 border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-semibold transition-all flex items-center justify-center group">
                                 <i class="fas fa-shopping-bag mr-3"></i>
                                 Pesanan Saya
                             </a>
@@ -1006,10 +1159,10 @@
                 </div>
                 
                 <!-- Footer Note -->
-                <div class="mt-6 pt-4 border-t border-gray-800/50">
+                <div class="mt-6 pt-4 border-t border-gray-700/50">
                     <p class="text-gray-500 text-xs text-center">
                         <i class="fas fa-shield-alt mr-2 text-primary"></i>
-                        Data Anda aman bersama kami sejak 2003
+                        Data Anda aman bersama kami
                     </p>
                 </div>
             </div>
@@ -1020,11 +1173,6 @@
     <div id="customer-login-popup" class="popup-overlay">
         <div class="popup-content">
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary rounded-t-lg"></div>
-            
-            {{-- <button id="close-login-popup" 
-                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors close-button z-50">
-                <i class="fas fa-times text-xl"></i>
-            </button> --}}
             
             <div class="p-6">
                 <div class="text-center mb-6">
@@ -1092,10 +1240,10 @@
                 
                 <div class="relative my-6">
                     <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-800"></div>
+                        <div class="w-full border-t border-gray-700"></div>
                     </div>
                     <div class="relative flex justify-center text-xs">
-                        <span class="px-4 bg-gradient-to-br from-dark-lighter to-dark text-gray-500">atau masuk dengan</span>
+                        <span class="px-4 bg-gradient-to-br from-dark-800 to-dark-800 text-gray-500">atau masuk dengan</span>
                     </div>
                 </div>
 
@@ -1115,22 +1263,22 @@
 
                 <div class="relative my-4">
                     <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-800"></div>
+                        <div class="w-full border-t border-gray-700"></div>
                     </div>
                     <div class="relative flex justify-center text-xs">
-                        <span class="px-4 bg-gradient-to-br from-dark-lighter to-dark text-gray-500">belum punya akun?</span>
+                        <span class="px-4 bg-gradient-to-br from-dark-800 to-dark-800 text-gray-500">belum punya akun?</span>
                     </div>
                 </div>
 
                 <div class="space-y-3">
                     <button id="switch-to-register-button"
-                            class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
+                            class="w-full bg-dark-700/50 hover:bg-dark-700 border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
                         <i class="fas fa-user-plus mr-3 text-xs"></i>
                         Buat Akun Baru
                     </button>
 
                     <button id="back-from-login-button"
-                            class="w-full bg-transparent hover:bg-dark-light/30 border border-gray-700 hover:border-gray-600 text-gray-400 hover:text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
+                            class="w-full bg-transparent hover:bg-dark-700/30 border border-gray-700 hover:border-gray-600 text-gray-400 hover:text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
                         <i class="fas fa-arrow-left mr-3"></i>
                         Kembali
                     </button>
@@ -1143,11 +1291,6 @@
     <div id="customer-registration-popup" class="popup-overlay">
         <div class="popup-content large">
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-primary rounded-t-lg"></div>
-            
-            {{-- <button id="close-registration-popup"
-                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors close-button z-50">
-                <i class="fas fa-times text-xl"></i>
-            </button> --}}
 
             <div class="registration-container">
                 <div class="lg:w-2/5 bg-gradient-to-br from-primary/10 to-primary-dark/10 p-6 lg:p-8">
@@ -1280,7 +1423,7 @@
                             </div>
                         </div>
                         
-                        <div class="flex items-start space-x-3 bg-dark-light/30 p-3 rounded-lg border border-gray-800 mt-4">
+                        <div class="flex items-start space-x-3 bg-dark-700/30 p-3 rounded-lg border border-gray-700 mt-4">
                             <input type="checkbox" 
                                    id="register-terms"
                                    name="terms"
@@ -1304,22 +1447,22 @@
                     
                     <div class="relative my-4">
                         <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-800"></div>
+                            <div class="w-full border-t border-gray-700"></div>
                         </div>
                         <div class="relative flex justify-center text-xs">
-                            <span class="px-4 bg-gradient-to-br from-dark-lighter to-dark text-gray-500">sudah punya akun?</span>
+                            <span class="px-4 bg-gradient-to-br from-dark-800 to-dark-800 text-gray-500">sudah punya akun?</span>
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
                         <button id="switch-to-login-button"
-                                class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
+                                class="w-full bg-dark-700/50 hover:bg-dark-700 border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
                             <i class="fas fa-sign-in-alt mr-3 text-xs"></i>
                             Masuk ke Akun
                         </button>
                         
                         <button id="back-from-registration-button"
-                                class="w-full bg-transparent hover:bg-dark-light/30 border border-gray-700 hover:border-gray-600 text-gray-400 hover:text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
+                                class="w-full bg-transparent hover:bg-dark-700/30 border border-gray-700 hover:border-gray-600 text-gray-400 hover:text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
                             <i class="fas fa-arrow-left mr-3"></i>
                             Kembali
                         </button>
@@ -1370,16 +1513,16 @@
                 
                 <div class="relative my-4">
                     <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-800"></div>
+                        <div class="w-full border-t border-gray-700"></div>
                     </div>
                     <div class="relative flex justify-center text-xs">
-                        <span class="px-4 bg-dark-lighter text-gray-500">atau</span>
+                        <span class="px-4 bg-dark-800 text-gray-500">atau</span>
                     </div>
                 </div>
                 
                 <div class="space-y-3">
                     <button id="back-to-login-button"
-                            class="w-full bg-dark-light/50 hover:bg-dark-light border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
+                            class="w-full bg-dark-700/50 hover:bg-dark-700 border border-gray-700 hover:border-primary text-white py-3 rounded-lg font-medium transition-all flex items-center justify-center group text-sm">
                         <i class="fas fa-arrow-left mr-3"></i>
                         Kembali ke Login
                     </button>
@@ -1462,138 +1605,93 @@
         </div>
     </div>
 
-    <!-- Konten Utama -->
-    <div class="flex-1 pt-20">
-        <main>
-            @yield('content')
-        </main>
-    </div>
+    <!-- Main Content -->
+    <main class="flex-grow pt-20">
+        @yield('content')
+    </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark-lighter border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-6 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                
-                <!-- Info Perusahaan -->
-                <div class="lg:col-span-2">
-                    <div class="flex items-center space-x-4 mb-6">
-                        <div class="relative">
-                            <div class="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-glow">
-                                <span class="text-white font-bold text-xl">GC</span>
-                            </div>
-                            <div class="absolute -inset-1 bg-gradient-primary rounded-2xl blur opacity-20"></div>
+    <!-- FOOTER PREMIUM -->
+    <footer class="bg-dark-900 border-t border-dark-500 pt-16 pb-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <!-- Column 1: About -->
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
+                            <span class="text-white font-bold">GC</span>
                         </div>
                         <div>
-                            <h3 class="text-2xl font-bold text-white font-heading">Glorious Computer</h3>
-                            <p class="gradient-text font-semibold tracking-wide">Solusi Teknologi Sejak 2003</p>
+                            <div class="font-bold text-white">GLORIOUS</div>
+                            <div class="text-primary text-xs">COMPUTER</div>
                         </div>
                     </div>
-                    <p class="text-gray-400 mb-8 leading-relaxed">
-                        Penyedia solusi teknologi terkemuka yang mengkhususkan diri dalam perbaikan komputer, 
-                        upgrade hardware, instalasi software, dan layanan IT komprehensif dengan keunggulan 
-                        selama lebih dari 20 tahun di Purbalingga.
+                    <p class="text-gray-400 text-sm mb-4">
+                        Solusi teknologi terpercaya sejak 2019. Menyediakan produk dan layanan IT berkualitas tinggi.
                     </p>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-12 h-12 bg-dark-light hover:bg-primary rounded-xl flex items-center justify-center transition-all group shadow-soft">
-                            <i class="fab fa-facebook-f text-gray-400 group-hover:text-white text-lg"></i>
+                    <div class="flex space-x-3">
+                        <a href="#" class="w-10 h-10 bg-dark-700 hover:bg-primary rounded-lg flex items-center justify-center transition-all">
+                            <i class="fab fa-facebook-f text-gray-400 hover:text-white text-sm"></i>
                         </a>
-                        <a href="#" class="w-12 h-12 bg-dark-light hover:bg-pink-600 rounded-xl flex items-center justify-center transition-all group shadow-soft">
-                            <i class="fab fa-instagram text-gray-400 group-hover:text-white text-lg"></i>
+                        <a href="#" class="w-10 h-10 bg-dark-700 hover:bg-pink-600 rounded-lg flex items-center justify-center transition-all">
+                            <i class="fab fa-instagram text-gray-400 hover:text-white text-sm"></i>
                         </a>
-                        <a href="#" class="w-12 h-12 bg-dark-light hover:bg-blue-500 rounded-xl flex items-center justify-center transition-all group shadow-soft">
-                            <i class="fab fa-twitter text-gray-400 group-hover:text-white text-lg"></i>
-                        </a>
-                        <a href="https://wa.me/6282133803940" 
-                           target="_blank"
-                           class="w-12 h-12 bg-dark-light hover:bg-green-600 rounded-xl flex items-center justify-center transition-all group shadow-soft">
-                            <i class="fab fa-whatsapp text-gray-400 group-hover:text-white text-lg"></i>
+                        <a href="#" class="w-10 h-10 bg-dark-700 hover:bg-blue-500 rounded-lg flex items-center justify-center transition-all">
+                            <i class="fab fa-twitter text-gray-400 hover:text-white text-sm"></i>
                         </a>
                     </div>
                 </div>
                 
-                <!-- Layanan -->
+                <!-- Column 2: Quick Links -->
                 <div>
-                    <h4 class="text-xl font-bold text-white font-heading mb-6 pb-2 border-b border-gray-800">Layanan Kami</h4>
-                    <ul class="space-y-4">
-                        <li>
-                            <a href="{{ route('main.services.index') }}" class="flex items-center text-gray-400 hover:text-primary transition-all group">
-                                <div class="w-8 h-8 bg-dark-light rounded-lg flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
-                                    <i class="fas fa-laptop-code text-sm"></i>
-                                </div>
-                                <span>Servis PC & Laptop</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('main.services.index') }}" class="flex items-center text-gray-400 hover:text-primary transition-all group">
-                                <div class="w-8 h-8 bg-dark-light rounded-lg flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
-                                    <i class="fas fa-microchip text-sm"></i>
-                                </div>
-                                <span>Upgrade Hardware</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('main.services.index') }}" class="flex items-center text-gray-400 hover:text-primary transition-all group">
-                                <div class="w-8 h-8 bg-dark-light rounded-lg flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
-                                    <i class="fas fa-print text-sm"></i>
-                                </div>
-                                <span>Servis Printer</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('main.services.index') }}" class="flex items-center text-gray-400 hover:text-primary transition-all group">
-                                <div class="w-8 h-8 bg-dark-light rounded-lg flex items-center justify-center mr-3 group-hover:bg-primary transition-all">
-                                    <i class="fas fa-cog text-sm"></i>
-                                </div>
-                                <span>Install Software</span>
-                            </a>
-                        </li>
+                    <h4 class="font-semibold text-white mb-4">Quick Links</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="/" class="text-gray-400 hover:text-primary transition-colors">Beranda</a></li>
+                        <li><a href="/products" class="text-gray-400 hover:text-primary transition-colors">Produk</a></li>
+                        <li><a href="#services" class="text-gray-400 hover:text-primary transition-colors">Layanan</a></li>
+                        <li><a href="#about" class="text-gray-400 hover:text-primary transition-colors">Tentang Kami</a></li>
                     </ul>
                 </div>
                 
-                <!-- Info Kontak -->
+                <!-- Column 3: Services -->
                 <div>
-                    <h4 class="text-xl font-bold text-white font-heading mb-6 pb-2 border-b border-gray-800">Info Kontak</h4>
-                    <ul class="space-y-5">
-                        <li class="flex items-start">
-                            <div class="w-10 h-10 bg-dark-light rounded-lg flex items-center justify-center mr-4 mt-1">
-                                <i class="fas fa-map-marker-alt text-primary"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-white">Lokasi</p>
-                                <p class="text-gray-400 text-sm">Jl. Argandaru No.4<br>Bukateja, Purbalingga</p>
-                            </div>
+                    <h4 class="font-semibold text-white mb-4">Layanan</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">Service Laptop</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">Custom PC Build</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">Upgrade Hardware</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">Konsultasi IT</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 4: Contact -->
+                <div>
+                    <h4 class="font-semibold text-white mb-4">Kontak</h4>
+                    <ul class="space-y-3 text-sm text-gray-400">
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-map-marker-alt text-primary mt-1"></i>
+                            <span>Purwokerto, Central Java, ID</span>
                         </li>
-                        <li class="flex items-center">
-                            <div class="w-10 h-10 bg-dark-light rounded-lg flex items-center justify-center mr-4">
-                                <i class="fas fa-phone-alt text-primary"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-white">Telepon</p>
-                                <a href="tel:082133803940" class="text-gray-400 hover:text-primary transition-colors text-sm">0821-3380-3940</a>
-                            </div>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-phone text-primary"></i>
+                            <a href="tel:+6282133803940" class="hover:text-primary transition-colors">+62 821-3380-3940</a>
                         </li>
-                        <li class="flex items-center">
-                            <div class="w-10 h-10 bg-dark-light rounded-lg flex items-center justify-center mr-4">
-                                <i class="fas fa-clock text-primary"></i>
-                            </div>
-                            <div>
-                                <p class="font-medium text-white">Jam Operasional</p>
-                                <p class="text-gray-400 text-sm">Sen - Sab: 08:00 - 17:00</p>
-                            </div>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-envelope text-primary"></i>
+                            <a href="mailto:info@glorious.com" class="hover:text-primary transition-colors">info@glorious.com</a>
                         </li>
                     </ul>
                 </div>
             </div>
             
-            <!-- Hak Cipta -->
-            <div class="border-t border-gray-800 mt-12 pt-8 text-center">
-                <p class="text-gray-500">
-                    &copy; {{ date('Y') }} <span class="text-white font-semibold">Glorious Computer</span>. Hak Cipta Dilindungi. 
-                    <span class="gradient-text font-medium ml-2">Keunggulan dalam Solusi Teknologi</span>
+            <!-- Bottom Bar -->
+            <div class="border-t border-dark-500 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-500 text-sm">
+                    © {{ date('Y') }} Glorious Computer. All rights reserved.
                 </p>
-                <p class="text-gray-600 text-sm mt-2">
-                    Dirancang dengan <i class="fas fa-heart text-red-500 mx-1"></i> untuk masyarakat Purbalingga
-                </p>
+                <div class="flex gap-6 text-sm">
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">Terms of Service</a>
+                </div>
             </div>
         </div>
     </footer>
@@ -1631,7 +1729,6 @@
             this.updateUserState();
             this.initializeCart();
             this.hideAllPopups();
-            // Jangan panggil checkSession() - auth sudah dari Blade (__INITIAL_AUTH__)
             this.setupPasswordStrengthChecker();
         },
         
@@ -1689,12 +1786,12 @@
             // Close mobile menu when clicking links
             document.querySelectorAll('#mobile-menu a').forEach(link => {
                 link.addEventListener('click', () => {
-                    mobileMenu.classList.remove('open');
-                    menuToggle.classList.remove('hamburger-active');
+                    if (mobileMenu) mobileMenu.classList.remove('open');
+                    if (menuToggle) menuToggle.classList.remove('hamburger-active');
                     
                     if (mobileProductsMenu && mobileProductsMenu.classList.contains('open')) {
                         mobileProductsMenu.classList.remove('open');
-                        productsArrow.classList.remove('rotate-180');
+                        if (productsArrow) productsArrow.classList.remove('rotate-180');
                     }
                 });
             });
@@ -1709,7 +1806,7 @@
                 });
             }
             
-            // Cart buttons - hanya blokir klik jika guest (Blade: tombol cart hanya ada saat @@auth Customer)
+            // Cart buttons
             const cartButton = document.getElementById('cart-button');
             const cartButtonMobile = document.getElementById('cart-button-mobile');
 
@@ -1736,7 +1833,7 @@
                 });
             }
 
-            // Wishlist: jika auth biarkan link jalan (jangan preventDefault); jika guest tampilkan login
+            // Wishlist buttons
             const wishlistButton = document.getElementById('wishlist-button');
             const wishlistButtonMobile = document.getElementById('wishlist-button-mobile');
 
@@ -1747,7 +1844,6 @@
                         e.stopPropagation();
                         this.showPopup('customer-login-popup');
                     }
-                    // else: biarkan default (navigasi ke href)
                 });
             }
 
@@ -1759,33 +1855,9 @@
                         this.showPopup('customer-login-popup');
                         this.hideMobileMenu();
                     }
-                    // else: biarkan default
                 });
             }
 
-            // Require-login buttons (guest: show alert + open login popup)
-            document.addEventListener('click', (e) => {
-                const el = e.target.closest('.js-require-login-wa, .js-require-login-cart, .js-require-login-wishlist');
-                if (!el || window.isAuth === true || window.isAuth === 'true' || this.currentUser) return;
-                e.preventDefault();
-                e.stopPropagation();
-                const msg = el.getAttribute('data-message') || 'Silakan login untuk melanjutkan.';
-                this.showToast(msg, 'info');
-                this.showPopup('customer-login-popup');
-                this.hideMobileMenu();
-            });
-
-            // Block order-wa-form submit when guest (form only rendered when auth, but safety)
-            document.addEventListener('submit', (e) => {
-                const form = e.target.closest('.order-wa-form');
-                if (!form) return;
-                if (window.isAuth !== true && window.isAuth !== 'true' && !this.currentUser) {
-                    e.preventDefault();
-                    this.showToast('Silakan login untuk memesan via WhatsApp.', 'info');
-                    this.showPopup('customer-login-popup');
-                }
-            });
-            
             // Cart close buttons
             const cartCloseButton = document.getElementById('cart-close-button');
             const cartContinueButton = document.getElementById('cart-continue-button');
@@ -1997,48 +2069,27 @@
                 });
             }
             
-            // Social login buttons
+            // Google login button
             const googleLoginButton = document.getElementById('google-login-button');
-            const facebookLoginButton = document.getElementById('facebook-login-button');
-
             if (googleLoginButton) {
                 googleLoginButton.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    // Redirect ke endpoint Laravel Google OAuth (session-based)
                     window.location.href = '/auth/google';
                 });
             }
 
-            if (facebookLoginButton) {
-                facebookLoginButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.showToast('Fitur login Facebook sedang dalam pengembangan', 'info');
-                });
-            }
-
-            // FIXED: Close popup dengan Escape key untuk semua popup
+            // Close popup dengan Escape key
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && this.activePopup) {
                     this.hidePopup(this.activePopup);
                 }
             });
             
-            // FIXED: Close popup ketika klik di luar content popup
+            // Close popup ketika klik di luar content popup
             document.addEventListener('click', (e) => {
                 if (this.activePopup && e.target.classList.contains('popup-overlay')) {
                     this.hidePopup(this.activePopup);
-                }
-            });
-            
-            // Navbar scroll effect
-            window.addEventListener('scroll', () => {
-                const nav = document.querySelector('nav');
-                if (window.scrollY > 20) {
-                    nav.classList.add('shadow-lg', 'bg-dark/95');
-                } else {
-                    nav.classList.remove('shadow-lg', 'bg-dark/95');
                 }
             });
         },
@@ -2315,7 +2366,6 @@
             const identifier = document.getElementById('login-identifier')?.value;
             const password = document.getElementById('login-password')?.value;
             const rememberMe = document.getElementById('remember-me')?.checked;
-            const type = 'user';
 
             if (!identifier || !password) {
                 this.showError('Login Gagal', 'Harap isi semua field yang diperlukan');
@@ -2356,7 +2406,7 @@
                     localStorage.setItem('glorious_user', JSON.stringify(data.user));
                     this.hidePopup('customer-login-popup');
                     this.showSuccess('Login Berhasil', data.message || 'Selamat datang kembali!');
-                    // WAJIB: reload/redirect agar Blade re-render dengan @@auth & session sinkron
+                    // Reload/redirect agar Blade re-render dengan auth & session sinkron
                     if (data.redirect) {
                         window.location.href = data.redirect;
                     } else {
@@ -2442,7 +2492,7 @@
                     localStorage.setItem('glorious_user', JSON.stringify(data.user));
                     this.hidePopup('customer-registration-popup');
                     this.showSuccess('Pendaftaran Berhasil', data.message || 'Selamat! Akun Anda telah berhasil dibuat.');
-                    // WAJIB: reload/redirect agar Blade re-render dengan @@auth & session sinkron
+                    // Reload/redirect agar Blade re-render dengan auth & session sinkron
                     if (data.redirect) {
                         window.location.href = data.redirect;
                     } else {
@@ -2573,37 +2623,6 @@
                 if (guestButtons) guestButtons.classList.remove('hidden');
                 if (userButtons) userButtons.classList.add('hidden');
             }
-        },
-        
-        async checkSession() {
-            try {
-                const response = await fetch('{{ url("/session") }}', {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' },
-                    credentials: 'same-origin'
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.authenticated && data.user) {
-                        this.currentUser = data.user;
-                        localStorage.setItem('glorious_user', JSON.stringify(data.user));
-                        this.updateUserState();
-                    } else {
-                        localStorage.removeItem('glorious_user');
-                        this.currentUser = null;
-                        this.updateUserState();
-                    }
-                } else {
-                    localStorage.removeItem('glorious_user');
-                    this.currentUser = null;
-                    this.updateUserState();
-                }
-            } catch (error) {
-                console.error('Session check error:', error);
-                localStorage.removeItem('glorious_user');
-                this.currentUser = null;
-                this.updateUserState();
-            }
         }
     };
 
@@ -2644,7 +2663,7 @@
         .catch(() => { if (typeof PopupManager !== 'undefined') PopupManager.showToast('Gagal menambah ke keranjang', 'error'); });
     };
 
-    // Product card: toggle wishlist (customer only) - selaras dengan navbar & halaman wishlist
+    // Product card: toggle wishlist (customer only)
     window.toggleWishlistFromCard = function(productId) {
         const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         fetch(`{{ url('wishlist/toggle') }}/${productId}`, {
@@ -2690,5 +2709,7 @@
 </script>
 
     @stack('scripts')
+
+  @include('components.product-quick-view')  
 </body>
 </html>
