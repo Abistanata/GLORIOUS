@@ -95,14 +95,27 @@
                         {{ $product->name }}
                     </h1>
 
-                    {{-- Rating (placeholder — tidak diubah) --}}
+                    {{-- Rating --}}
                     <div class="flex items-center gap-3">
                         <div class="flex gap-0.5">
+                            @php
+                                $avgRating = $product->average_rating ?? 0;
+                                $fullStars = floor($avgRating);
+                                $hasHalfStar = ($avgRating - $fullStars) >= 0.5;
+                            @endphp
                             @for($i = 1; $i <= 5; $i++)
-                                <i class="fas fa-star text-sm {{ $i <= 4 ? 'text-yellow-400' : 'text-gray-600' }}"></i>
+                                @if($i <= $fullStars)
+                                    <i class="fas fa-star text-sm text-yellow-400"></i>
+                                @elseif($i == $fullStars + 1 && $hasHalfStar)
+                                    <i class="fas fa-star-half-alt text-sm text-yellow-400"></i>
+                                @else
+                                    <i class="far fa-star text-sm text-gray-600"></i>
+                                @endif
                             @endfor
                         </div>
-                        <span class="text-gray-400 text-sm">(4.5 • 28 ulasan)</span>
+                        <span class="text-gray-400 text-sm">
+                            ({{ number_format($avgRating, 1) }} • {{ $product->review_count ?? 0 }} ulasan)
+                        </span>
                     </div>
 
                     {{-- Price — LOGIC TIDAK DIUBAH --}}
@@ -316,6 +329,143 @@
                         </h2>
                         <p class="text-gray-300 leading-relaxed">{{ $product->description }}</p>
                     </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        {{-- ── REVIEWS SECTION ──────────────────────────────────────── --}}
+        <div class="bg-gray-900/60 rounded-2xl border border-gray-700/80 mb-10 overflow-hidden ring-1 ring-white/5 shadow-xl shadow-black/30">
+            <div class="px-6 md:px-8 py-8">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-star text-primary"></i>
+                    Ulasan & Rating
+                </h2>
+
+                {{-- Review Form (untuk customer yang sudah login) --}}
+                @auth
+                    @php
+                        $userRole = \Illuminate\Support\Str::lower(auth()->user()->role ?? '');
+                    @endphp
+                    @if($userRole === 'customer')
+                        <div class="mb-8 p-6 bg-gray-800/50 rounded-xl border border-gray-700/60">
+                            <h3 class="text-lg font-semibold text-white mb-4">Tulis Ulasan Anda</h3>
+                            <form id="reviewForm" class="space-y-4" enctype="multipart/form-data">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                
+                                {{-- Star Rating Input --}}
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Rating</label>
+                                    <div class="flex items-center gap-2" id="starRating">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <button type="button" 
+                                                    class="star-btn text-2xl text-gray-600 hover:text-yellow-400 transition-colors"
+                                                    data-rating="{{ $i }}">
+                                                <i class="far fa-star"></i>
+                                            </button>
+                                        @endfor
+                                    </div>
+                                    <input type="hidden" name="rating" id="ratingInput" value="0" required>
+                                    <p class="text-xs text-gray-500 mt-1" id="ratingText">Pilih rating</p>
+                                </div>
+
+                                {{-- Comment Input --}}
+                                <div>
+                                    <label for="comment" class="block text-sm font-medium text-gray-300 mb-2">Komentar</label>
+                                    <textarea name="comment" 
+                                            id="comment" 
+                                            rows="4" 
+                                            class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            placeholder="Bagikan pengalaman Anda dengan produk ini..."></textarea>
+                                </div>
+
+                                {{-- Image Upload --}}
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Gambar (opsional)</label>
+                                    <input type="file" 
+                                           name="images[]" 
+                                           id="reviewImages" 
+                                           accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                           multiple
+                                           class="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-xl text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary/20 file:text-primary file:font-semibold focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <p class="text-xs text-gray-500 mt-1">Maks. 5 gambar, per file maks. 2MB (JPG, PNG, GIF, WebP)</p>
+                                    <div id="reviewImagePreview" class="flex flex-wrap gap-2 mt-2"></div>
+                                </div>
+
+                                <button type="submit" 
+                                        class="w-full bg-primary hover:bg-primary-dark text-white py-3 px-6 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Kirim Ulasan
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+                @endauth
+
+                {{-- Reviews List --}}
+                <div id="reviewsContainer" class="space-y-6">
+                    @if($product->reviews && $product->reviews->count() > 0)
+                        @foreach($product->reviews as $review)
+                            <div class="p-6 bg-gray-800/50 rounded-xl border border-gray-700/60">
+                                <div class="flex items-start gap-4">
+                                    {{-- User Avatar --}}
+                                    <div class="flex-shrink-0">
+                                        @if($review->user && $review->user->profile_photo_path)
+                                            <img src="{{ asset('storage/' . $review->user->profile_photo_path) }}" 
+                                                 alt="{{ $review->user->name }}"
+                                                 class="w-12 h-12 rounded-full object-cover border-2 border-gray-700">
+                                        @else
+                                            <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center border-2 border-gray-700">
+                                                <i class="fas fa-user text-primary text-lg"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    {{-- Review Content --}}
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <div>
+                                                <h4 class="text-white font-semibold">
+                                                    {{ $review->user ? $review->user->name : 'Anonim' }}
+                                                </h4>
+                                                <p class="text-xs text-gray-500">
+                                                    {{ $review->created_at->format('d M Y, H:i') }}
+                                                </p>
+                                            </div>
+                                            <div class="flex gap-0.5">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <i class="fas fa-star text-sm {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-600' }}"></i>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        
+                                        @if($review->comment)
+                                            <p class="text-gray-300 leading-relaxed mt-2">{{ $review->comment }}</p>
+                                        @endif
+                                        @if($review->images && count($review->images) > 0)
+                                            <div class="flex flex-wrap gap-2 mt-3">
+                                                @foreach($review->images as $imgPath)
+                                                    @php
+                                                        $imgUrl = asset('storage/' . $imgPath);
+                                                    @endphp
+                                                    <img src="{{ $imgUrl }}" 
+                                                         alt="Ulasan" 
+                                                         class="w-20 h-20 object-cover rounded-lg border border-gray-600 cursor-pointer hover:opacity-90 transition-opacity"
+                                                         onclick="openImageModal('{{ $imgUrl }}')">
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="text-center py-12 text-gray-500">
+                            <i class="fas fa-star text-4xl mb-4 opacity-30"></i>
+                            <p class="text-lg font-medium">Belum ada ulasan</p>
+                            <p class="text-sm mt-2">Jadilah yang pertama memberikan ulasan untuk produk ini!</p>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -671,6 +821,254 @@
     document.addEventListener('click', function(e) {
         const modal = document.getElementById('imageModal');
         if (e.target === modal) closeImageModal();
+    });
+
+    // Star Rating Handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const starBtns = document.querySelectorAll('.star-btn');
+        const ratingInput = document.getElementById('ratingInput');
+        const ratingText = document.getElementById('ratingText');
+        let selectedRating = 0;
+
+        starBtns.forEach((btn, index) => {
+            btn.addEventListener('click', function() {
+                selectedRating = index + 1;
+                ratingInput.value = selectedRating;
+                
+                // Update star display
+                starBtns.forEach((star, i) => {
+                    const icon = star.querySelector('i');
+                    if (i < selectedRating) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        star.classList.remove('text-gray-600');
+                        star.classList.add('text-yellow-400');
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        star.classList.remove('text-yellow-400');
+                        star.classList.add('text-gray-600');
+                    }
+                });
+
+                // Update rating text
+                const ratingLabels = ['Pilih rating', 'Sangat Buruk', 'Buruk', 'Biasa', 'Bagus', 'Sangat Bagus'];
+                ratingText.textContent = ratingLabels[selectedRating];
+            });
+
+            btn.addEventListener('mouseenter', function() {
+                const hoverRating = index + 1;
+                starBtns.forEach((star, i) => {
+                    const icon = star.querySelector('i');
+                    if (i < hoverRating && !selectedRating) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        star.classList.add('text-yellow-400');
+                    }
+                });
+            });
+        });
+
+        document.getElementById('starRating').addEventListener('mouseleave', function() {
+            if (!selectedRating) {
+                starBtns.forEach((star) => {
+                    const icon = star.querySelector('i');
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    star.classList.remove('text-yellow-400');
+                    star.classList.add('text-gray-600');
+                });
+            }
+        });
+
+        // Review Image Preview
+        const reviewImagesInput = document.getElementById('reviewImages');
+        const reviewImagePreview = document.getElementById('reviewImagePreview');
+        if (reviewImagesInput && reviewImagePreview) {
+            reviewImagesInput.addEventListener('change', function() {
+                const files = this.files;
+                if (files.length > 5) {
+                    showNotification('Maksimal 5 gambar yang dapat diunggah', 'warning');
+                    this.value = '';
+                    reviewImagePreview.innerHTML = '';
+                    return;
+                }
+                reviewImagePreview.innerHTML = '';
+                const maxPreview = 5;
+                for (let i = 0; i < Math.min(files.length, maxPreview); i++) {
+                    const file = files[i];
+                    if (!file.type.startsWith('image/')) continue;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'w-16 h-16 object-cover rounded-lg border border-gray-600';
+                        reviewImagePreview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Review Form Submission
+        const reviewForm = document.getElementById('reviewForm');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!ratingInput.value || ratingInput.value === '0') {
+                    showNotification('Silakan pilih rating terlebih dahulu', 'error');
+                    return;
+                }
+
+                const formData = new FormData(reviewForm);
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                
+                fetch('{{ route("main.reviews.store") }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': token || '',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        reviewForm.reset();
+                        document.getElementById('reviewImages').value = '';
+                        document.getElementById('reviewImagePreview').innerHTML = '';
+                        selectedRating = 0;
+                        ratingInput.value = '0';
+                        ratingText.textContent = 'Pilih rating';
+                        
+                        // Reset stars
+                        starBtns.forEach((star) => {
+                            const icon = star.querySelector('i');
+                            icon.classList.remove('fas');
+                            icon.classList.add('far');
+                            star.classList.remove('text-yellow-400');
+                            star.classList.add('text-gray-600');
+                        });
+
+                        // Reload reviews
+                        loadReviews();
+                    } else {
+                        showNotification(data.message || 'Gagal mengirim review', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Terjadi kesalahan saat mengirim review', 'error');
+                });
+            });
+        }
+
+        // Function to load reviews
+        function loadReviews() {
+            fetch('{{ route("main.reviews.index", $product->id) }}', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const container = document.getElementById('reviewsContainer');
+                    if (data.reviews.length === 0) {
+                        container.innerHTML = `
+                            <div class="text-center py-12 text-gray-500">
+                                <i class="fas fa-star text-4xl mb-4 opacity-30"></i>
+                                <p class="text-lg font-medium">Belum ada ulasan</p>
+                                <p class="text-sm mt-2">Jadilah yang pertama memberikan ulasan untuk produk ini!</p>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = data.reviews.map(review => {
+                            const date = new Date(review.created_at);
+                            const formattedDate = date.toLocaleDateString('id-ID', { 
+                                day: 'numeric', 
+                                month: 'short', 
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            
+                            const stars = Array.from({length: 5}, (_, i) => 
+                                i < review.rating 
+                                    ? '<i class="fas fa-star text-sm text-yellow-400"></i>'
+                                    : '<i class="fas fa-star text-sm text-gray-600"></i>'
+                            ).join('');
+
+                            const avatar = review.user && review.user.profile_photo_path
+                                ? `<img src="{{ asset('storage/') }}/${review.user.profile_photo_path}" alt="${review.user.name}" class="w-12 h-12 rounded-full object-cover border-2 border-gray-700">`
+                                : `<div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center border-2 border-gray-700"><i class="fas fa-user text-primary text-lg"></i></div>`;
+
+                            const imagesHtml = review.images && review.images.length > 0
+                                ? `<div class="flex flex-wrap gap-2 mt-3">
+                                    ${review.images.map(img => {
+                                        const url = '{{ asset("storage") }}/' + img;
+                                        return `<img src="${url}" alt="Ulasan" class="w-20 h-20 object-cover rounded-lg border border-gray-600 cursor-pointer hover:opacity-90 transition-opacity" onclick="openImageModal('${url}')">`;
+                                    }).join('')}
+                                   </div>`
+                                : '';
+
+                            return `
+                                <div class="p-6 bg-gray-800/50 rounded-xl border border-gray-700/60">
+                                    <div class="flex items-start gap-4">
+                                        <div class="flex-shrink-0">${avatar}</div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <div>
+                                                    <h4 class="text-white font-semibold">${review.user ? review.user.name : 'Anonim'}</h4>
+                                                    <p class="text-xs text-gray-500">${formattedDate}</p>
+                                                </div>
+                                                <div class="flex gap-0.5">${stars}</div>
+                                            </div>
+                                            ${review.comment ? `<p class="text-gray-300 leading-relaxed mt-2">${review.comment}</p>` : ''}
+                                            ${imagesHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                    
+                    // Update rating display
+                    updateRatingDisplay(data.average_rating, data.review_count);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading reviews:', error);
+            });
+        }
+
+        function updateRatingDisplay(avgRating, reviewCount) {
+            const ratingContainer = document.querySelector('.flex.items-center.gap-3');
+            if (ratingContainer) {
+                const fullStars = Math.floor(avgRating);
+                const hasHalfStar = (avgRating - fullStars) >= 0.5;
+                
+                let starsHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= fullStars) {
+                        starsHTML += '<i class="fas fa-star text-sm text-yellow-400"></i>';
+                    } else if (i === fullStars + 1 && hasHalfStar) {
+                        starsHTML += '<i class="fas fa-star-half-alt text-sm text-yellow-400"></i>';
+                    } else {
+                        starsHTML += '<i class="far fa-star text-sm text-gray-600"></i>';
+                    }
+                }
+                
+                ratingContainer.innerHTML = `
+                    <div class="flex gap-0.5">${starsHTML}</div>
+                    <span class="text-gray-400 text-sm">(${parseFloat(avgRating).toFixed(1)} • ${reviewCount} ulasan)</span>
+                `;
+            }
+        }
     });
 </script>
 

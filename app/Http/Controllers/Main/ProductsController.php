@@ -19,7 +19,7 @@ class ProductsController extends Controller
      */
     public function index(Request $request)
     {
-        $productsQuery = Product::with(['category', 'supplier']);
+        $productsQuery = Product::with(['category', 'supplier', 'reviews']);
 
         // Hitung stok saat ini menggunakan subquery - sama dengan AdminDashboardController
         $productsQuery->addSelect([
@@ -133,7 +133,7 @@ class ProductsController extends Controller
      */
     public function show($id)
     {
-        $product = Product::with(['category', 'supplier'])
+        $product = Product::with(['category', 'supplier', 'reviews.user:id,name,profile_photo_path'])
             ->findOrFail($id);
 
         // Hitung stok saat ini dari StockTransaction - cara yang sama dengan index

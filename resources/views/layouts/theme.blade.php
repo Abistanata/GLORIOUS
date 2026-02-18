@@ -652,7 +652,7 @@
                     </a>
 
                     <!-- Tentang -->
-                    <a href="{{ url('/') }}#about" 
+                    <a href="#tentang"
                        class="group relative px-4 py-2 rounded-lg transition-all duration-200 hover:bg-dark-700/50">
                         <div class="flex items-center gap-2">
                             <i class="fas fa-info-circle text-sm text-primary-400 opacity-80 group-hover:opacity-100 transition-opacity"></i>
@@ -1669,7 +1669,7 @@
                     <ul class="space-y-3 text-sm text-gray-400">
                         <li class="flex items-start gap-2">
                             <i class="fas fa-map-marker-alt text-primary mt-1"></i>
-                            <span>Purwokerto, Central Java, ID</span>
+                            <span>No 4 (Depan BRI, Jl. Argandaru, Dusun 5, Bukateja, Kec. Bukateja, Kabupaten Purbalingga, Jawa Tengah 53382</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <i class="fas fa-phone text-primary"></i>
@@ -1677,7 +1677,7 @@
                         </li>
                         <li class="flex items-center gap-2">
                             <i class="fas fa-envelope text-primary"></i>
-                            <a href="mailto:info@glorious.com" class="hover:text-primary transition-colors">info@glorious.com</a>
+                            <a href="mailto:info@glorious.com" class="hover:text-primary transition-colors">glorious0326@gmail.com</a>
                         </li>
                     </ul>
                 </div>

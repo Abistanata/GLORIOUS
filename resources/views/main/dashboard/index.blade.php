@@ -30,7 +30,7 @@
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
                     </span>
-                    <span class="text-sm font-medium text-primary-300">Service &amp; Jual Beli Komputer Terpercaya</span>
+                    <span class="text-sm font-medium text-primary-300">Service &amp; Jual Komputer Terpercaya</span>
                 </div>
 
                 <div class="space-y-4">
@@ -43,8 +43,8 @@
                         </span>
                     </h1>
                     <p class="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-2xl">
-                        Service PC, laptop &amp; printer profesional. Jual beli laptop dan PC bekas berkualitas tinggi
-                        dengan harga terbaik dan garansi terpercaya di Purwokerto.
+                        Service PC, laptop &amp; printer profesional. Jual laptop dan PC bekas berkualitas tinggi
+                        dengan harga terbaik dan garansi terpercaya di Purbalingga.
                     </p>
                 </div>
 
@@ -118,7 +118,7 @@
                                 </div>
                                 <div>
                                     <p class="text-white font-bold text-sm">Glorious Computer</p>
-                                    <p class="text-gray-500 text-xs">Purwokerto, Jawa Tengah</p>
+                                    <p class="text-gray-500 text-xs">Bukateja, Purbalingga, Jawa Tengah</p>
                                 </div>
                                 <div class="ml-auto flex items-center gap-1">
                                     <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
@@ -133,9 +133,9 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-white font-semibold text-sm">Service PC &amp; Laptop</p>
-                                    <p class="text-gray-500 text-xs truncate">Diagnosa, ganti part, install ulang OS</p>
+                                    <p class="text-gray-500 text-xs truncate">Diagnosa, ganti part, install ulang Windows,Linux DLL</p>
                                 </div>
-                                <i class="fas fa-chevron-right text-gray-600 text-xs"></i>
+                               
                             </div>
 
                             {{-- Service Printer --}}
@@ -147,7 +147,7 @@
                                     <p class="text-white font-semibold text-sm">Service Printer</p>
                                     <p class="text-gray-500 text-xs truncate">Servis &amp; isi ulang tinta / toner</p>
                                 </div>
-                                <i class="fas fa-chevron-right text-gray-600 text-xs"></i>
+                                
                             </div>
 
                             {{-- Jual Beli --}}
@@ -156,10 +156,10 @@
                                     <i class="fas fa-exchange-alt text-green-400 text-xl"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-white font-semibold text-sm">Jual Beli Laptop &amp; PC Bekas</p>
+                                    <p class="text-white font-semibold text-sm">Jual Laptop &amp; PC Bekas</p>
                                     <p class="text-gray-500 text-xs truncate">Berkualitas, bergaransi, harga fair</p>
                                 </div>
-                                <i class="fas fa-chevron-right text-gray-600 text-xs"></i>
+                              
                             </div>
 
                             {{-- Hardware --}}
@@ -171,7 +171,7 @@
                                     <p class="text-white font-semibold text-sm">Jual Hardware &amp; Aksesoris</p>
                                     <p class="text-gray-500 text-xs truncate">RAM, SSD, keyboard, mouse, dll</p>
                                 </div>
-                                <i class="fas fa-chevron-right text-gray-600 text-xs"></i>
+                               
                             </div>
                         </div>
                     </div>
@@ -183,7 +183,7 @@
                                     <i class="fas fa-star text-yellow-400 text-xs"></i>
                                 </div>
                                 <div>
-                                    <p class="text-white text-xs font-bold">5 Tahun</p>
+                                    <p class="text-white text-xs font-bold">20 Tahun</p>
                                     <p class="text-gray-500 text-xs">Berpengalaman</p>
                                 </div>
                             </div>
@@ -334,7 +334,7 @@
             </span>
             <h2 class="text-4xl lg:text-5xl font-bold text-white mb-4">Apa yang Kami Kerjakan</h2>
             <p class="text-lg text-gray-400 max-w-2xl mx-auto">
-                Spesialis service perangkat komputer dan jual beli laptop serta PC bekas berkualitas tinggi
+                Spesialis service perangkat komputer dan jual laptop serta PC bekas berkualitas tinggi
             </p>
         </div>
 
@@ -372,7 +372,7 @@
                 <div class="w-16 h-16 rounded-xl bg-green-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <i class="fas fa-exchange-alt text-3xl text-green-400"></i>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-3">Jual Beli Laptop &amp; PC Bekas</h3>
+                <h3 class="text-xl font-bold text-white mb-3">Jual  Laptop &amp; PC Bekas</h3>
                 <p class="text-gray-400 mb-5 leading-relaxed text-sm">
                     Laptop dan PC bekas berkualitas yang sudah dicek menyeluruh dan bergaransi toko. Kami juga menerima pembelian unit bekas Anda.
                 </p>
@@ -414,7 +414,7 @@
 
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             @php
-                $featuredProducts = \App\Models\Product::with('category')
+                $featuredProducts = \App\Models\Product::with(['category', 'reviews'])
                     ->where('is_active', true)
                     ->where('current_stock', '>', 0)
                     ->orderBy('created_at', 'desc')
@@ -452,6 +452,42 @@
                         <span class="text-xs text-primary-400 font-medium">{{ $product->category->name ?? 'Uncategorized' }}</span>
                     </div>
                     <h3 class="text-lg font-bold text-white mb-2 line-clamp-2">{{ $product->name }}</h3>
+                    
+                    {{-- Rating Display --}}
+                    @php
+                        $avgRating = $product->average_rating ?? 0;
+                        $reviewCount = $product->review_count ?? 0;
+                        $fullStars = floor($avgRating);
+                        $hasHalfStar = ($avgRating - $fullStars) >= 0.5;
+                    @endphp
+                    @if($reviewCount > 0)
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="flex gap-0.5">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $fullStars)
+                                        <i class="fas fa-star text-xs text-yellow-400"></i>
+                                    @elseif($i == $fullStars + 1 && $hasHalfStar)
+                                        <i class="fas fa-star-half-alt text-xs text-yellow-400"></i>
+                                    @else
+                                        <i class="far fa-star text-xs text-gray-600"></i>
+                                    @endif
+                                @endfor
+                            </div>
+                            <span class="text-xs text-gray-400">
+                                ({{ number_format($avgRating, 1) }} • {{ $reviewCount }} {{ $reviewCount == 1 ? 'review' : 'reviews' }})
+                            </span>
+                        </div>
+                    @else
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="flex gap-0.5">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="far fa-star text-xs text-gray-600"></i>
+                                @endfor
+                            </div>
+                            <span class="text-xs text-gray-500">Belum ada review</span>
+                        </div>
+                    @endif
+                    
                     <div class="mb-4">
                         @if($product->has_discount)
                             <div class="flex items-baseline gap-2">
@@ -500,7 +536,7 @@
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-600">Glorious Computer?</span>
                     </h2>
                     <p class="text-gray-400 leading-relaxed text-lg">
-                        Kami adalah toko komputer yang berdiri sejak 2019 di Purwokerto, Jawa Tengah. Spesialisasi kami adalah service PC, laptop, dan printer serta jual beli laptop dan PC bekas berkualitas tinggi.
+                        Kami adalah toko komputer yang berdiri sejak 2003 di Bukateja, Purbalingga, Jawa Tengah. Spesialisasi kami adalah service PC, laptop, dan printer serta jual beli laptop dan PC bekas berkualitas tinggi.
                     </p>
                     <p class="text-gray-400 leading-relaxed mt-4">
                         Setiap unit bekas yang kami jual telah melalui pengecekan menyeluruh oleh teknisi berpengalaman, sehingga Anda mendapatkan perangkat andal dengan harga yang sepadan.
@@ -514,7 +550,7 @@
                         </div>
                         <div>
                             <h4 class="text-white font-semibold mb-1">Teknisi Berpengalaman</h4>
-                            <p class="text-gray-500 text-sm">Lebih dari 5 tahun menangani berbagai kerusakan PC, laptop, dan printer.</p>
+                            <p class="text-gray-500 text-sm">Lebih dari 20 tahun menangani berbagai kerusakan PC, laptop, dan printer.</p>
                         </div>
                     </div>
                     <div class="flex items-start gap-4">
@@ -574,17 +610,99 @@
                     </div>
                     <div>
                         <p class="text-white font-semibold">Lokasi Kami</p>
-                        <p class="text-gray-400 text-sm">Purwokerto, Kabupaten Banyumas, Jawa Tengah</p>
+                        <p class="text-gray-400 text-sm">No 4 (Depan BRI, Jl. Argandaru, Dusun 5, Bukateja, Kec. Bukateja, Kabupaten Purbalingga, Jawa Tengah 53382</p>
                     </div>
-                    <a href="https://wa.me/6282133803940" target="_blank"
-                       class="ml-auto flex-shrink-0 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-sm font-medium hover:bg-green-500/20 transition-colors">
-                        <i class="fab fa-whatsapp mr-1"></i> Tanya Rute
+                    <a href="https://maps.app.goo.gl/ScH5X7Do9pVwroRV8" target="_blank"
+  class="ml-auto flex-shrink-0 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400 text-sm font-medium hover:bg-green-500/20 transition-colors">
+  <i class="fas fa-map-marker-alt mr-1"></i> Buka Maps
+</a>
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+{{-- REVIEWS SECTION --}}
+@if(isset($reviews) && $reviews->count() > 0)
+<section class="py-24 bg-dark-800" id="reviews">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <span class="inline-block px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-300 text-sm font-medium mb-4">
+                Testimoni Customer
+            </span>
+            <h2 class="text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
+                Apa Kata
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-600">Customer Kami?</span>
+            </h2>
+            <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                Ulasan jujur dari customer yang sudah menggunakan layanan dan produk kami
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($reviews as $review)
+                <div class="bg-gray-900/60 rounded-2xl border border-gray-700/80 p-6 hover:border-primary-500/50 transition-all duration-300">
+                    <div class="flex items-start gap-4 mb-4">
+                        {{-- User Avatar --}}
+                        <div class="flex-shrink-0">
+                            @if($review->user && $review->user->profile_photo_path)
+                                <img src="{{ asset('storage/' . $review->user->profile_photo_path) }}" 
+                                     alt="{{ $review->user->name }}"
+                                     class="w-12 h-12 rounded-full object-cover border-2 border-primary-500/30">
+                            @else
+                                <div class="w-12 h-12 rounded-full bg-primary-500/20 flex items-center justify-center border-2 border-primary-500/30">
+                                    <i class="fas fa-user text-primary-400 text-lg"></i>
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- User Info & Rating --}}
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-1">
+                                <h4 class="text-white font-semibold">
+                                    {{ $review->user ? $review->user->name : 'Anonim' }}
+                                </h4>
+                                <div class="flex gap-0.5">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star text-xs {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-600' }}"></i>
+                                    @endfor
+                                </div>
+                            </div>
+                            @if($review->product)
+                                <p class="text-xs text-gray-500 mb-2">
+                                    <i class="fas fa-box text-primary-400"></i> {{ $review->product->name }}
+                                </p>
+                            @endif
+                            <p class="text-xs text-gray-500">
+                                {{ $review->created_at->format('d M Y') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Review Comment --}}
+                    @if($review->comment)
+                        <p class="text-gray-300 leading-relaxed text-sm line-clamp-3">
+                            "{{ Str::limit($review->comment, 150) }}"
+                        </p>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+
+        {{-- View All Reviews Link --}}
+        @if($reviews->count() > 0)
+        <div class="text-center mt-10">
+            <a href="{{ route('main.products.index') }}"
+               class="inline-flex items-center gap-2 px-6 py-3 bg-primary-500/10 hover:bg-primary-500/20 border border-primary-500/30 text-primary-300 rounded-xl font-semibold transition-all duration-300">
+                Lihat Semua Review
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        @endif
+    </div>
+</section>
+@endif
 
 {{-- CTA BANNER --}}
 <section class="py-20 bg-gradient-to-r from-primary-600 via-primary-500 to-primary-600 relative overflow-hidden">
@@ -670,7 +788,7 @@
                         </div>
                         <div>
                             <h4 class="font-semibold text-white mb-1">Alamat Toko</h4>
-                            <p class="text-gray-400 text-sm">Purwokerto, Kabupaten Banyumas, Jawa Tengah</p>
+                            <p class="text-gray-400 text-sm">No 4 (Depan BRI, Jl. Argandaru, Dusun 5, Bukateja, Kec. Bukateja, Kabupaten Purbalingga, Jawa Tengah 53382</p>
                         </div>
                     </div>
                 </div>
@@ -693,7 +811,7 @@
                         </div>
                         <div>
                             <h4 class="font-semibold text-white mb-1">Email</h4>
-                            <a href="mailto:info@gloriouscomputer.com" class="text-blue-400 hover:text-blue-300 text-sm transition-colors">info@gloriouscomputer.com</a>
+                            <a href="mailto:glorious0326@gmail.com" class="text-blue-400 hover:text-blue-300 text-sm transition-colors">glorious0326@gmail.com</a>
                         </div>
                     </div>
                 </div>

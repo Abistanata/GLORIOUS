@@ -23,6 +23,11 @@
             $imageUrl = $imagePath;
         }
     }
+    // Rating data
+    $avgRating = $product->average_rating ?? 0;
+    $reviewCount = $product->review_count ?? 0;
+    $fullStars = floor($avgRating);
+    $hasHalfStar = ($avgRating - $fullStars) >= 0.5;
 @endphp
 
 <div class="group bg-gray-800/50 border border-gray-700 rounded-xl overflow-hidden transition-all hover:border-primary/30 hover:shadow-lg h-full flex flex-col" data-product-id="{{ $product->id }}">
@@ -55,6 +60,35 @@
         <h3 class="text-base font-semibold text-white mt-1 mb-2 line-clamp-2">
             <a href="{{ route('main.products.show', $product->id) }}" class="hover:text-primary transition-colors">{{ $product->name }}</a>
         </h3>
+
+        {{-- Rating Display --}}
+        @if($reviewCount > 0)
+            <div class="flex items-center gap-2 mb-2">
+                <div class="flex gap-0.5">
+                    @for($i = 1; $i <= 5; $i++)
+                        @if($i <= $fullStars)
+                            <i class="fas fa-star text-xs text-yellow-400"></i>
+                        @elseif($i == $fullStars + 1 && $hasHalfStar)
+                            <i class="fas fa-star-half-alt text-xs text-yellow-400"></i>
+                        @else
+                            <i class="far fa-star text-xs text-gray-600"></i>
+                        @endif
+                    @endfor
+                </div>
+                <span class="text-xs text-gray-400">
+                    ({{ number_format($avgRating, 1) }} • {{ $reviewCount }} {{ $reviewCount == 1 ? 'review' : 'reviews' }})
+                </span>
+            </div>
+        @else
+            <div class="flex items-center gap-2 mb-2">
+                <div class="flex gap-0.5">
+                    @for($i = 1; $i <= 5; $i++)
+                        <i class="far fa-star text-xs text-gray-600"></i>
+                    @endfor
+                </div>
+                <span class="text-xs text-gray-500">Belum ada review</span>
+            </div>
+        @endif
 
         <div class="text-gray-400 text-sm line-clamp-2 mb-3">
             @if(!empty($product->specification))

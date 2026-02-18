@@ -48,6 +48,8 @@ class Product extends Model
         'final_price', // baru
         'profit_margin', // baru
         'stock_percentage', // baru
+        'average_rating', // review
+        'review_count', // review
     ];
 
     protected $casts = [
@@ -82,6 +84,11 @@ class Product extends Model
     public function stockTransactions()
     {
         return $this->hasMany(StockTransaction::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 
     // Accessors
@@ -358,5 +365,21 @@ class Product extends Model
     {
         $amount = $this->getMarginAmount();
         return 'Rp' . number_format($amount, 0, ',', '.');
+    }
+
+    protected function averageRating(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                return round($this->reviews()->avg('rating') ?? 0, 1);
+            }
+        );
+    }
+
+    protected function reviewCount(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->reviews()->count()
+        );
     }
 }

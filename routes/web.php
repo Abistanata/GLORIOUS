@@ -40,6 +40,10 @@ Route::get('/products/category/{category_id}', [ProductsController::class, 'inde
 Route::get('/products/{id}', [ProductsController::class, 'show'])->name('main.products.show');
 Route::post('/consultation', [\App\Http\Controllers\Main\ConsultationController::class, 'submit'])->name('main.consultation.submit');
 
+// Reviews routes
+Route::get('/products/{productId}/reviews', [\App\Http\Controllers\Main\ReviewController::class, 'index'])->name('main.reviews.index');
+Route::post('/reviews', [\App\Http\Controllers\Main\ReviewController::class, 'store'])->name('main.reviews.store')->middleware('auth');
+
 // ===================================
 // WISHLIST ROUTES (index public; add/remove butuh auth + Customer)
 // ===================================
@@ -131,6 +135,13 @@ Route::middleware(['auth', 'role:Admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/orders', [AdminDashboardController::class, 'ordersIndex'])->name('orders.index');
         Route::get('/orders/{order}', [AdminDashboardController::class, 'orderShow'])->name('orders.show');
         Route::put('/orders/{order}/status', [AdminDashboardController::class, 'orderUpdateStatus'])->name('orders.update-status');
+
+        // Reviews Management
+        Route::get('/reviews', [\App\Http\Controllers\AdminReviewController::class, 'index'])->name('reviews.index');
+        Route::get('/reviews/{review}/edit', [\App\Http\Controllers\AdminReviewController::class, 'edit'])->name('reviews.edit');
+        Route::put('/reviews/{review}', [\App\Http\Controllers\AdminReviewController::class, 'update'])->name('reviews.update');
+        Route::delete('/reviews/{review}', [\App\Http\Controllers\AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+        Route::post('/reviews/bulk-action', [\App\Http\Controllers\AdminReviewController::class, 'bulkAction'])->name('reviews.bulk-action');
 
         // Products Management (alternative routes)
         Route::get('/products', [AdminDashboardController::class, 'productList'])->name('products.index');

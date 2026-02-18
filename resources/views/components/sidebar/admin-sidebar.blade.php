@@ -32,6 +32,10 @@
         Pesanan
     </x-sidebar.link>
 
+    <x-sidebar.link :href="route('admin.reviews.index')" :active="request()->routeIs('admin.reviews.*')" icon="fas fa-star">
+        Review Customer
+    </x-sidebar.link>
+
     <x-sidebar.dropdown :active="request()->routeIs('admin.reports.*')" icon="fas fa-chart-pie">
         <x-slot name="trigger">Laporan</x-slot>
         <x-sidebar.sublink :href="route('admin.reports.stock')" :active="request()->routeIs('admin.reports.stock')">Laporan Stok</x-sidebar.sublink>
