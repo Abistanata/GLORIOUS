@@ -612,29 +612,20 @@
          "
          :class="scrolled ? 'bg-dark-900/95 backdrop-blur-lg border-b border-gray-800 shadow-xl py-3' : 'bg-dark-900/85 backdrop-blur-md border-b border-gray-800/50 py-4'">
         
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between">
                 
                 <!-- LOGO -->
                 <div class="flex-shrink-0 logo-container transition-all duration-300">
-                    <a href="{{ url('/') }}" class="flex items-center gap-3 group">
+                    <a href="{{ url('/') }}" class="flex items-center group">
                         <div class="relative">
-                            <div class="bg-gradient-to-br from-primary-600 to-primary-500 rounded-xl flex items-center justify-center group-hover:scale-105 transition-all duration-300 shadow-lg"
-                                 :class="scrolled ? 'w-10 h-10' : 'w-12 h-12'">
-                                <span class="text-white font-bold" :class="scrolled ? 'text-base' : 'text-lg'">GC</span>
+                            <div class="rounded-xl flex items-center justify-center overflow-hidden group-hover:scale-105 transition-all duration-300 shadow-glow-lg"
+                                 :class="scrolled ? 'w-28 h-10' : 'w-32 h-12'">
+                                <img src="{{ asset('images/LogoDashboard.png') }}"
+                                     alt="Glorious Computer Logo"
+                                     class="w-full h-full object-contain">
                             </div>
-                            <div class="absolute -inset-1 bg-gradient-to-br from-primary-600 to-primary-500 rounded-xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
-                        </div>
-                        
-                        <div class="flex flex-col">
-                            <span class="text-white font-bold tracking-tight leading-none"
-                                  :class="scrolled ? 'text-lg' : 'text-xl'">
-                                GLORIOUS
-                            </span>
-                            <span class="text-primary-400 font-semibold tracking-wider"
-                                  :class="scrolled ? 'text-[10px]' : 'text-xs'">
-                                SOLUSI TEKNOLOGI
-                            </span>
+                            <div class="pointer-events-none absolute -inset-2 rounded-2xl bg-gradient-to-br from-primary-500/40 via-primary-400/10 to-transparent blur-xl opacity-60 group-hover:opacity-90 transition-opacity duration-300"></div>
                         </div>
                     </a>
                 </div>
@@ -652,7 +643,7 @@
                     </a>
 
                     <!-- Tentang -->
-                    <a href="#tentang"
+                    <a href="{{ url('/') }}#tentang" 
                        class="group relative px-4 py-2 rounded-lg transition-all duration-200 hover:bg-dark-700/50">
                         <div class="flex items-center gap-2">
                             <i class="fas fa-info-circle text-sm text-primary-400 opacity-80 group-hover:opacity-100 transition-opacity"></i>
@@ -1295,8 +1286,10 @@
             <div class="registration-container">
                 <div class="lg:w-2/5 bg-gradient-to-br from-primary/10 to-primary-dark/10 p-6 lg:p-8">
                     <div class="flex items-center space-x-4 mb-6">
-                        <div class="w-12 h-12 bg-gradient-primary rounded-2xl flex items-center justify-center shadow-glow">
-                            <span class="text-white font-bold">GC</span>
+                        <div class="w-28 h-12 bg-white rounded-2xl flex items-center justify-center shadow-glow border border-primary-500 overflow-hidden">
+                            <img src="{{ asset('images/LogoDashboard.png') }}"
+                                 alt="Glorious Computer Logo"
+                                 class="w-full h-full object-contain">
                         </div>
                         <div>
                             <h2 class="text-lg font-bold text-white font-heading">Glorious Computer</h2>
@@ -1617,8 +1610,10 @@
                 <!-- Column 1: About -->
                 <div>
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
-                            <span class="text-white font-bold">GC</span>
+                        <div class="w-28 h-12 bg-white rounded-xl flex items-center justify-center border border-primary-500 overflow-hidden">
+                            <img src="{{ asset('images/LogoDashboard.png') }}"
+                                 alt="Glorious Computer Logo"
+                                 class="w-full h-full object-contain">
                         </div>
                         <div>
                             <div class="font-bold text-white">GLORIOUS</div>
@@ -1677,7 +1672,7 @@
                         </li>
                         <li class="flex items-center gap-2">
                             <i class="fas fa-envelope text-primary"></i>
-                            <a href="mailto:info@glorious.com" class="hover:text-primary transition-colors">glorious0326@gmail.com</a>
+                            <a href="mailto:glorious0326@gmail.com" class="hover:text-primary transition-colors">glorious0326@gmail.com</a>
                         </li>
                     </ul>
                 </div>
