@@ -9,6 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- Favicon -->
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     
     <!-- Tailwind CSS -->
@@ -131,6 +132,44 @@
             0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 0, 0.3); }
             50% { box-shadow: 0 0 40px rgba(255, 107, 0, 0.6); }
         }
+
+        /* Chatbase bubble animations */
+        @keyframes chatbasePulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+        }
+
+        @keyframes chatbaseBounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes chatbaseGlow {
+            0%, 100% {
+                box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4),
+                            0 0 0 0 rgba(59, 130, 246, 0.7);
+            }
+            50% {
+                box-shadow: 0 4px 25px rgba(59, 130, 246, 0.6),
+                            0 0 0 8px rgba(59, 130, 246, 0);
+            }
+        }
+
+        @keyframes chatbaseShake {
+            0%, 100% { transform: rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: rotate(-5deg); }
+            20%, 40%, 60%, 80% { transform: rotate(5deg); }
+        }
         
         @keyframes shimmer {
             0% { background-position: -200% center; }
@@ -222,6 +261,101 @@
         /* Smooth Transitions */
         .transition-smooth {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Optimized premium glow - lightweight but visible */
+        .brand-logo-glow {
+            display: block;
+            transform: translateZ(0);
+            /* Optimized: hanya 3 layer untuk performa lebih baik + brightness untuk text hitam */
+            filter:
+                drop-shadow(0 0 12px rgba(255, 107, 0, 0.35))
+                drop-shadow(0 0 28px rgba(255, 107, 0, 0.25))
+                drop-shadow(0 0 50px rgba(255, 107, 0, 0.18))
+                brightness(1.1)
+                contrast(1.05);
+            transition: filter 200ms ease, transform 200ms ease;
+        }
+
+        .group:hover .brand-logo-glow,
+        .group:focus-visible .brand-logo-glow {
+            transform: translateZ(0) scale(1.02);
+            filter:
+                drop-shadow(0 0 15px rgba(255, 107, 0, 0.45))
+                drop-shadow(0 0 35px rgba(255, 107, 0, 0.35))
+                drop-shadow(0 0 60px rgba(255, 107, 0, 0.25))
+                brightness(1.15)
+                contrast(1.08);
+        }
+
+        /* ===========================
+           CHATBASE BUBBLE ANIMATIONS
+           =========================== */
+        /* Animate Chatbase bubble button ONLY - not the chat window */
+        #chatbase-bubble,
+        #chatbase-bubble-button,
+        [id*="chatbase-bubble"]:not([id*="widget"]):not([id*="container"]):not([id*="window"]),
+        [class*="chatbase-bubble"]:not([class*="widget"]):not([class*="container"]):not([class*="window"]),
+        button[aria-label*="chat"],
+        button[aria-label*="Chat"] {
+            animation: chatbaseBounce 2s ease-in-out infinite,
+                       chatbaseGlow 2s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effect untuk Chatbase bubble ONLY */
+        #chatbase-bubble:hover,
+        #chatbase-bubble-button:hover,
+        [id*="chatbase-bubble"]:hover:not([id*="widget"]):not([id*="container"]):not([id*="window"]) {
+            animation: chatbasePulse 0.6s ease-in-out infinite,
+                       chatbaseBounce 2s ease-in-out infinite;
+            transform: scale(1.1);
+        }
+
+        /* Disable animations untuk chat window/container yang terbuka */
+        iframe[src*="chatbase.co"],
+        [id*="chatbase-widget"],
+        [id*="chatbase-container"],
+        [id*="chatbase-window"],
+        [class*="chatbase-widget"],
+        [class*="chatbase-container"],
+        [class*="chatbase-window"],
+        div:has(iframe[src*="chatbase.co"]) {
+            animation: none !important;
+            transition: opacity 0.3s ease, transform 0.3s ease !important;
+        }
+
+        /* Pulse effect untuk menarik perhatian - hanya bubble */
+        @media (prefers-reduced-motion: no-preference) {
+            #chatbase-bubble,
+            #chatbase-bubble-button,
+            [id*="chatbase-bubble"]:not([id*="widget"]):not([id*="container"]):not([id*="window"]) {
+                animation: chatbaseBounce 2.5s ease-in-out infinite,
+                           chatbaseGlow 2s ease-in-out infinite;
+            }
+        }
+
+        /* Shake animation saat pertama kali muncul (optional) - hanya bubble */
+        @keyframes chatbaseEntrance {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(-180deg);
+            }
+            60% {
+                transform: scale(1.2) rotate(10deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        /* Apply entrance animation on load - hanya bubble button */
+        #chatbase-bubble,
+        #chatbase-bubble-button {
+            animation: chatbaseEntrance 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                       chatbaseBounce 2.5s ease-in-out 0.8s infinite,
+                       chatbaseGlow 2s ease-in-out 0.8s infinite;
         }
         
         /* ===========================
@@ -560,6 +694,13 @@
         }
         
         /* ===========================
+           ALPINE.JS X-CLOAK
+           =========================== */
+        [x-cloak] {
+            display: none !important;
+        }
+        
+        /* ===========================
            RESPONSIVE UTILITIES
            =========================== */
         @media (prefers-reduced-motion: reduce) {
@@ -581,16 +722,103 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-[10000] space-y-3 max-w-sm"></div>
 
-    <!-- Tombol WhatsApp Floating -->
-    <a href="https://wa.me/6282133803940" 
-       target="_blank"
-       class="fab-button w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center shadow-glow-lg hover:shadow-glow-xl transition-all hover:scale-110 group"
-       title="Chat via WhatsApp">
-        <i class="fab fa-whatsapp text-2xl text-white group-hover:animate-pulse"></i>
-        <div class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
-            <span class="text-xs text-white font-bold">!</span>
-        </div>
-    </a>
+   <script>
+(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="yJu5HxQP_CuxK5NWRvTLA";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
+<script>
+// Ensure Chatbase bubble gets animations after load - ONLY BUBBLE, NOT CHAT WINDOW
+(function() {
+    function isChatWindow(el) {
+        // Check if element is chat window/container, not bubble button
+        const id = (el.id || '').toLowerCase();
+        const className = (el.className || '').toLowerCase();
+        const tagName = (el.tagName || '').toLowerCase();
+        
+        return id.includes('widget') || 
+               id.includes('container') || 
+               id.includes('window') ||
+               className.includes('widget') ||
+               className.includes('container') ||
+               className.includes('window') ||
+               tagName === 'iframe' ||
+               el.querySelector('iframe');
+    }
+    
+    function applyChatbaseAnimations() {
+        const selectors = [
+            '#chatbase-bubble',
+            '#chatbase-bubble-button',
+            '[id*="chatbase-bubble"]',
+            '[class*="chatbase-bubble"]',
+            'button[aria-label*="chat"]',
+            'button[aria-label*="Chat"]'
+        ];
+        
+        selectors.forEach(selector => {
+            try {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(el => {
+                    // Skip chat window/container
+                    if (isChatWindow(el)) {
+                        el.style.animation = 'none';
+                        return;
+                    }
+                    
+                    // Add animation only to bubble button
+                    el.style.animation = 'chatbaseBounce 2.5s ease-in-out infinite, chatbaseGlow 2s ease-in-out infinite';
+                    el.style.transition = 'all 0.3s ease';
+                    el.style.cursor = 'pointer';
+                    
+                    // Add hover effect
+                    el.addEventListener('mouseenter', function() {
+                        if (!isChatWindow(this)) {
+                            this.style.animation = 'chatbasePulse 0.6s ease-in-out infinite, chatbaseBounce 2.5s ease-in-out infinite';
+                            this.style.transform = 'scale(1.1)';
+                        }
+                    });
+                    
+                    el.addEventListener('mouseleave', function() {
+                        if (!isChatWindow(this)) {
+                            this.style.animation = 'chatbaseBounce 2.5s ease-in-out infinite, chatbaseGlow 2s ease-in-out infinite';
+                            this.style.transform = 'scale(1)';
+                        }
+                    });
+                });
+            } catch(e) {}
+        });
+        
+        // Explicitly disable animations on chat windows
+        try {
+            const chatWindows = document.querySelectorAll(
+                'iframe[src*="chatbase.co"], ' +
+                '[id*="chatbase-widget"], ' +
+                '[id*="chatbase-container"], ' +
+                '[id*="chatbase-window"], ' +
+                '[class*="chatbase-widget"], ' +
+                '[class*="chatbase-container"], ' +
+                '[class*="chatbase-window"]'
+            );
+            chatWindows.forEach(el => {
+                el.style.animation = 'none';
+                el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            });
+        } catch(e) {}
+    }
+    
+    // Run after page load
+    window.addEventListener('load', () => {
+        setTimeout(applyChatbaseAnimations, 1000);
+        setTimeout(applyChatbaseAnimations, 2000);
+        setTimeout(applyChatbaseAnimations, 3000);
+    });
+    
+    // Also watch for dynamically added elements
+    const observer = new MutationObserver(() => {
+        applyChatbaseAnimations();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
+</script>
 
     <!-- NAVBAR PREMIUM REDESIGNED -->
     <nav id="main-navbar" 
@@ -619,13 +847,12 @@
                 <div class="flex-shrink-0 logo-container transition-all duration-300">
                     <a href="{{ url('/') }}" class="flex items-center group">
                         <div class="relative">
-                            <div class="rounded-xl flex items-center justify-center overflow-hidden group-hover:scale-105 transition-all duration-300 shadow-glow-lg"
+                            <div class="rounded-xl flex items-center justify-center overflow-visible group-hover:scale-105 transition-all duration-300"
                                  :class="scrolled ? 'w-28 h-10' : 'w-32 h-12'">
-                                <img src="{{ asset('images/LogoDashboard.png') }}"
+                                <img src="{{ asset('images/Logo2.png') }}"
                                      alt="Glorious Computer Logo"
-                                     class="w-full h-full object-contain">
+                                     class="w-full h-full object-contain brand-logo-glow">
                             </div>
-                            <div class="pointer-events-none absolute -inset-2 rounded-2xl bg-gradient-to-br from-primary-500/40 via-primary-400/10 to-transparent blur-xl opacity-60 group-hover:opacity-90 transition-opacity duration-300"></div>
                         </div>
                     </a>
                 </div>
@@ -653,7 +880,7 @@
                     </a>
 
                     <!-- Produk Dropdown -->
-                    <div class="relative" 
+                    <div class="relative z-[60]" 
                          @mouseenter="productDropdownOpen = true"
                          @mouseleave="productDropdownOpen = false">
                         
@@ -667,9 +894,12 @@
                                 <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-500 group-hover:w-2/3 transition-all duration-300 rounded-full"></div>
                             </a>
                             
-                            <button type="button" class="p-2 hover:bg-dark-700/50 rounded-lg transition-colors">
+                            <button type="button" 
+                                    @click="productDropdownOpen = !productDropdownOpen"
+                                    class="p-2 hover:bg-dark-700/50 rounded-lg transition-colors z-[61] relative"
+                                    aria-label="Toggle produk dropdown">
                                 <i class="fas fa-chevron-down text-xs text-gray-400 transition-transform duration-300"
-                                   :class="productDropdownOpen ? 'rotate-180' : ''"></i>
+                                   :class="productDropdownOpen ? 'rotate-180 text-primary-400' : ''"></i>
                             </button>
                         </div>
 
@@ -681,8 +911,9 @@
                              x-transition:leave="transition ease-in duration-150"
                              x-transition:leave-start="opacity-100 scale-100"
                              x-transition:leave-end="opacity-0 scale-95"
-                             class="absolute left-0 mt-2 w-64 bg-dark-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden"
-                             style="display: none;">
+                             class="absolute left-0 mt-2 w-64 bg-dark-800 border border-gray-700 rounded-xl shadow-2xl overflow-hidden z-[60]"
+                             style="display: none;"
+                             x-cloak>
                             
                             <div class="px-4 py-3 border-b border-gray-700 bg-dark-700/30">
                                 <h3 class="text-white font-semibold text-sm flex items-center gap-2">
@@ -1286,10 +1517,12 @@
             <div class="registration-container">
                 <div class="lg:w-2/5 bg-gradient-to-br from-primary/10 to-primary-dark/10 p-6 lg:p-8">
                     <div class="flex items-center space-x-4 mb-6">
-                        <div class="w-28 h-12 bg-white rounded-2xl flex items-center justify-center shadow-glow border border-primary-500 overflow-hidden">
-                            <img src="{{ asset('images/LogoDashboard.png') }}"
-                                 alt="Glorious Computer Logo"
-                                 class="w-full h-full object-contain">
+                        <div class="relative">
+                            <div class="rounded-xl flex items-center justify-center overflow-visible transition-all duration-300 w-32 h-12">
+                                <img src="{{ asset('images/Logo2.png') }}"
+                                     alt="Glorious Computer Logo"
+                                     class="w-full h-full object-contain brand-logo-glow">
+                            </div>
                         </div>
                         <div>
                             <h2 class="text-lg font-bold text-white font-heading">Glorious Computer</h2>
@@ -1610,10 +1843,12 @@
                 <!-- Column 1: About -->
                 <div>
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-28 h-12 bg-white rounded-xl flex items-center justify-center border border-primary-500 overflow-hidden">
-                            <img src="{{ asset('images/LogoDashboard.png') }}"
-                                 alt="Glorious Computer Logo"
-                                 class="w-full h-full object-contain">
+                        <div class="relative">
+                            <div class="rounded-xl flex items-center justify-center overflow-visible transition-all duration-300 w-32 h-12">
+                                <img src="{{ asset('images/Logo2.png') }}"
+                                     alt="Glorious Computer Logo"
+                                     class="w-full h-full object-contain brand-logo-glow">
+                            </div>
                         </div>
                         <div>
                             <div class="font-bold text-white">GLORIOUS</div>
